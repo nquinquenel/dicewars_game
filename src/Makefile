@@ -1,4 +1,4 @@
-CFLAGS=-Wall
+CFLAGS=-Wall -lSDL2
 
 # création de l'exécutable 'Programme'
 all: main.o fenetre.o

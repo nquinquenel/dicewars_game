@@ -4,7 +4,7 @@
 
 int main() {
   printf("Test de fonctionnement. (main.c)\n");
-  test();
+  fenetre();
 
   return 0;
 }
