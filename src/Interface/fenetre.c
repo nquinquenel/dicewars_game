@@ -13,7 +13,7 @@ void fenetre()
     {
         /* Création de la fenêtre */
         SDL_Window* pWindow = NULL;
-        pWindow = SDL_CreateWindow("Ma première application SDL2",SDL_WINDOWPOS_UNDEFINED,
+        pWindow = SDL_CreateWindow("DiceWars",SDL_WINDOWPOS_UNDEFINED,
                                                                   SDL_WINDOWPOS_UNDEFINED,
                                                                   640,
                                                                   480,
