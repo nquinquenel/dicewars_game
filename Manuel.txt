@@ -1,0 +1,12 @@
+saisie du nb de joueurs
+saisie du nombre de joueurs réels
+pour chaque joueur réel, saisie du nom
+Lancer la partie -> générer une map (graphe connexe et planaire)
+Si le joueur veut cette carte, cliquer sur le bouton "Valider", sinon, proposer une autre map.
+Chaque joueur à le même nombre de territoire (à 1 prêt)
+
+Un tour:
+  - pour attaquer, cliquer sur la zone (alliée avec un nb de dés > 1) de départ pour la sélectionner (cliquer à nouveau pour annuler la sélection), puis cliquer sur une zone ennemie adjacente
+  - lancer les dés de chaque zone
+  
+    - si = : attanquant perdant
