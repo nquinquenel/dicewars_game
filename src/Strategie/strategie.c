@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-// Fonction � appeler au d�but de chaque partie
-// La strat�gie doit compl�ter la structure SPlayerInfo
 /********************************************************************************************
 *
 * FUNCTION NAME: InitGame
@@ -76,7 +74,8 @@ void EndGame(unsigned int idWinner)
 *********************************************************************************************/
 SPlayerInfo* CreatePlayer(unsigned int idNewPlayer, char *name, SPlayerInfo *info)
 {
-  return NULL;
+  info -> members[idNewPlayer] = *name; //MAJ du nom du joueur
+  return info;
 }
 
 
