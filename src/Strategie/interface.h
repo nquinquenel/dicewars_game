@@ -14,7 +14,7 @@ typedef struct SCell
 	int owner;	// Id du joueur qui la poss�de
 	int nbDices;	// Nombre de d�s
 
-	SCell **neighbors;	// Tableau de poiteur vers des cellules voisines
+	struct SCell **neighbors;	// Tableau de poiteur vers des cellules voisines
 	int nbNeighbors;	// Nombre de cellules voisines
 } SCell;
 
