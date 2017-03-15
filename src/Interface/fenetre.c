@@ -4,6 +4,7 @@
 
 void fenetre()
 {
+  int running = 1;
   SDL_Window* window = NULL;
   window = SDL_CreateWindow
   (
@@ -24,10 +25,22 @@ void fenetre()
   // Clear winow
   SDL_RenderClear( renderer );
 
-  generer_map(renderer, 800, 600, 4);
+
+  generer_map(renderer, 800, 600, 6);
+
+  SDL_Event e;
+
+  while (running == 1) {
+    while( SDL_PollEvent( &e ) != 0 ){
+      if(e.type == SDL_QUIT){
+        running = 0;
+        printf("Closing the window ...\n");
+      }
+    }
+  }
 
   // Wait for 5 sec
-  SDL_Delay( 5000 );
+//  SDL_Delay( 5000 );
 
   SDL_DestroyWindow(window);
   SDL_Quit();
