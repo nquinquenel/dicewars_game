@@ -1,7 +1,5 @@
 #include "../Librairies/interface.h"
 #include "../Librairies/interfacePerso.h"
-#include <stdlib.h>
-#include <stdio.h>
 
 /********************************************************************************************
 *
@@ -74,13 +72,15 @@ void EndGame(unsigned int idWinner)
 *********************************************************************************************/
 SPlayerInfo* CreatePlayer(unsigned int idNewPlayer, char *name, SPlayerInfo *info)
 {
-  info -> members[idNewPlayer] = *name; //MAJ du nom du joueur
+  //MAJ du nom du joueur
+  snprintf(info -> members[idNewPlayer], sizeof(info -> members[idNewPlayer]), "%s", name); //copie des <arg2> 1ers char de <arg4> dans <arg1>, en rajoutant '\0'
   return info;
 }
 
 
 //LANCEUR
 int main(int argc, char const *argv[]) {
+
   printf("%s\n", "dans main de strategie");
   return 0;
 }
