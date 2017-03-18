@@ -6,7 +6,6 @@
 typedef struct SIa
 {
 	int id;	// Id de l'ia
-	int nbTurns;	// le nombre de tours restants à effectuer
 } SIa;
 
 /********************************************************************************************
@@ -16,7 +15,7 @@ typedef struct SIa
 * DESCRIPTION: création d'un nouveau joueur
 *
 * ARGUMENT    TYPE             DESCRIPTION
-* id          unsigned int     l'id du joueur
+* idNewPlayer unsigned int     l'id du joueur
 * name        *char            le nom du nouveau joueur
 * info        *SPlayerInfo     structure qui contient le nom de la strategie et le nom des joueurs
 *
@@ -33,7 +32,7 @@ SPlayerInfo* CreatePlayer(unsigned int idNewPlayer, char *name, SPlayerInfo *inf
 *
 * ARGUMENT      TYPE             DESCRIPTION
 * map           const *SMap      la carte
-* startingCell  *SCell           la cellule de départ
+* startingCell  *SCell           l'adresse de la cellule de départ
 *
 * RETURNS: la taille de la grappe de cellules
 *
