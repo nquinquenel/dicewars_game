@@ -2,6 +2,13 @@
 #include <stdio.h>
 #include <string.h>
 
+// Structure définissant les caractéristiques de l'ia courante
+typedef struct SIa
+{
+	int id;	// Id de l'ia
+	int nbTurns;	// le nombre de tours restants à effectuer
+} SIa;
+
 /********************************************************************************************
 *
 * FUNCTION NAME: CreatePlayer
@@ -17,3 +24,50 @@
 *
 *********************************************************************************************/
 SPlayerInfo* CreatePlayer(unsigned int idNewPlayer, char *name, SPlayerInfo *info);
+
+/********************************************************************************************
+*
+* FUNCTION NAME: getClusterSize
+*
+* DESCRIPTION: renvoie la taille de la grappe de cellules
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* startingCell  *SCell           la cellule de départ
+*
+* RETURNS: la taille de la grappe de cellules
+*
+*********************************************************************************************/
+int getClusterSize(const SMap *map, SCell *startingCell);
+
+/********************************************************************************************
+*
+* FUNCTION NAME: isIntInArray
+*
+* DESCRIPTION: teste si un entier est dans un tableau d'entiers
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* val           int              la valeur à rechercher
+* arr           *int             le tableau d'entiers
+* size          int              la taille du tableau
+*
+* RETURNS: 1 si val est dans arr, 0 sinon
+*
+*********************************************************************************************/
+int isValueInArray(int val, int *arr, int size);
+
+/********************************************************************************************
+*
+* FUNCTION NAME: isCellInArrayOfCellPointer
+*
+* DESCRIPTION: teste si une adresse de cellule est dans un tableau d'adresses de cellules
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* cell          *SCell           l'adresse de la cellule à rechercher
+* arrCell       **SCell          le tableau d'adresses de cellules
+* size          int              la taille du tableau
+*
+* RETURNS: 1 si cell est dans arrCell, 0 sinon
+*
+*********************************************************************************************/
+int isCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size);
