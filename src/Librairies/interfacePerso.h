@@ -70,3 +70,16 @@ int isValueInArray(int val, int *arr, int size);
 *
 *********************************************************************************************/
 int isCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size);
+
+/********************************************************************************************
+*
+* FUNCTION NAME: updateStack
+*
+* DESCRIPTION: met à jour la pile de dés du joueur suite à l'attaque
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* attackingCell *SCell           l'adresse de la cellule attaquante
+*
+*********************************************************************************************/
+void updateStack(const SMap *map, SCell *attackingCell);

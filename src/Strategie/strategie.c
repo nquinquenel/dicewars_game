@@ -51,7 +51,7 @@ int PlayTurn(const SMap *map, STurn *turn)
   int i;
   for(i = 0; i < nbTerritoires; i ++) //parcours des cellules
   {
-    if (territoires[i].owner == IA.id ) //si le territoire m'appartient
+    if (territoires[i].owner == IA.id ) //si je suis le propriétaire
     {
       turn->cellFrom = territoires[i].id; //définition de la cellule attaquante
       break;
@@ -164,6 +164,26 @@ int getClusterSize(const SMap *map, SCell *startingCell)
   }
   free(cellsToTest);
   return clusterIdsSize;
+}
+
+/********************************************************************************************
+*
+* FUNCTION NAME: updateStack
+*
+* DESCRIPTION: met à jour la pile de dés du joueur suite à l'attaque
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* attackingCell *SCell           l'adresse de la cellule attaquante
+*
+*********************************************************************************************/
+void updateStack(const SMap *map, SCell *attackingCell){
+  int clusterSize = getClusterSize(map, attackingCell);
+
+  if ((map->stack[IA.id]) < clusterSize) //si le nombre de dés a augmenté suite à l'attaque
+  {
+    map->stack[IA.id] = clusterSize;
+  }
 }
 
 /********************************************************************************************
