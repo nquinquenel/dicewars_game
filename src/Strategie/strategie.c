@@ -156,6 +156,13 @@ int getClusterSize(const SMap *map, SCell *startingCell)
     }
     nextCellToTest++;
   }
+
+  //libération allocation mémoire
+  int k;
+  for (k = 0; k < (map->nbCells); k++) {
+    free(cellsToTest[k]);
+  }
+  free(cellsToTest);
   return clusterIdsSize;
 }
 
