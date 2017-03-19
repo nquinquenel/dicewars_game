@@ -97,3 +97,16 @@ void updateStack(const SMap *map, SCell *attackingCell);
 *
 *********************************************************************************************/
 int* MiniSCell(SCell **voisins, int nbVoisins);
+
+/********************************************************************************************
+*
+* FUNCTION NAME: liberationMemoireTab
+*
+* DESCRIPTION: Fonction à appeler pour nettoyer un tableau de int
+*
+* ARGUMENT    TYPE             DESCRIPTION
+* *tab          int     les éléments du tableau
+* taille        int     la taille du tableau
+*
+*********************************************************************************************/
+void liberationMemoireTab(int *tab, int taille)

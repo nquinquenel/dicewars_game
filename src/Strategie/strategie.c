@@ -131,6 +131,27 @@ int* MiniSCell(SCell **voisins, int nbVoisins)
 
 /********************************************************************************************
 *
+* FUNCTION NAME: liberationMemoireTab
+*
+* DESCRIPTION: Fonction à appeler pour nettoyer un tableau de int
+*
+* ARGUMENT    TYPE             DESCRIPTION
+* *tab          int     les éléments du tableau
+* taille        int     la taille du tableau
+*
+*********************************************************************************************/
+void liberationMemoireTab(int *tab, int taille)
+{
+  int i;
+  for(i = 0; i < taille; i++)
+  {
+    //free(tab[i]);
+  }
+  free(tab);
+}
+
+/********************************************************************************************
+*
 * FUNCTION NAME: EndGame
 *
 * DESCRIPTION: fonction à appeler lors de la fin de partie
