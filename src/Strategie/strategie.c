@@ -39,35 +39,57 @@ void InitGame(unsigned int id, unsigned int nbPlayer, SPlayerInfo *info)
 *********************************************************************************************/
 int PlayTurn(const SMap *map, STurn *turn)
 {
-
-  // actuellement:
-  // cellFrom = la premiere cellule alliée trouvée
-  // cellTo = la premiere cellule ennemi voisine de cellFrom trouvée
-
-
   int nbTerritoires = map->nbCells;
   SCell *territoires = map->cells; //tableau de pointeurs de SCell
 
+  // Premiere étape récupération du nombre de territoires nous appartenant
   int i;
-  for(i = 0; i < nbTerritoires; i ++) //parcours des cellules
+  int count = 0;
+  for(i = 0; i < nbTerritoires; i++) //parcours des cellules
   {
-    if (territoires[i].owner == IA.id ) //si je suis le propriétaire
+     if (territoires[i].owner == IA.id ) //si je suis le propriétaire
+     {
+       count++; // On incrémente pour chaque territoire nous appartenant
+     }
+  }
+  SCell *tab = malloc((count)*sizeof(SCell)); // On malloc notre tableau
+  count = 0; // On réinitialise le compteur
+
+  // Deuxieme étape attribution des cellules de notre territoire dans un tableau
+  for(i = 0; i < nbTerritoires; i++) // parcours des cellules
+  {
+    if (territoires[i].owner == IA.id ) // si je suis le propriétaire
     {
-      turn->cellFrom = territoires[i].id; //définition de la cellule attaquante
-      break;
+      tab[count] = territoires[i]; // On ajoute chaque cellule à notre
+      count++; // On incrémente le compteur
     }
   }
-  SCell **voisins = territoires[turn->cellFrom].neighbors; // Tableau de pointeur vers les cellules voisines de turn->cellFrom
-  int nbVoisins = territoires[turn->cellFrom].nbNeighbors;
-  int j;
-  for(j = 0; j < nbVoisins; j++)
+  int* coup; //Contiendra l'adresse du résultat du test des voisins
+  // Troisieme étape on cherche le territoire avec la plus grosse probabilité de victoires
+  for(i = 0; i < count+1; i++) //parcours des cellules
   {
-    if (voisins[j]->owner != IA.id) //si le territoire voisin est un territoire ennemi
+    if(i == 0)
     {
-      turn->cellTo = voisins[j]->id; //définition de la cellule attaquée
-      break;
+      coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); // attribution par défaut
+      coup[0] -= tab[i].nbDices; //On décrémente par le nombre de dés que l'on a
+      turn->cellFrom = tab[i].id; //attribution temporaire
+      turn->cellTo = tab[i].neighbors[coup[1]]->id; //attribution temporaire
+    }
+    else if(MiniSCell(tab[i].neighbors, tab[i].nbNeighbors)[0]-tab[i].nbDices < coup[0])//On vérifie en enlevant directement le nb de dés si c'est inférieur
+    {
+      coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); //On change stock notre adresse de tableau
+      coup[0] -= tab[i].nbDices; //On doit décrémenter pour pouvoir vérifier le suivant
+      turn->cellFrom = tab[i].id; //nouvelle attribution
+      turn->cellTo = tab[i].neighbors[coup[1]]->id; //nouvelle attribution
     }
   }
+  if(coup[0]>=0) //Check important pour éviter de faire un coup négatif (exemple : 2 contre 4 dés par exemple)
+  {
+    turn->cellFrom = 0; //On détruit les assignations temporaires
+    turn->cellTo = 0; //On détruit les assignations temporaires
+  }
+  free(tab);
+  free(coup);
   return 1;
 }
 
