@@ -83,3 +83,17 @@ int isCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size);
 *
 *********************************************************************************************/
 void updateStack(const SMap *map, SCell *attackingCell);
+
+/********************************************************************************************
+*
+* FUNCTION NAME: MiniSCell
+*
+* DESCRIPTION: fonction permettant de chercher le plus petit voisin existant
+*
+* ARGUMENT    TYPE             DESCRIPTION
+* voisins    SCell **     Le pointeur du tableau de pointeurs
+* nbVoisins  int          Le nombre de voisins de notre cellule
+* RETURNS: Un tableau à deux cases contenant les informations nécessaires soit le rang et le nombre de dés
+*
+*********************************************************************************************/
+int* MiniSCell(SCell **voisins, int nbVoisins);

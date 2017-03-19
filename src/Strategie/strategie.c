@@ -95,6 +95,42 @@ int PlayTurn(const SMap *map, STurn *turn)
 
 /********************************************************************************************
 *
+* FUNCTION NAME: MiniSCell
+*
+* DESCRIPTION: fonction permettant de chercher le plus petit voisin existant
+*
+* ARGUMENT    TYPE             DESCRIPTION
+* voisins    SCell **     Le pointeur du tableau de pointeurs
+* nbVoisins  int          Le nombre de voisins de notre cellule
+* RETURNS: Un tableau à deux cases contenant les informations nécessaires soit le rang et le nombre de dés
+*
+*********************************************************************************************/
+int* MiniSCell(SCell **voisins, int nbVoisins)
+{
+  int k;
+  int mini; // le nombre de dés minimale
+  int rang; //le rang du voisins
+  for(k = 0; k < nbVoisins; k++)
+  {
+    if(k == 0)
+    {
+      mini = voisins[k]->nbDices;
+      rang = k;
+    }
+    else if(voisins[k]->nbDices < mini)
+    {
+      mini = voisins[k]->nbDices;
+      rang = k;
+    }
+  }
+  int *tableau = malloc(2*sizeof(int));//Création du tableau de retour
+  tableau[0] = mini;
+  tableau[1] = rang;
+  return tableau;
+}
+
+/********************************************************************************************
+*
 * FUNCTION NAME: EndGame
 *
 * DESCRIPTION: fonction à appeler lors de la fin de partie
