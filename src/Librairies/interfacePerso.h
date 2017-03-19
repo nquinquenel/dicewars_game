@@ -28,7 +28,7 @@ SPlayerInfo* CreatePlayer(unsigned int idNewPlayer, char *name, SPlayerInfo *inf
 
 /********************************************************************************************
 *
-* FUNCTION NAME: getClusterSize
+* FUNCTION NAME: GetClusterSize
 *
 * DESCRIPTION: renvoie la taille de la grappe de cellules
 *
@@ -39,11 +39,11 @@ SPlayerInfo* CreatePlayer(unsigned int idNewPlayer, char *name, SPlayerInfo *inf
 * RETURNS: la taille de la grappe de cellules
 *
 *********************************************************************************************/
-int getClusterSize(const SMap *map, SCell *startingCell);
+int GetClusterSize(const SMap *map, SCell *startingCell);
 
 /********************************************************************************************
 *
-* FUNCTION NAME: isIntInArray
+* FUNCTION NAME: IsIntInArray
 *
 * DESCRIPTION: teste si un entier est dans un tableau d'entiers
 *
@@ -55,11 +55,11 @@ int getClusterSize(const SMap *map, SCell *startingCell);
 * RETURNS: 1 si val est dans arr, 0 sinon
 *
 *********************************************************************************************/
-int isValueInArray(int val, int *arr, int size);
+int IsValueInArray(int val, int *arr, int size);
 
 /********************************************************************************************
 *
-* FUNCTION NAME: isCellInArrayOfCellPointer
+* FUNCTION NAME: IsCellInArrayOfCellPointer
 *
 * DESCRIPTION: teste si une adresse de cellule est dans un tableau d'adresses de cellules
 *
@@ -71,20 +71,24 @@ int isValueInArray(int val, int *arr, int size);
 * RETURNS: 1 si cell est dans arrCell, 0 sinon
 *
 *********************************************************************************************/
-int isCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size);
+int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size);
 
 /********************************************************************************************
 *
-* FUNCTION NAME: updateStack
+* FUNCTION NAME: UpdateStack
 *
-* DESCRIPTION: met à jour la pile de dés du joueur suite à l'attaque
+* DESCRIPTION: met à jour la pile de dés du joueur suite à une attaque / défense
+*              on ne fera rien si startingCell est la cellule qui a été attaquée et que l'attaque a échoué
 *
 * ARGUMENT      TYPE             DESCRIPTION
 * map           const *SMap      la carte
-* attackingCell *SCell           l'adresse de la cellule attaquante
+* startingCell  *SCell           l'adresse de la cellule attaquante / attaquée
+* attacking     int              1 si startingCell est la cellule qui a attaqué, 0 si c'est la cellule qui a été attaquée
+* success       int              1 si l'attaque a réussi, 0 sinon
+* idPlayer      int              l'id du joueur pour lequel il faut mettre à jour la pile de dés après l'attaque / défense
 *
 *********************************************************************************************/
-void updateStack(const SMap *map, SCell *attackingCell);
+void UpdateStack(const SMap *map, SCell *startingCell, int attacking, int success, int idPlayer);
 
 /********************************************************************************************
 *
@@ -102,7 +106,7 @@ int* MiniSCell(SCell **voisins, int nbVoisins);
 
 /********************************************************************************************
 *
-* FUNCTION NAME: liberationMemoireTab
+* FUNCTION NAME: LiberationMemoireTab
 *
 * DESCRIPTION: Fonction à appeler pour nettoyer un tableau de int
 *
@@ -111,11 +115,11 @@ int* MiniSCell(SCell **voisins, int nbVoisins);
 * taille      int              la taille du tableau
 *
 *********************************************************************************************/
-void liberationMemoireTab(int *tab, int taille);
+void LiberationMemoireTab(int *tab, int taille);
 
 /********************************************************************************************
 *
-* FUNCTION NAME: distributeDices
+* FUNCTION NAME: DistributeDices
 *
 * DESCRIPTION: distribue les dés aléatoirement entre les cellules à la fin du tour du joueur
 *
@@ -123,4 +127,19 @@ void liberationMemoireTab(int *tab, int taille);
 * map           const *SMap      la carte
 *
 *********************************************************************************************/
-void distributeDices(const SMap *map);
+void DistributeDices(const SMap *map);
+
+/********************************************************************************************
+*
+* FUNCTION NAME: Attack
+*
+* DESCRIPTION: attaque en fonction du STurn
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* turn          *STurn           le tour courant
+*
+* RETURNS: 1 si on a gagné l'attaque, 0 sinon
+*
+*********************************************************************************************/
+int Attack(const SMap *map, STurn *turn);
