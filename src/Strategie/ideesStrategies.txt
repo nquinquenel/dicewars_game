@@ -15,3 +15,5 @@ Si un joueur a plus de la moitié des territoires, l'attaquer et délaisser les 
 Quand on est le leader, et donc que tous les autres joueurs nous attaquent, ne pas faire trop de lignes avec peu de dés en attaquant. Sauf si tous (ou presque) nos territoires ont 8 dés.
 
 Ne pas attaquer si on a moins de dès qu'un territoire adverse, voire même quand on en a autant.
+
+Essayer de ne pas bloquer des cellules avec beaucoup de dés dans un coins
