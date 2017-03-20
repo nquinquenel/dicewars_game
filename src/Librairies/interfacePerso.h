@@ -174,3 +174,18 @@ int Attack(const SMap *map, STurn *turn);
 *
 *********************************************************************************************/
 int ValidTurn(const SMap *map, STurn *turn, int idPlayer);
+
+/********************************************************************************************
+*
+* FUNCTION NAME: PercentageOfOccupation
+*
+* DESCRIPTION: renvoie le pourcentage d'occupation de la map du joueur
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* idPlayer      int              l'id du joueur courant
+*
+* RETURNS: un entier entre 0 et 100
+*
+*********************************************************************************************/
+int PercentageOfOccupation(const SMap *map, int idPlayer);

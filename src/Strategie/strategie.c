@@ -441,6 +441,33 @@ int* MiniSCell(SCell **voisins, int nbVoisins)
 
 /********************************************************************************************
 *
+* FUNCTION NAME: PercentageOfOccupation
+*
+* DESCRIPTION: renvoie le pourcentage d'occupation de la map du joueur
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* idPlayer      int              l'id du joueur courant
+*
+* RETURNS: un entier entre 0 et 100
+*
+*********************************************************************************************/
+int PercentageOfOccupation(const SMap *map, int idPlayer)
+{
+  int nbPlayerCells = 0; //le nombre de cellules du joueur ayant l'id idPlayer
+  SCell *allCells = map->cells; //toutes les cellules de la map
+  int i;
+
+  for (i = 0; i < map->nbCells; i++) //si la cellule appartient au joueur
+  {
+    if(allCells[i].owner == idPlayer) nbPlayerCells++; //on incrémente le compteur de son nombre de cellules
+  }
+
+  return (int) ((nbPlayerCells*100)/map->nbCells);
+}
+
+/********************************************************************************************
+*
 * FUNCTION NAME: LiberationMemoireTab
 *
 * DESCRIPTION: Fonction à appeler pour nettoyer un tableau de int
