@@ -412,21 +412,28 @@ int* MiniSCell(SCell **voisins, int nbVoisins)
   int k;
   int mini; // le nombre de dés minimale
   int rang; //le rang du voisins
-
+  int boo = 1;
   for(k = 0; k < nbVoisins; k++)
   {
-    if(k == 0)
+    if(boo)
     {
-      mini = voisins[k]->nbDices;
-      rang = k;
+      if(voisins[k]->owner != IA.id) // si je suis le propriétaire pour éviter d'attaquer son territoire
+      {
+        mini = voisins[k]->nbDices;
+        rang = k;
+        boo = 0;
+      }
     }
     else if(voisins[k]->nbDices < mini)
     {
-      mini = voisins[k]->nbDices;
-      rang = k;
+      if (voisins[k]->owner != IA.id ) // si je suis le propriétaire pour éviter d'attaquer son territoire
+      {
+        mini = voisins[k]->nbDices;
+        rang = k;
+      }
     }
   }
-  int *tableau = malloc(2*sizeof(int)); //Création du tableau de retour
+  int *tableau = malloc(2*sizeof(int));//Création du tableau de retour
   tableau[0] = mini;
   tableau[1] = rang;
   return tableau;
