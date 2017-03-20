@@ -154,7 +154,7 @@ int GetClusterSize(const SMap *map, SCell *startingCell)
   int i, j, k;
   int idPlayer = startingCell->owner; //l'id du joueur propriétaire de la cellule de référence
 
-  int clusterIds[map->nbCells]; //tableau des id des cellules de la grappe, de taille le nombre de cellules de la map, car taille maximale
+  //int clusterIds[map->nbCells]; //tableau des id des cellules de la grappe, de taille le nombre de cellules de la map, car taille maximale
   int clusterIdsSize = 0; //la taille de la grappe de cellules
 
   SCell **cellsToTest = malloc((map->nbCells)*sizeof(SCell *)); //tableau de pointeurs de SCell. Les cellules à tester lors du prochain while
@@ -169,7 +169,7 @@ int GetClusterSize(const SMap *map, SCell *startingCell)
   while (cellsToTestSize != nextCellToTest) //tant qu'il reste des cellules alliées dont on n'a pas regardé les voisins
   {
     SCell *currentCell = cellsToTest[nextCellToTest]; //adresse de la cellule courante à tester
-    clusterIds[clusterIdsSize] = currentCell->id; //on rajoute l'id de la cellule courante aux cellules parcourues
+    //clusterIds[clusterIdsSize] = currentCell->id; //on rajoute l'id de la cellule courante aux cellules parcourues
     clusterIdsSize++;
     SCell **voisins = currentCell->neighbors; // Tableau de pointeur vers les cellules voisines de la cellule courante
     int nbVoisins = currentCell->nbNeighbors;
