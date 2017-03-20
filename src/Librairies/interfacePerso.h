@@ -131,6 +131,21 @@ void DistributeDices(const SMap *map);
 
 /********************************************************************************************
 *
+* FUNCTION NAME: GetCell
+*
+* DESCRIPTION: renvoie l'adresse de la SCell qui a l'id idCell
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* idCell        int              l'id de la cellule à retourner
+*
+* RETURNS: l'adresse de la cellule qui a l'id idCell, NULL sinon
+*
+*********************************************************************************************/
+SCell* GetCell(const SMap *map, int idCell);
+
+/********************************************************************************************
+*
 * FUNCTION NAME: Attack
 *
 * DESCRIPTION: attaque en fonction du STurn
@@ -143,3 +158,19 @@ void DistributeDices(const SMap *map);
 *
 *********************************************************************************************/
 int Attack(const SMap *map, STurn *turn);
+
+/********************************************************************************************
+*
+* FUNCTION NAME: ValidTurn
+*
+* DESCRIPTION: teste si le coup est valide
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* turn          *STurn           le tour courant
+* idPlayer      int              l'id du joueur qui effectue le tour
+*
+* RETURNS: 1 si le coup est valide, 0 sinon
+*
+*********************************************************************************************/
+int ValidTurn(const SMap *map, STurn *turn, int idPlayer);

@@ -297,6 +297,31 @@ void DistributeDices(const SMap *map)
 
 /********************************************************************************************
 *
+* FUNCTION NAME: ValidTurn
+*
+* DESCRIPTION: teste si le coup est valide
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* turn          *STurn           le tour courant
+* idPlayer      int              l'id du joueur qui effectue le tour
+*
+* RETURNS: 1 si le coup est valide, 0 sinon
+*
+*********************************************************************************************/
+int ValidTurn(const SMap *map, STurn *turn, int idPlayer)
+{
+  SCell *attackingCell = GetCell(map, turn->cellFrom); //adresse de la cellule attaquante
+  SCell *defendingCell = GetCell(map, turn->cellTo);  //adresse de la cellule défendante
+
+  if(attackingCell->nbDices == 1) return 0; //si la cellule attaquante n'a qu'un dés
+  if(attackingCell->owner != idPlayer) return 0; //si la cellule attaquante n'appartient pas au joueur courant
+  if(defendingCell->owner == idPlayer) return 0; //si la cellule attaquée appartient au joueur courant
+  return 1;
+}
+
+/********************************************************************************************
+*
 * FUNCTION NAME: GetCell
 *
 * DESCRIPTION: renvoie l'adresse de la SCell qui a l'id idCell
