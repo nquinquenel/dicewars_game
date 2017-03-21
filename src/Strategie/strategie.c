@@ -447,12 +447,30 @@ int* MiniSCell(SCell **voisins, int nbVoisins)
 *
 * ARGUMENT      TYPE             DESCRIPTION
 * map           const *SMap      la carte
-* idPlayer      int              l'id du joueur courant
+* nbPlayerCells int              le nombre de cellules du joueur
 *
 * RETURNS: un entier entre 0 et 100
 *
 *********************************************************************************************/
-int PercentageOfOccupation(const SMap *map, int idPlayer)
+int PercentageOfOccupation(const SMap *map, int nbPlayerCells)
+{
+  return (int) ((nbPlayerCells*100)/map->nbCells);
+}
+
+/********************************************************************************************
+*
+* FUNCTION NAME: GetNbPlayerCells
+*
+* DESCRIPTION: renvoie le nombre de cellules appartenant au joueur
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* idPlayer      int              l'id du joueur courant
+*
+* RETURNS: e nombre de cellules appartenant au joueur
+*
+*********************************************************************************************/
+int GetNbPlayerCells(const SMap *map, int idPlayer)
 {
   int nbPlayerCells = 0; //le nombre de cellules du joueur ayant l'id idPlayer
   SCell *allCells = map->cells; //toutes les cellules de la map
@@ -463,7 +481,7 @@ int PercentageOfOccupation(const SMap *map, int idPlayer)
     if(allCells[i].owner == idPlayer) nbPlayerCells++; //on incrémente le compteur de son nombre de cellules
   }
 
-  return (int) ((nbPlayerCells*100)/map->nbCells);
+  return nbPlayerCells;
 }
 
 /********************************************************************************************

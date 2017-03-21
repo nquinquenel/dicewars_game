@@ -183,9 +183,24 @@ int ValidTurn(const SMap *map, STurn *turn, int idPlayer);
 *
 * ARGUMENT      TYPE             DESCRIPTION
 * map           const *SMap      la carte
-* idPlayer      int              l'id du joueur courant
+* nbPlayerCells int              le nombre de cellules du joueur
 *
 * RETURNS: un entier entre 0 et 100
 *
 *********************************************************************************************/
-int PercentageOfOccupation(const SMap *map, int idPlayer);
+int PercentageOfOccupation(const SMap *map, int nbPlayerCells);
+
+/********************************************************************************************
+*
+* FUNCTION NAME: GetNbPlayerCells
+*
+* DESCRIPTION: renvoie le nombre de cellules appartenant au joueur
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* idPlayer      int              l'id du joueur courant
+*
+* RETURNS: e nombre de cellules appartenant au joueur
+*
+*********************************************************************************************/
+int GetNbPlayerCells(const SMap *map, int idPlayer);
