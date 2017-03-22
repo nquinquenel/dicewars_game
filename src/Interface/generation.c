@@ -6,10 +6,16 @@
 #include <math.h>
 
 void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
+
+  //Itérateurs
   int i;
   int p;
   int j;
+
+  //Index qui permet de savoir quelle est la couleur actuellement utilisé lors de la génération des couleurs aux joueurs
   int couleur_actuelle = 0;
+
+  //Permet de générer une map aléatoire
   srand(time(NULL));
 
   //SDL_RenderSetScale(renderer, 5.0, 5.0);
@@ -20,6 +26,7 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
   //Tableau des ID de chaques cellules
   int** tab_id = malloc((h+2)*sizeof(int*));
 
+  //Permet d'enlever les id aux pixels bordures (à la fin)
   int** id_tmp = malloc((h+2)*sizeof(int*));
 
   //Tableau de comparaison entre id et joueurs
@@ -45,13 +52,14 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
   int** tab_points = malloc(50*sizeof(int*));
   int** tab_couleurs = malloc(50*sizeof(int*));
 
-
+  //Initalise certains tableaux et génère les points ainsi que les couleurs
   for (i = 0; i < 50; i++) {
     tab_points[i] = malloc(2*sizeof(int));
     tab_couleurs[i] = malloc(3*sizeof(int));
     couleur_aleatoire(tab_couleurs, i, &couleur_actuelle, couleurs, nbJoueurs);
     point_aleatoire(h, w, tab_points, i);
     tab_voisins[i] = malloc(50*sizeof(int));
+    //J'initialise les voisins à -1
     for (p = 0; p < 50; p++) {
       tab_voisins[i][p] = -1;
     }
@@ -94,7 +102,7 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
     }
   }
 
-  //Gestion des bordures
+  //Gestion des bordures et des voisins
   int bordure = 0;
   for (i = 0; i < h; i++) {
     for (p = 0; p < w; p++) {
@@ -134,6 +142,7 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
     }
   }
 
+  //Matrice adjacence
   j = 0;
   for (i = 0; i < 50; i++) {
     printf("Territoire %d : ", i);
@@ -143,7 +152,7 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
     printf("\n");
   }
 
-  // Render the rect to the screen
+  //Render tout ce qui a été modifié au niveau graphique
   SDL_RenderPresent(renderer);
 }
 
