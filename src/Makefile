@@ -10,7 +10,7 @@ main.o: main.c Interface/fenetre.h
 fenetre.o: Interface/fenetre.c Interface/generation.h
 				gcc -c Interface/fenetre.c -o fenetre.o $(CFLAGS)
 
-generation.o: Interface/generation.c
+generation.o: Interface/generation.c Librairies/interface.h
 				gcc -c Interface/generation.c -o generation.o $(CFLAGS)
 
 # suppression des fichiers temporaires

@@ -4,8 +4,9 @@
 #include <time.h>
 #include <stdlib.h>
 #include <math.h>
+#include "../Librairies/interface.h"
 
-void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
+void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerritoires) {
 
   //Itérateurs
   int i;
@@ -30,10 +31,10 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
   int** id_tmp = malloc((h+2)*sizeof(int*));
 
   //Tableau de comparaison entre id et joueurs
-  int *tab_comparaison = malloc(50*sizeof(int));
+  int *tab_comparaison = malloc(nbTerritoires*sizeof(int));
 
   //Tableau des voisins de chaque territoire
-  int** tab_voisins = malloc(50*sizeof(int*));
+  int** tab_voisins = malloc(nbTerritoires*sizeof(int*));
 
   //h+2 car on ne va pas utiliser la première valeur
   for (i = 0; i < h+2; i++) {
@@ -49,18 +50,18 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
   }
 
   //Tableau de points
-  int** tab_points = malloc(50*sizeof(int*));
-  int** tab_couleurs = malloc(50*sizeof(int*));
+  int** tab_points = malloc(nbTerritoires*sizeof(int*));
+  int** tab_couleurs = malloc(nbTerritoires*sizeof(int*));
 
   //Initalise certains tableaux et génère les points ainsi que les couleurs
-  for (i = 0; i < 50; i++) {
+  for (i = 0; i < nbTerritoires; i++) {
     tab_points[i] = malloc(2*sizeof(int));
     tab_couleurs[i] = malloc(3*sizeof(int));
     couleur_aleatoire(tab_couleurs, i, &couleur_actuelle, couleurs, nbJoueurs);
     point_aleatoire(h, w, tab_points, i);
-    tab_voisins[i] = malloc(50*sizeof(int));
+    tab_voisins[i] = malloc(nbTerritoires*sizeof(int));
     //J'initialise les voisins à -1
-    for (p = 0; p < 50; p++) {
+    for (p = 0; p < nbTerritoires; p++) {
       tab_voisins[i][p] = -1;
     }
   }
@@ -74,7 +75,7 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
   for (i = 0; i < h; i++) {
     for (p = 0; p < w; p++) {
 
-      for (j = 0; j < 50; j++) {
+      for (j = 0; j < nbTerritoires; j++) {
         dist = fabs(i - tab_points[j][0]) + fabs(p - tab_points[j][1]);
         if (dist < distanceMin) {
           distanceMin = dist;
@@ -87,12 +88,7 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
       tab_id[i+1][p+1] = id;
       tab_comparaison[id] = j%nbJoueurs;
 
-      if (id == 49 || id == 48) {
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
-      } else {
-        SDL_SetRenderDrawColor(renderer, tab_couleurs[couleur_point][0], tab_couleurs[couleur_point][1], tab_couleurs[couleur_point][2], 0);
-      }
-
+      SDL_SetRenderDrawColor(renderer, tab_couleurs[couleur_point][0], tab_couleurs[couleur_point][1], tab_couleurs[couleur_point][2], 0);
       SDL_RenderDrawPoint(renderer, i, p);
 
       distanceMin = h;
@@ -144,9 +140,9 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
 
   //Matrice adjacence
   j = 0;
-  for (i = 0; i < 50; i++) {
+  for (i = 0; i < nbTerritoires; i++) {
     printf("Territoire %d : ", i);
-    for (j = 0; j < 50; j++) {
+    for (j = 0; j < nbTerritoires; j++) {
       printf(" %d ", tab_voisins[i][j]);
     }
     printf("\n");
@@ -171,4 +167,14 @@ void couleur_aleatoire(int **tab, int row, int *couleur_actuelle, int couleur[8]
   if ((*couleur_actuelle) > nbJoueurs-1) {
     *couleur_actuelle = 0;
   }
+}
+
+SCell* generer_cellules(int **tab_adj, int nbTerritoires) {
+  SCell *tab_cell = malloc(nbTerritoires*sizeof(SCell));
+  return tab_cell;
+}
+
+SMap generer_territoires(SCell* cellules, int nbJoueurs) {
+  SMap map;
+  return map;
 }

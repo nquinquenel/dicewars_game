@@ -26,7 +26,7 @@ void fenetre()
   SDL_RenderClear( renderer );
 
 
-  generer_map(renderer, 800, 600, 6);
+  generer_map(renderer, 800, 600, 6, 50);
 
   SDL_Event e;
 
