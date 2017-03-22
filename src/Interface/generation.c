@@ -9,22 +9,37 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
   int i;
   int p;
   int j;
-  int couleur_actuelle = malloc(sizeof(int));
-  couleur_actuelle = 0;
+  int couleur_actuelle = 0;
   srand(time(NULL));
 
   //SDL_RenderSetScale(renderer, 5.0, 5.0);
 
   //Tableau des couleurs disponibles
-  int couleurs[8][3] = {{0,0,255}, {0, 255, 0}, {255, 0, 0}, {128, 255, 0}, {255, 128, 0}, {0, 255, 255}, {102, 51, 0}, {255, 102, 255}};
+  int couleurs[8][3] = {{0,0,255}, {0, 255, 0}, {255, 0, 0}, {128, 68, 188}, {255, 128, 0}, {0, 255, 255}, {102, 51, 0}, {255, 102, 255}};
 
   //Tableau des ID de chaques cellules
   int** tab_id = malloc((h+2)*sizeof(int*));
 
+  int** id_tmp = malloc((h+2)*sizeof(int*));
+
+  //Tableau de comparaison entre id et joueurs
+  int *tab_comparaison = malloc(50*sizeof(int));
+
+  //Tableau des voisins de chaque territoire
+  int** tab_voisins = malloc(50*sizeof(int*));
+
+  //h+2 car on ne va pas utiliser la première valeur
   for (i = 0; i < h+2; i++) {
     tab_id[i] = malloc((w)*sizeof(int*));
+    id_tmp[i] = malloc((w)*sizeof(int*));
   }
-  i = 0;
+
+  //Initialise les valeurs à -1 pour éviter de tomber sur des adresses mémoires
+  for (i = 0; i < h+2; i++) {
+    for (p = 0; p < w+2; p++) {
+      tab_id[i][p] = -1;
+    }
+  }
 
   //Tableau de points
   int** tab_points = malloc(50*sizeof(int*));
@@ -36,6 +51,10 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
     tab_couleurs[i] = malloc(3*sizeof(int));
     couleur_aleatoire(tab_couleurs, i, &couleur_actuelle, couleurs, nbJoueurs);
     point_aleatoire(h, w, tab_points, i);
+    tab_voisins[i] = malloc(50*sizeof(int));
+    for (p = 0; p < 50; p++) {
+      tab_voisins[i][p] = -1;
+    }
   }
 
   float distanceMin = h;
@@ -58,8 +77,14 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
 
       //Attribue au pixel l'id du point auquel il appartient
       tab_id[i+1][p+1] = id;
+      tab_comparaison[id] = j%nbJoueurs;
 
-      SDL_SetRenderDrawColor(renderer, tab_couleurs[couleur_point][0], tab_couleurs[couleur_point][1], tab_couleurs[couleur_point][2], 0);
+      if (id == 49 || id == 48) {
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 0);
+      } else {
+        SDL_SetRenderDrawColor(renderer, tab_couleurs[couleur_point][0], tab_couleurs[couleur_point][1], tab_couleurs[couleur_point][2], 0);
+      }
+
       SDL_RenderDrawPoint(renderer, i, p);
 
       distanceMin = h;
@@ -69,16 +94,54 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs) {
     }
   }
 
+  //Gestion des bordures
+  int bordure = 0;
   for (i = 0; i < h; i++) {
     for (p = 0; p < w; p++) {
       int id_cel = tab_id[i+1][p+1];
-      if ( tab_id[i+1][p] != id_cel || tab_id[i+1][p+2] != id_cel || tab_id[i][p+1] != id_cel || tab_id[i+2][p+1] != id_cel ) {
+      if (tab_id[i+1][p] != id_cel && tab_id[i+1][p] != -1) {
+        tab_voisins[id_cel][tab_id[i+1][p]] = tab_id[i+1][p];
+        tab_voisins[tab_id[i+1][p]][id_cel] = id_cel;
+        bordure = 1;
+      } else if (tab_id[i+1][p+2] != id_cel && tab_id[i+1][p+2] != -1) {
+        tab_voisins[id_cel][tab_id[i+1][p+2]] = tab_id[i+1][p+2];
+        tab_voisins[tab_id[i+1][p+2]][id_cel] = id_cel;
+        bordure = 1;
+      } else if (tab_id[i][p+1] != id_cel && tab_id[i][p+1] != -1) {
+        tab_voisins[id_cel][tab_id[i][p+1]] = tab_id[i][p+1];
+        tab_voisins[tab_id[i][p+1]][id_cel] = id_cel;
+        bordure = 1;
+      } else if (tab_id[i+2][p+1] != id_cel && tab_id[i+2][p+1] != -1) {
+        tab_voisins[id_cel][tab_id[i+2][p+1]] = tab_id[i+2][p+1];
+        tab_voisins[tab_id[i+2][p+1]][id_cel] = id_cel;
+        bordure = 1;
+      }
+      if (bordure == 1) {
+        id_tmp[i+1][p+1] = 1;
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);
         SDL_RenderDrawPoint(renderer, i, p);
+        bordure = 0;
       }
     }
   }
 
+  //Enlève les ID de tab_id qui correspondent aux bordures
+  for (i = 0; i < h; i++) {
+    for (p = 0; p < w; p++) {
+      if (id_tmp[i+1][p+1] == 1) {
+        tab_id[i+1][p+1] == -1;
+      }
+    }
+  }
+
+  j = 0;
+  for (i = 0; i < 50; i++) {
+    printf("Territoire %d : ", i);
+    for (j = 0; j < 50; j++) {
+      printf(" %d ", tab_voisins[i][j]);
+    }
+    printf("\n");
+  }
 
   // Render the rect to the screen
   SDL_RenderPresent(renderer);
