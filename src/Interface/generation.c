@@ -9,9 +9,7 @@
 void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerritoires) {
 
   //Itérateurs
-  int i;
-  int p;
-  int j;
+  int i, p, j;
 
   //Index qui permet de savoir quelle est la couleur actuellement utilisé lors de la génération des couleurs aux joueurs
   int couleur_actuelle = 0;
@@ -148,6 +146,9 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerr
     printf("\n");
   }
 
+  SCell *map_cellules = generer_cellules(tab_voisins, nbTerritoires, tab_comparaison);
+  SMap map = generer_territoire(map_cellules, nbTerritoires);
+
   //Render tout ce qui a été modifié au niveau graphique
   SDL_RenderPresent(renderer);
 }
@@ -169,12 +170,38 @@ void couleur_aleatoire(int **tab, int row, int *couleur_actuelle, int couleur[8]
   }
 }
 
-SCell* generer_cellules(int **tab_adj, int nbTerritoires) {
+SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison) {
   SCell *tab_cell = malloc(nbTerritoires*sizeof(SCell));
+
+  int i, j, voisin;
+
+  for (i = 0; i < nbTerritoires; i++) {
+    tab_cell[i].id = i;
+    tab_cell[i].owner = tab_comparaison[i];
+    //20 voisins max (très peu probable moins)
+    tab_cell[i].neighbors = malloc(20*sizeof(SCell*));
+    //Implémenter le nombre de dés aléatoires
+    tab_cell[i].nbDices = 1;
+    voisin = 0;
+    for (j = 0; j < nbTerritoires; j++) {
+      if (tab_adj[i][j] != -1) {
+        tab_cell[i].neighbors[i] = malloc(sizeof(SCell));
+        tab_cell[i].neighbors[i] = &tab_cell[j];
+        voisin++;
+      }
+    }
+    tab_cell[i].nbNeighbors = voisin;
+  }
+
   return tab_cell;
 }
 
-SMap generer_territoires(SCell* cellules, int nbJoueurs) {
+SMap generer_territoire(SCell* cellules, int nbTerritoires) {
   SMap map;
+
+  map.cells = cellules;
+  map.nbCells = nbTerritoires;
+  map.stack = 0;
+
   return map;
 }
