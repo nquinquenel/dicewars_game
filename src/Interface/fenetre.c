@@ -4,32 +4,44 @@
 
 void fenetre()
 {
-    /* Initialisation simple */
-    if (SDL_Init(SDL_INIT_VIDEO) != 0 )
-    {
-        fprintf(stdout,"Échec de l'initialisation de la SDL (%s)\n",SDL_GetError());
+  int running = 1;
+  SDL_Window* window = NULL;
+  window = SDL_CreateWindow
+  (
+      "DiceWars", SDL_WINDOWPOS_UNDEFINED,
+      SDL_WINDOWPOS_UNDEFINED,
+      800,
+      600,
+      SDL_WINDOW_SHOWN
+  );
+
+  // Setup renderer
+  SDL_Renderer* renderer = NULL;
+
+  renderer =  SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED);
+  // Set render color to red ( background will be rendered in this color )
+  SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );
+
+  // Clear winow
+  SDL_RenderClear( renderer );
+
+
+  generer_map(renderer, 800, 600, 6, 50);
+
+  SDL_Event e;
+
+  while (running == 1) {
+    while( SDL_PollEvent( &e ) != 0 ){
+      if(e.type == SDL_QUIT){
+        running = 0;
+        printf("Closing the window ...\n");
+      }
     }
+  }
 
-    {
-        /* Création de la fenêtre */
-        SDL_Window* pWindow = NULL;
-        pWindow = SDL_CreateWindow("DiceWars",SDL_WINDOWPOS_UNDEFINED,
-                                                                  SDL_WINDOWPOS_UNDEFINED,
-                                                                  640,
-                                                                  480,
-                                                                  SDL_WINDOW_SHOWN);
+  // Wait for 5 sec
+//  SDL_Delay( 5000 );
 
-        if( pWindow )
-        {
-            SDL_Delay(3000); /* Attendre trois secondes, que l'utilisateur voit la fenêtre */
-
-            SDL_DestroyWindow(pWindow);
-        }
-        else
-        {
-            fprintf(stderr,"Erreur de création de la fenêtre: %s\n",SDL_GetError());
-        }
-    }
-
-    SDL_Quit();
+  SDL_DestroyWindow(window);
+  SDL_Quit();
 }
