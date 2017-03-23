@@ -2,8 +2,15 @@
 #include "fenetre.h"
 #include <stdio.h>
 
-void fenetre()
-{
+/********************************************************************************************
+*
+* FUNCTION NAME: fenetre
+*
+* DESCRIPTION: Génère la fenêtre de jeu SDL2 et départ du programme (boucle du jeu)
+*
+*********************************************************************************************/
+void fenetre() {
+  //Condition pour faire tourner le jeu en boucle
   int running = 1;
   SDL_Window* window = NULL;
   window = SDL_CreateWindow
@@ -15,16 +22,13 @@ void fenetre()
       SDL_WINDOW_SHOWN
   );
 
-  // Setup renderer
+  //Mise en place du renderer qui permet d'intérargir avec la fenêtre SDL2
   SDL_Renderer* renderer = NULL;
 
   renderer =  SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED);
-  // Set render color to red ( background will be rendered in this color )
-  SDL_SetRenderDrawColor( renderer, 255, 255, 255, 255 );
 
-  // Clear winow
+  //Nettoie la fenêtre
   SDL_RenderClear( renderer );
-
 
   generer_map(renderer, 800, 600, 6, 50);
 
@@ -38,9 +42,6 @@ void fenetre()
       }
     }
   }
-
-  // Wait for 5 sec
-//  SDL_Delay( 5000 );
 
   SDL_DestroyWindow(window);
   SDL_Quit();
