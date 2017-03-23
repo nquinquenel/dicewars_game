@@ -190,3 +190,18 @@ int PercentageOfOccupation(const SMap *map, int nbPlayerCells);
 *
 *********************************************************************************************/
 int GetNbPlayerCells(const SMap *map, int idPlayer);
+
+/********************************************************************************************
+*
+* FUNCTION NAME: AreNeighbors
+*
+* DESCRIPTION: teste si deux cellules sont voisines
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* cell1          *SCell          l'adresse de la cellule n°1
+* cell1          *SCell          l'adresse de la cellule n°2
+*
+* RETURNS: 1 si les cellules sont voisines, 0 sinon
+*
+*********************************************************************************************/
+int AreNeighbors(SCell *cell1, SCell *cell2);

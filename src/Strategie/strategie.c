@@ -316,6 +316,9 @@ int ValidTurn(const SMap *map, STurn *turn, int idPlayer)
   SCell *attackingCell = GetCell(map, turn->cellFrom); //adresse de la cellule attaquante
   SCell *defendingCell = GetCell(map, turn->cellTo);  //adresse de la cellule défendante
 
+
+  //teste si les cellules sont bien voisines
+
   if(attackingCell->nbDices == 1) return 0; //si la cellule attaquante n'a qu'un dés
   if(attackingCell->owner != idPlayer) return 0; //si la cellule attaquante n'appartient pas au joueur courant
   if(defendingCell->owner == idPlayer) return 0; //si la cellule attaquée appartient au joueur courant
@@ -553,5 +556,30 @@ int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size)
     if (arrCell[i] == cell) return 1;
   }
 
+  return 0;
+}
+
+/********************************************************************************************
+*
+* FUNCTION NAME: AreNeighbors
+*
+* DESCRIPTION: teste si deux cellules sont voisines
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* cell1          *SCell          l'adresse de la cellule n°1
+* cell1          *SCell          l'adresse de la cellule n°2
+*
+* RETURNS: 1 si les cellules sont voisines, 0 sinon
+*
+*********************************************************************************************/
+int AreNeighbors(SCell *cell1, SCell *cell2)
+{
+  int i;
+  for (i = 0; i < cell1->nbNeighbors; i++) {
+    if (cell2 == cell1->neighbors[i]) //si les 2 cellules sont voisines
+    {
+      return 1;
+    }
+  }
   return 0;
 }
