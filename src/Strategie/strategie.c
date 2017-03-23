@@ -318,7 +318,7 @@ int ValidTurn(const SMap *map, STurn *turn, int idPlayer)
 
 
   //teste si les cellules sont bien voisines
-
+  if (!AreNeighbors(attackingCell, defendingCell)) return 0; //si les cellules ne sont pas voisines
   if(attackingCell->nbDices == 1) return 0; //si la cellule attaquante n'a qu'un dés
   if(attackingCell->owner != idPlayer) return 0; //si la cellule attaquante n'appartient pas au joueur courant
   if(defendingCell->owner == idPlayer) return 0; //si la cellule attaquée appartient au joueur courant
