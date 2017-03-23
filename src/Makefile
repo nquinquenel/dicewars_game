@@ -1,4 +1,4 @@
-CFLAGS=-Wall -lSDL2
+CFLAGS=-Wall `sdl2-config --cflags --libs`
 
 # création de l'exécutable 'Programme'
 all: main.o strategie.o fenetre.o generation.o

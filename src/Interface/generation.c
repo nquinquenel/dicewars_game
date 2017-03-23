@@ -30,7 +30,6 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerr
 
   //Permet de générer une map aléatoire
   srand(time(NULL));
-
   //SDL_RenderSetScale(renderer, 5.0, 5.0);
 
   //Tableau des couleurs disponibles
@@ -239,8 +238,8 @@ SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison) 
     voisin = 0;
     for (j = 0; j < nbTerritoires; j++) {
       if (tab_adj[i][j] != -1) {
-        tab_cell[i].neighbors[i] = malloc(sizeof(SCell));
-        tab_cell[i].neighbors[i] = &tab_cell[j];
+        tab_cell[i].neighbors[voisin] = malloc(sizeof(SCell));
+        tab_cell[i].neighbors[voisin] = &tab_cell[j];
         voisin++;
       }
     }
