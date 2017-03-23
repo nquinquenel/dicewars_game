@@ -1,11 +1,14 @@
 CFLAGS=-Wall -lSDL2
 
 # création de l'exécutable 'Programme'
-all: main.o fenetre.o generation.o
-				gcc main.o fenetre.o generation.o -o DiceWars $(CFLAGS)
+all: main.o strategie.o fenetre.o generation.o
+				gcc main.o strategie.o fenetre.o generation.o -o DiceWars $(CFLAGS)
 
-main.o: main.c Interface/fenetre.h
+main.o: main.c Librairies/interface.h Librairies/interfacePerso.h
 				gcc -c main.c -o main.o $(CFLAGS)
+
+strategie.o: Strategie/strategie.c Librairies/interface.h Librairies/interfacePerso.h Interface/fenetre.h
+				gcc -c Strategie/strategie.c -o strategie.o $(CFLAGS)
 
 fenetre.o: Interface/fenetre.c Interface/generation.h
 				gcc -c Interface/fenetre.c -o fenetre.o $(CFLAGS)

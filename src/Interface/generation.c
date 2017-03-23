@@ -150,6 +150,7 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerr
     }
   }
 
+  /*
   //Matrice adjacence
   j = 0;
   for (i = 0; i < nbTerritoires; i++) {
@@ -158,7 +159,7 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerr
       printf(" %d ", tab_voisins[i][j]);
     }
     printf("\n");
-  }
+  }*/
 
   SCell *map_cellules = generer_cellules(tab_voisins, nbTerritoires, tab_comparaison);
   SMap map = generer_territoire(map_cellules, nbTerritoires);
@@ -231,7 +232,7 @@ SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison) 
   for (i = 0; i < nbTerritoires; i++) {
     tab_cell[i].id = i;
     tab_cell[i].owner = tab_comparaison[i];
-    //20 voisins max (très peu probable moins)
+    //20 voisins max (très peu probable plus)
     tab_cell[i].neighbors = malloc(20*sizeof(SCell*));
     //Implémenter le nombre de dés aléatoires
     tab_cell[i].nbDices = 1;
@@ -270,4 +271,8 @@ SMap generer_territoire(SCell* cellules, int nbTerritoires) {
   map.stack = 0;
 
   return map;
+}
+
+void lib_memoire() {
+
 }

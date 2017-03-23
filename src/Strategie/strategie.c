@@ -1,7 +1,8 @@
 #include "../Librairies/interface.h"
 #include "../Librairies/interfacePerso.h"
+#include "../Interface/fenetre.h"
 
-SIa IA;//varibale globale permettant de garder accessible les caractéristiques de l'IA courante
+SIa IA;//variable globale permettant de garder accessible les caractéristiques de l'IA courante
 
 /********************************************************************************************
 *
@@ -20,6 +21,7 @@ void InitGame(unsigned int id, unsigned int nbPlayer, SPlayerInfo *info)
 {
   IA.id = id; //sauvegarde de l'id de l'IA
   IA.nbPlayer = nbPlayer; //sauvegarde du nombre de joueurs
+  fenetre();
 }
 
 /********************************************************************************************
@@ -550,14 +552,6 @@ int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size)
   for (i=0; i < size; i++) {
     if (arrCell[i] == cell) return 1;
   }
-
-  return 0;
-}
-
-//LANCEUR
-int main(int argc, char const *argv[])
-{
-  printf("%s\n", " -> dans main de strategie");
 
   return 0;
 }
