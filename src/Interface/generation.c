@@ -20,7 +20,7 @@
 * nbTerritoires int              Nombre de cellules
 *
 *********************************************************************************************/
-void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerritoires) {
+void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerritoires, int *tab_comparaison, int** tab_id) {
 
   //Itérateurs
   int i, p, j;
@@ -35,14 +35,8 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerr
   //Tableau des couleurs disponibles
   int couleurs[8][3] = {{0,0,255}, {0, 255, 0}, {255, 0, 0}, {128, 68, 188}, {255, 128, 0}, {0, 255, 255}, {102, 51, 0}, {255, 102, 255}};
 
-  //Tableau des ID de chaques cellules
-  int** tab_id = malloc((h+2)*sizeof(int*));
-
   //Permet d'enlever les id aux pixels bordures (à la fin)
   int** id_tmp = malloc((h+2)*sizeof(int*));
-
-  //Tableau de comparaison entre id et joueurs
-  int *tab_comparaison = malloc(nbTerritoires*sizeof(int));
 
   //Tableau des voisins de chaque territoire
   int** tab_voisins = malloc(nbTerritoires*sizeof(int*));
@@ -144,7 +138,7 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerr
   for (i = 0; i < h; i++) {
     for (p = 0; p < w; p++) {
       if (id_tmp[i+1][p+1] == 1) {
-        tab_id[i+1][p+1] == -1;
+        tab_id[i+1][p+1] = -1;
       }
     }
   }

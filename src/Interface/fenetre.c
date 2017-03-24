@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include "fenetre.h"
 #include <stdio.h>
+#include "jouer.h"
 
 /********************************************************************************************
 *
@@ -22,23 +23,31 @@ void fenetre() {
       SDL_WINDOW_SHOWN
   );
 
+  //Tableau de comparaison entre id et joueurs
+  int *tab_comparaison = malloc(50*sizeof(int));
+
+  //Tableau des ID de chaques cellules
+  int** tab_id = malloc(802*sizeof(int*));
+
   //Mise en place du renderer qui permet d'intérargir avec la fenêtre SDL2
   SDL_Renderer* renderer = NULL;
 
-  renderer =  SDL_CreateRenderer( window, -1, SDL_RENDERER_ACCELERATED);
+  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
   //Nettoie la fenêtre
-  SDL_RenderClear( renderer );
+  SDL_RenderClear(renderer);
 
-  generer_map(renderer, 800, 600, 6, 50);
+  generer_map(renderer, 800, 600, 6, 50, tab_comparaison, tab_id);
 
   SDL_Event e;
 
   while (running == 1) {
     while(SDL_PollEvent(&e) != 0) {
-      if(e.type == SDL_QUIT){
+      switch (e.type) {
+      case SDL_QUIT:
         running = 0;
-        printf("Closing the window ...\n");
+      case SDL_MOUSEBUTTONDOWN:
+        attaquer_territoire(e.button.x, e.button.y, 800, 600, tab_comparaison, tab_id, renderer);
       }
     }
   }
