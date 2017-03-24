@@ -175,34 +175,6 @@ int GetClusterSize(const SMap *map, SCell *startingCell)
 
 /********************************************************************************************
 *
-* FUNCTION NAME: GetCell
-*
-* DESCRIPTION: renvoie l'adresse de la SCell qui a l'id idCell
-*
-* ARGUMENT      TYPE             DESCRIPTION
-* map           const *SMap      la carte
-* idCell        int              l'id de la cellule à retourner
-*
-* RETURNS: l'adresse de la cellule qui a l'id idCell, NULL sinon
-*
-*********************************************************************************************/
-SCell* GetCell(const SMap *map, int idCell)
-{
-  int i;
-  SCell *allCells = map->cells; //tableau de toutes les SCell de la map
-
-  for (i = 0; i <( map->nbCells); i++)
-  {
-    if (allCells[i].id == idCell) {
-      return &(allCells[i]);
-    }
-  }
-
-  return NULL;
-}
-
-/********************************************************************************************
-*
 * FUNCTION NAME: MiniSCell
 *
 * DESCRIPTION: fonction permettant de chercher le plus petit voisin existant
@@ -358,30 +330,5 @@ int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size)
     if (arrCell[i] == cell) return 1;
   }
 
-  return 0;
-}
-
-/********************************************************************************************
-*
-* FUNCTION NAME: AreNeighbors
-*
-* DESCRIPTION: teste si deux cellules sont voisines
-*
-* ARGUMENT      TYPE             DESCRIPTION
-* cell1          *SCell          l'adresse de la cellule n°1
-* cell1          *SCell          l'adresse de la cellule n°2
-*
-* RETURNS: 1 si les cellules sont voisines, 0 sinon
-*
-*********************************************************************************************/
-int AreNeighbors(SCell *cell1, SCell *cell2)
-{
-  int i;
-  for (i = 0; i < cell1->nbNeighbors; i++) {
-    if (cell2 == cell1->neighbors[i]) //si les 2 cellules sont voisines
-    {
-      return 1;
-    }
-  }
   return 0;
 }

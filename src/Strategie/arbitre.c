@@ -6,7 +6,7 @@
 *
 * FUNCTION NAME: CreatePlayer
 *
-* DESCRIPTION: création d'un nouveau joueur
+* DESCRIPTION: création d'un nouveau joueur dans la struct SPlayerInfo
 *
 * ARGUMENT    TYPE             DESCRIPTION
 * idNewPlayer unsigned int     l'id du joueur
@@ -198,4 +198,115 @@ int Attack(const SMap *map, STurn *turn)
 
   attackingCell->nbDices = 1; //le nombre de dés de la cellule attaquante descendent à 1
   return 0; //on a perdu l'attaque
+}
+
+/********************************************************************************************
+*
+* FUNCTION NAME: AreNeighbors
+*
+* DESCRIPTION: teste si deux cellules sont voisines
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* cell1          *SCell          l'adresse de la cellule n°1
+* cell1          *SCell          l'adresse de la cellule n°2
+*
+* RETURNS: 1 si les cellules sont voisines, 0 sinon
+*
+*********************************************************************************************/
+int AreNeighbors(SCell *cell1, SCell *cell2)
+{
+  int i;
+  for (i = 0; i < cell1->nbNeighbors; i++) {
+    if (cell2 == cell1->neighbors[i]) //si les 2 cellules sont voisines
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
+
+/********************************************************************************************
+*
+* FUNCTION NAME: GetCell
+*
+* DESCRIPTION: renvoie l'adresse de la SCell qui a l'id idCell
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* idCell        int              l'id de la cellule à retourner
+*
+* RETURNS: l'adresse de la cellule qui a l'id idCell, NULL sinon
+*
+*********************************************************************************************/
+SCell* GetCell(const SMap *map, int idCell)
+{
+  int i;
+  SCell *allCells = map->cells; //tableau de toutes les SCell de la map
+
+  for (i = 0; i <( map->nbCells); i++)
+  {
+    if (allCells[i].id == idCell) {
+      return &(allCells[i]);
+    }
+  }
+
+  return NULL;
+}
+
+/********************************************************************************************
+*
+* FUNCTION NAME: GetClusterSize
+*
+* DESCRIPTION: renvoie la taille de la grappe de cellules
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* startingCell  *SCell           l'adresse de la cellule de départ
+*
+* RETURNS: la taille de la grappe de cellules
+*
+*********************************************************************************************/
+int GetClusterSize(const SMap *map, SCell *startingCell)
+{
+  int i, j, k;
+  int idPlayer = startingCell->owner; //l'id du joueur propriétaire de la cellule de référence
+
+  //int clusterIds[map->nbCells]; //tableau des id des cellules de la grappe, de taille le nombre de cellules de la map, car taille maximale
+  int clusterIdsSize = 0; //la taille de la grappe de cellules
+
+  SCell **cellsToTest = malloc((map->nbCells)*sizeof(SCell *)); //tableau de pointeurs de SCell. Les cellules à tester lors du prochain while
+  for (i = 0; i < (map->nbCells); i++) {
+    cellsToTest[i] = malloc(sizeof(SCell));
+  }
+
+  cellsToTest[0] = startingCell; //la premiere cellule à tester dans le while est startingCell
+  int cellsToTestSize = 1; //la taille du tableau de cellules à tester
+  int nextCellToTest = 0; //indice de la prochaine cellule à tester
+
+  while (cellsToTestSize != nextCellToTest) //tant qu'il reste des cellules alliées dont on n'a pas regardé les voisins
+  {
+    SCell *currentCell = cellsToTest[nextCellToTest]; //adresse de la cellule courante à tester
+    //clusterIds[clusterIdsSize] = currentCell->id; //on rajoute l'id de la cellule courante aux cellules parcourues
+    clusterIdsSize++;
+    SCell **voisins = currentCell->neighbors; // Tableau de pointeur vers les cellules voisines de la cellule courante
+    int nbVoisins = currentCell->nbNeighbors;
+
+    for(j = 0; (j < nbVoisins) ; j++) //parcours des voisins
+    {
+      if ((voisins[j]->owner == idPlayer) && !IsCellInArrayOfCellPointer(voisins[j], cellsToTest, cellsToTestSize)) //si le cellule voisine est un cellule alliée et qu'elle n'a pas déjà dans cellsToTest
+      {
+        cellsToTest[cellsToTestSize] = voisins[j]; //on l'a rajoute dans la liste des cellules à tester
+        cellsToTestSize++;
+      }
+    }
+    nextCellToTest++;
+  }
+
+  //libération allocation mémoire
+  for (k = 0; k < (map->nbCells); k++) {
+    free(cellsToTest[k]);
+  }
+  free(cellsToTest);
+
+  return clusterIdsSize;
 }
