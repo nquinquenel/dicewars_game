@@ -3,6 +3,13 @@ Projet DiceWars
 
 Développement du jeu DiceWars, composé d'une interface graphique (librairie SDL) et d'une intelligence artificielle.
 
+Comment jouer ?
+===================
+
+Sélectionner son terrain (une bordure interne blanche va apparaître si vous avez sélectionné votre territoire).
+Sélectionner un terrain à attaquer.
+Appuyer sur la touche entrée pour passer son tour.
+
 Comment compiler ?
 ===================
 
