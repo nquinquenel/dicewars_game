@@ -7,8 +7,11 @@ Comment jouer ?
 ===================
 
 Sélectionner son terrain (une bordure interne blanche va apparaître si vous avez sélectionné votre territoire).
+
 Sélectionner un terrain à attaquer.
+
 Appuyer sur la touche entrée pour passer son tour.
+
 
 Comment compiler ?
 ===================
