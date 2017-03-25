@@ -4,6 +4,21 @@
 
 int idJoueurActuel;
 
+/********************************************************************************************
+*
+* FUNCTION NAME: createGame //SUJET A DES CHANGEMENTS AU NIVEAU DES PARAMETRES
+*
+* DESCRIPTION: Initialise et démarre le jeu
+*
+* ARGUMENT    TYPE             DESCRIPTION
+* nbParties   int              le nombre de parties à jouer
+* nbPlayer    int              le nombre de joueurs dans la partie
+* nbArg       int              nombres d'arguments (nbParties + nbPlayer + les IA)
+* noms        char**           le nom des IA
+*
+* RETURNS: L'id du joueur actuel
+*
+*********************************************************************************************/
 void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
   int nbIA = nbArg - nbPlayer;
   printf("Nombre d'IA : %d", nbIA);
@@ -21,6 +36,20 @@ void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
   fenetre();
 }
 
+/********************************************************************************************
+*
+* FUNCTION NAME: demandeAttaque
+*
+* DESCRIPTION: Fait une demande d'attaque, si elle est correcte alors l'attaque se fait
+*
+* ARGUMENT    TYPE             DESCRIPTION
+* map         SMap*            la map actuelle
+* turn        STurn*           le tour à jouer
+* idPlayer    int              l'id du joueur qui attaque
+*
+* RETURNS: 1 si l'attaque a réussi, 0 si non, et -1 si la demande d'attaque n'est pas valide
+*
+*********************************************************************************************/
 int demandeAttaque(SMap *map, STurn *turn, int idPlayer) {
   if (ValidTurn(map, turn, idPlayer) == 1) {
     return Attack(map, turn);
@@ -29,10 +58,32 @@ int demandeAttaque(SMap *map, STurn *turn, int idPlayer) {
   }
 }
 
+/********************************************************************************************
+*
+* FUNCTION NAME: getIdJoueurActuel
+*
+* DESCRIPTION: Retourne l'id du joueur actuel
+*
+* ARGUMENT    TYPE             DESCRIPTION
+*
+* RETURNS: L'id du joueur actuel
+*
+*********************************************************************************************/
 int getIdJoueurActuel() {
   return idJoueurActuel;
 }
 
+/********************************************************************************************
+*
+* FUNCTION NAME: setIdJoueurActuel
+*
+* DESCRIPTION: Permet de changer l'id du joueur actuel (à travers un autre fichier par exemple)
+*
+* ARGUMENT    TYPE             DESCRIPTION
+* id          int              la nouvelle id
+* nbJoueurs   int              le nombre de joueurs dans la partie (afin d'avoir un idJoueurActuel toujours correct)
+*
+*********************************************************************************************/
 void setIdJoueurActuel(int id, int nbJoueurs) {
   if (id > nbJoueurs-1) {
     id = 0;
