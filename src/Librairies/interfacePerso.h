@@ -8,6 +8,12 @@ typedef struct SIa
 	int id;	// Id de l'ia
 	int nbPlayer; // Nombre de joueurs dans la partie
 } SIa;
+
+void createGame(int nbParties, int nbPlayer, int nbArg, char** noms);
+int demandeAttaque(SMap *map, STurn *turn, int idPlayer);
+int getIdJoueurActuel();
+void setIdJoueurActuel(int id, int nbJoueurs);
+
 /********************************************************************************************
 *
 * FUNCTION NAME: CreatePlayer

@@ -2,6 +2,44 @@
 #include "../Librairies/interfacePerso.h"
 #include "../Interface/fenetre.h"
 
+int idJoueurActuel;
+
+void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
+  int nbIA = nbArg - nbPlayer;
+  printf("Nombre d'IA : %d", nbIA);
+
+  SPlayerInfo **sp = malloc(2*sizeof(SPlayerInfo*));
+
+  int i;
+  for (i = 0; i < nbIA; i++) {
+    sp[i-nbIA] = malloc(sizeof(SPlayerInfo));
+    InitGame(i, nbPlayer, sp[i-nbIA]);
+  }
+
+  idJoueurActuel = 0;
+
+  fenetre();
+}
+
+int demandeAttaque(SMap *map, STurn *turn, int idPlayer) {
+  if (ValidTurn(map, turn, idPlayer) == 1) {
+    return Attack(map, turn);
+  } else {
+    return -1;
+  }
+}
+
+int getIdJoueurActuel() {
+  return idJoueurActuel;
+}
+
+void setIdJoueurActuel(int id, int nbJoueurs) {
+  if (id > nbJoueurs-1) {
+    id = 0;
+  }
+  idJoueurActuel = id;
+}
+
 /********************************************************************************************
 *
 * FUNCTION NAME: CreatePlayer
@@ -95,19 +133,19 @@ void DistributeDices(const SMap *map)
 
   for (j = 0; j < map->nbCells; j++) //remplissage de myCells
   {
-    if ((IA.id == allCells[i].owner) && (allCells[i].nbDices<8)) //si la cellule m'appartient et qu'elle a moins de 8 dés
-    {
-      myCells[myCellsSize] = &(allCells[i]);
-      myCellsSize++;
-    }
-    else
-    {
-      myCells[myCellsSize] = NULL;
-      myCellsSize++;
-    }
+  //  if ((IA.id == allCells[i].owner) && (allCells[i].nbDices<8)) //si la cellule m'appartient et qu'elle a moins de 8 dés
+  //  {
+  //    myCells[myCellsSize] = &(allCells[i]);
+  //    myCellsSize++;
+  //  }
+  //  else
+  //  {
+  //    myCells[myCellsSize] = NULL;
+  //    myCellsSize++;
+  //  }
   }
-
-  int nbDices = map->stack[IA.id]; // le nb de dés à distribuer
+  int nbDices = 0;
+//  int nbDices = map->stack[IA.id]; // le nb de dés à distribuer
   srand(time(NULL)); // initialisation de rand
   int randCell; //place de la cellule dans myCells tirée aléatoirement
   while (nbDices && myCellsSize) //tant qu'il reste des dés à distribuer et qu'il reste des cellules qui ont moins de 8 dés
@@ -144,10 +182,10 @@ int ValidTurn(const SMap *map, STurn *turn, int idPlayer)
   SCell *attackingCell = GetCell(map, turn->cellFrom); //adresse de la cellule attaquante
   SCell *defendingCell = GetCell(map, turn->cellTo);  //adresse de la cellule défendante
 
-
   //teste si les cellules sont bien voisines
   if (!AreNeighbors(attackingCell, defendingCell)) return 0; //si les cellules ne sont pas voisines
   if(attackingCell->nbDices == 1) return 0; //si la cellule attaquante n'a qu'un dés
+
   if(attackingCell->owner != idPlayer) return 0; //si la cellule attaquante n'appartient pas au joueur courant
   if(defendingCell->owner == idPlayer) return 0; //si la cellule attaquée appartient au joueur courant
   return 1;

@@ -7,19 +7,19 @@ all: main.o arbitre.o strategie.o fenetre.o generation.o jouer.o
 main.o: main.c Librairies/interface.h Librairies/interfacePerso.h
 				gcc -c main.c -o main.o $(CFLAGS)
 
-arbitre.o: Strategie/arbitre.c Librairies/interface.h Interface/fenetre.h
+arbitre.o: Strategie/arbitre.c Librairies/interface.h Interface/fenetre.h Librairies/interfacePerso.h
 				gcc -c Strategie/arbitre.c -o arbitre.o
 
 strategie.o: Strategie/strategie.c
 				gcc -c Strategie/strategie.c -o strategie.o $(CFLAGS)
 
-fenetre.o: Interface/fenetre.c Interface/generation.h
+fenetre.o: Interface/fenetre.c Interface/generation.h Librairies/interfacePerso.h
 				gcc -c Interface/fenetre.c -o fenetre.o $(CFLAGS)
 
 generation.o: Interface/generation.c Librairies/interface.h
 				gcc -c Interface/generation.c -o generation.o $(CFLAGS)
 
-jouer.o: Interface/jouer.c Interface/jouer.h
+jouer.o: Interface/jouer.c Interface/jouer.h Librairies/interface.h
 				gcc -c Interface/jouer.c -o jouer.o $(CFLAGS)
 
 # suppression des fichiers temporaires

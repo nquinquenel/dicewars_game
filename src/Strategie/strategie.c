@@ -128,7 +128,7 @@ void EndGame(unsigned int idWinner)
 * RETURNS: la taille de la grappe de cellules
 *
 *********************************************************************************************/
-int GetClusterSize(const SMap *map, SCell *startingCell)
+int GetClusterSizeStrat(const SMap *map, SCell *startingCell)
 {
   int i, j, k;
   int idPlayer = startingCell->owner; //l'id du joueur propriétaire de la cellule de référence

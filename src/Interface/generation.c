@@ -20,7 +20,7 @@
 * nbTerritoires int              Nombre de cellules
 *
 *********************************************************************************************/
-void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerritoires, int *tab_comparaison, int** tab_id) {
+SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerritoires, int *tab_comparaison, int** tab_id) {
 
   //Itérateurs
   int i, p, j;
@@ -32,14 +32,15 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerr
   srand(time(NULL));
   //SDL_RenderSetScale(renderer, 5.0, 5.0);
 
-  //Tableau des couleurs disponibles
-  int couleurs[8][3] = {{0,0,255}, {0, 255, 0}, {255, 0, 0}, {128, 68, 188}, {255, 128, 0}, {0, 255, 255}, {102, 51, 0}, {255, 102, 255}};
-
   //Permet d'enlever les id aux pixels bordures (à la fin)
   int** id_tmp = malloc((h+2)*sizeof(int*));
 
   //Tableau des voisins de chaque territoire
   int** tab_voisins = malloc(nbTerritoires*sizeof(int*));
+
+
+    //Tableau des couleurs disponibles
+    int couleurs[8][3] = {{0,0,255}, {0, 255, 0}, {255, 0, 0}, {128, 68, 188}, {255, 128, 0}, {0, 255, 255}, {102, 51, 0}, {255, 102, 255}};
 
   //h+2 car on ne va pas utiliser la première valeur
   for (i = 0; i < h+2; i++) {
@@ -91,7 +92,7 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerr
 
       //Attribue au pixel l'id du point auquel il appartient
       tab_id[i+1][p+1] = id;
-      tab_comparaison[id] = j%nbJoueurs;
+      tab_comparaison[id] = id%nbJoueurs;
 
       SDL_SetRenderDrawColor(renderer, tab_couleurs[couleur_point][0], tab_couleurs[couleur_point][1], tab_couleurs[couleur_point][2], 0);
       SDL_RenderDrawPoint(renderer, i, p);
@@ -155,10 +156,12 @@ void generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerr
   }*/
 
   SCell *map_cellules = generer_cellules(tab_voisins, nbTerritoires, tab_comparaison);
-  SMap map = generer_territoire(map_cellules, nbTerritoires);
+  SMap *map = generer_territoire(map_cellules, nbTerritoires);
 
   //Render tout ce qui a été modifié au niveau graphique
   SDL_RenderPresent(renderer);
+
+  return map;
 }
 
 /********************************************************************************************
@@ -228,7 +231,7 @@ SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison) 
     //20 voisins max (très peu probable plus)
     tab_cell[i].neighbors = malloc(20*sizeof(SCell*));
     //Implémenter le nombre de dés aléatoires
-    tab_cell[i].nbDices = 1;
+    tab_cell[i].nbDices = 3;
     voisin = 0;
     for (j = 0; j < nbTerritoires; j++) {
       if (tab_adj[i][j] != -1) {
@@ -256,12 +259,12 @@ SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison) 
 * RETURNS: Retourne la SMap générée
 *
 *********************************************************************************************/
-SMap generer_territoire(SCell* cellules, int nbTerritoires) {
-  SMap map;
+SMap* generer_territoire(SCell* cellules, int nbTerritoires) {
+  SMap *map;
 
-  map.cells = cellules;
-  map.nbCells = nbTerritoires;
-  map.stack = 0;
+  map->cells = cellules;
+  map->nbCells = nbTerritoires;
+  map->stack = 0;
 
   return map;
 }
