@@ -25,4 +25,4 @@ void fenetre();
 * nbDices                   int              le nombre de dés de la cellule
 *
 *********************************************************************************************/
-void displayDices(SDL_Renderer* renderer, SDL_Surface** background_surface_tab, SDL_Texture** background_texture_tab, int pixel_x, int pixel_y, int idCell, int nbDices);
+void displayDices(SDL_Renderer* renderer, int pixel_x, int pixel_y, int idCell, int nbDices);

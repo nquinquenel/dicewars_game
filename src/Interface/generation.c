@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "../Librairies/interface.h"
+#include "../Interface/fenetre.h"
 
 /********************************************************************************************
 *
@@ -38,9 +39,8 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
   //Tableau des voisins de chaque territoire
   int** tab_voisins = malloc(nbTerritoires*sizeof(int*));
 
-
-    //Tableau des couleurs disponibles
-    int couleurs[8][3] = {{0,0,255}, {0, 255, 0}, {255, 0, 0}, {128, 68, 188}, {255, 128, 0}, {0, 255, 255}, {102, 51, 0}, {255, 102, 255}};
+  //Tableau des couleurs disponibles
+  int couleurs[8][3] = {{0,0,255}, {0, 255, 0}, {255, 0, 0}, {128, 68, 188}, {255, 128, 0}, {0, 255, 255}, {102, 51, 0}, {255, 102, 255}};
 
   //h+2 car on ne va pas utiliser la première valeur
   for (i = 0; i < h+2; i++) {
@@ -65,6 +65,7 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
     tab_couleurs[i] = malloc(3*sizeof(int));
     couleur_aleatoire(tab_couleurs, i, &couleur_actuelle, couleurs, nbJoueurs);
     point_aleatoire(h, w, tab_points, i);
+    SDL_RenderPresent(renderer);
     tab_voisins[i] = malloc(nbTerritoires*sizeof(int));
     //J'initialise les voisins à -1
     for (p = 0; p < nbTerritoires; p++) {
@@ -155,7 +156,7 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
     printf("\n");
   }*/
 
-  SCell *map_cellules = generer_cellules(tab_voisins, nbTerritoires, tab_comparaison);
+  SCell *map_cellules = generer_cellules(tab_voisins, nbTerritoires, tab_comparaison, renderer, tab_points);
   SMap *map = generer_territoire(map_cellules, nbTerritoires);
 
   //Render tout ce qui a été modifié au niveau graphique
@@ -178,8 +179,20 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
 *
 *********************************************************************************************/
 void point_aleatoire(int h, int w, int **tab, int row) {
-  tab[row][0] = rand()%(h);
-  tab[row][1] = rand()%(w);
+  int coord_x = rand()%(h);
+  int coord_y = rand()%(w);
+  int i;
+
+  for (i = 0; i < row; i++) {
+    while (coord_x > (h-24) || coord_y < 52 || (fabs(tab[i][0] - coord_x) + fabs(tab[i][1] - coord_y)) < 55) {
+      coord_x = rand()%(h);
+      coord_y = rand()%(w);
+      i = 0;
+    }
+  }
+
+  tab[row][0] = coord_x;
+  tab[row][1] = coord_y;
 }
 
 /********************************************************************************************
@@ -220,7 +233,7 @@ void couleur_aleatoire(int **tab, int row, int *couleur_actuelle, int couleur[8]
 * RETURNS: Retourne un tableau de SCell
 *
 *********************************************************************************************/
-SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison) {
+SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison, SDL_Renderer* renderer, int** tab_points) {
   SCell *tab_cell = malloc(nbTerritoires*sizeof(SCell));
 
   int i, j, voisin;
@@ -232,6 +245,9 @@ SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison) 
     tab_cell[i].neighbors = malloc(20*sizeof(SCell*));
     //Implémenter le nombre de dés aléatoires
     tab_cell[i].nbDices = 3;
+
+    displayDices(renderer, tab_points[i][0], tab_points[i][1], i, 3);
+
     voisin = 0;
     for (j = 0; j < nbTerritoires; j++) {
       if (tab_adj[i][j] != -1) {

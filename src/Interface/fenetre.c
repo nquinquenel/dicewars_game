@@ -4,8 +4,8 @@
 #include "jouer.h"
 #include "../Librairies/interfacePerso.h"
 
-int IMG_DICES_W = 20;//la dimension de l'image des dés en largeur
-int IMG_DICES_H = 20; //la dimension de l'image des dés en hauteur
+int IMG_DICES_W = 24;//la dimension de l'image des dés en largeur
+int IMG_DICES_H = 52; //la dimension de l'image des dés en hauteur
 
 /********************************************************************************************
 *
@@ -176,10 +176,7 @@ void fenetre() {
 * nbDices                   int              le nombre de dés de la cellule
 *
 *********************************************************************************************/
-void displayDices(SDL_Renderer* renderer, SDL_Surface** background_surface_tab, SDL_Texture** background_texture_tab, int pixel_x, int pixel_y, int idCell, int nbDices)
-{
-  printf("%s\n", "Didier");
-
+void displayDices(SDL_Renderer* renderer, int pixel_x, int pixel_y, int idCell, int nbDices) {
   // les objets SDL pour l'image
   SDL_Surface* background_surface = NULL;
   SDL_Texture* background_texture = NULL;
@@ -187,17 +184,15 @@ void displayDices(SDL_Renderer* renderer, SDL_Surface** background_surface_tab, 
   // positionnement et taille de l'image
   SDL_Rect img_pos;
   img_pos.x = pixel_x;
-  img_pos.y = pixel_y;
+  img_pos.y = (pixel_y-52);
   img_pos.w = IMG_DICES_W;
   img_pos.h = IMG_DICES_H;
 
-  background_surface = SDL_LoadBMP("./Interface/images/test3.bmp");
+  background_surface = SDL_LoadBMP("Images/3dés.bmp");
   background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
 
-  background_surface_tab[idCell] = background_surface;
-  background_texture_tab[idCell] = background_texture;
+  //background_surface_tab[idCell] = background_surface;
+  //background_texture_tab[idCell] = background_texture;
 
   SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
-
-  SDL_RenderPresent(renderer);
 }
