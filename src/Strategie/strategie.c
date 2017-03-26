@@ -175,6 +175,22 @@ int PlayTurn2(const SMap *map, STurn *turn)
   return 1; //on effectuera notre attaque
 }
 
+/********************************************************************************************
+*
+* FUNCTION NAME: PlayTurn3
+*
+* DESCRIPTION: Fonction à appeler à chaque tour sur la stratégie et tant que le retour de
+*              fonction est vrai et qu'il n'y a pas d'erreur.
+*              - Ne pas oublier pour l'arbitre de dupliquer toute la structure map pour chaque appel !
+*              - En cas d'erreur, rétablir la carte dans l'état initial avant le premier tour du joueur.
+*
+* ARGUMENT    TYPE             DESCRIPTION
+* map         const *SMap      la carte
+* turn        *STurn           le tour courant
+*
+* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
+*
+*********************************************************************************************/
 int PlayTurn3(const SMap *map, STurn *turn)
 {
   int nbTerritoires = map->nbCells;
