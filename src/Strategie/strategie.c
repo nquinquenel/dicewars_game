@@ -294,6 +294,20 @@ int* MiniSCell(SCell **voisins, int nbVoisins)
   return tableau;
 }
 
+/********************************************************************************************
+*
+* FUNCTION NAME: MiniCoupSCell
+*
+* DESCRIPTION: fonction permettant de chercher un voisin qui a une diffférence de 1 avec notre cellule
+*
+* ARGUMENT    TYPE             DESCRIPTION
+* voisins     **SCell          Le pointeur du tableau de pointeurs
+* nbVoisins   int              Le nombre de voisins de notre cellule
+* nbDes       int              Le nombre de dés de notre cellule
+*
+* RETURNS: Un tableau de 2 entiers contenant le rang et le nombre de dés
+*
+*********************************************************************************************/
 int* MiniCoupSCell(SCell **voisins, int nbVoisins, int nbDes)
 {
   int k;
