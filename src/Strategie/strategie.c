@@ -175,6 +175,69 @@ int PlayTurn2(const SMap *map, STurn *turn)
   return 1; //on effectuera notre attaque
 }
 
+int PlayTurn3(const SMap *map, STurn *turn)
+{
+  int nbTerritoires = map->nbCells;
+  SCell *territoires = map->cells; //tableau de SCell
+
+  // Premiere étape : récupération du nombre de territoires nous appartenant
+  int i;
+  int count = 0;
+  for(i = 0; i < nbTerritoires; i++) //parcours des cellules
+  {
+    if (territoires[i].owner == IA.id ) //si je suis le propriétaire
+    {
+      count++; // On incrémente pour chaque territoire nous appartenant
+    }
+  }
+
+  // Deuxieme étape : attribution des cellules de notre territoire dans un tableau
+  SCell *tab = malloc((count)*sizeof(SCell)); // On malloc notre tableau
+  count = 0; // On réinitialise le compteur
+  for(i = 0; i < nbTerritoires; i++) // parcours des cellules
+  {
+    if (territoires[i].owner == IA.id ) // si je suis le propriétaire
+    {
+      tab[count] = territoires[i]; // On ajoute chaque cellule à notre tableau
+      count++; // On incrémente le compteur
+    }
+  }
+
+  // Troisieme étape : on cherche le territoire avec la plus grosse probabilité de victoires
+  int* coup; //Contiendra l'adresse du résultat du test des voisins
+  for(i = 0; i < count+1; i++) //parcours des cellules
+  {
+    if(i == 0)
+    {
+      coup = MiniCoupSCell(tab[i].neighbors, tab[i].nbNeighbors, tab[i].nbDices); // attribution par défaut
+      coup[0] -= tab[i].nbDices; //On décrémente par le nombre de dés que l'on a
+      turn->cellFrom = tab[i].id; //attribution temporaire
+      turn->cellTo = tab[i].neighbors[coup[1]]->id; //attribution temporaire
+    }
+    else if(MiniCoupSCell(tab[i].neighbors, tab[i].nbNeighbors, tab[i].nbDices)[0]-tab[i].nbDices < coup[0])
+    {
+      coup = MiniCoupSCell(tab[i].neighbors, tab[i].nbNeighbors,tab[i].nbDices); //On change stock notre adresse de tableau
+      coup[0] -= tab[i].nbDices; //On doit décrémenter pour pouvoir vérifier le suivant
+      turn->cellFrom = tab[i].id; //nouvelle attribution
+      turn->cellTo = tab[i].neighbors[coup[1]]->id; //nouvelle attribution
+    }
+    if(coup[0]==1)
+    {
+      return 1;
+    }
+  }
+  if(coup[0] >= 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
+  {
+    return 0; //on passera notre tour
+  }
+
+  //libération de l'allocation mémoire
+  free(tab);
+  free(coup);
+
+  return 1; //on effectuera notre attaque
+}
+
 /********************************************************************************************
 *
 * FUNCTION NAME: EndGame
