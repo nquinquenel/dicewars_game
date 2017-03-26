@@ -65,7 +65,6 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
     tab_couleurs[i] = malloc(3*sizeof(int));
     couleur_aleatoire(tab_couleurs, i, &couleur_actuelle, couleurs, nbJoueurs);
     point_aleatoire(h, w, tab_points, i);
-    SDL_RenderPresent(renderer);
     tab_voisins[i] = malloc(nbTerritoires*sizeof(int));
     //J'initialise les voisins à -1
     for (p = 0; p < nbTerritoires; p++) {
