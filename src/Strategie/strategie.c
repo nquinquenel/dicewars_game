@@ -294,6 +294,52 @@ int* MiniSCell(SCell **voisins, int nbVoisins)
   return tableau;
 }
 
+int* MiniCoupSCell(SCell **voisins, int nbVoisins, int nbDes)
+{
+  int k;
+  int mini; // le nombre de dés minimale
+  int rang; //le rang du voisins
+  int boo = 1;
+  int *tableau = malloc(2*sizeof(int));//Création du tableau de retour
+
+
+  for(k = 0; k < nbVoisins; k++)
+  {
+    if(boo)
+    {
+      if(voisins[k]->owner != IA.id) // si je suis le propriétaire pour éviter d'attaquer son territoire
+      {
+        mini = voisins[k]->nbDices;
+        rang = k;
+        boo = 0;
+        if(nbDes - mini == 1)
+        {
+          tableau[0] = mini;
+          tableau[1] = rang;
+          return tableau;
+        }
+      }
+    }
+    else if(voisins[k]->nbDices < mini)
+    {
+      if (voisins[k]->owner != IA.id ) // si je suis le propriétaire pour éviter d'attaquer son territoire
+      {
+        mini = voisins[k]->nbDices;
+        rang = k;
+        if(nbDes - mini == 1)
+        {
+          tableau[0] = mini;
+          tableau[1] = rang;
+          return tableau;
+        }
+      }
+    }
+  }
+  tableau[0] = mini;
+  tableau[1] = rang;
+  return tableau;
+}
+
 /********************************************************************************************
 *
 * FUNCTION NAME: PercentageOfOccupation
