@@ -267,7 +267,14 @@ int PlayTurn3(const SMap *map, STurn *turn)
 void EndGame(unsigned int idWinner)
 {
   //free tous les objets
-  //afficher gagnant et score (le nombre de tours)
+  //afficher gagnant et score (le nombre de tours
+  FILE *logfile = fopen("logfile.txt","a");
+  char str[256] = "/tgame winner: idWinner";
+  if(logfile==NULL){
+	printf("cant open file");
+  }
+  fprintf(logfile,"%s",str);
+  fclose(logfile);
 }
 
 /********************************************************************************************
