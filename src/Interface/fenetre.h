@@ -7,7 +7,7 @@
 * DESCRIPTION: Génère la fenêtre de jeu SDL2 et départ du programme (boucle du jeu)
 *
 *********************************************************************************************/
-void fenetre();
+void fenetre(int nbJoueurs);
 
 /********************************************************************************************
 *

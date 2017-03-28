@@ -9,7 +9,12 @@ int main(int argc, char **argv) {
   for (i = 0; i < argc; i++) {
     printf("argv[%d] = %s\n", i, argv[i]);
   }
-  fenetre();
+
+  int nbParties, nbPlayer;
+  nbParties = argv[1][0] - '0';
+  nbPlayer = argv[2][0] - '0';
+
+  createGame(nbParties, nbPlayer, argc, argv);
 
   return 0;
 }

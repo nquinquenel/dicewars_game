@@ -29,6 +29,9 @@ void setIdJoueurActuel(int id, int nbJoueurs);
 *
 *********************************************************************************************/
 SPlayerInfo* CreatePlayer(unsigned int idNewPlayer, char *name, SPlayerInfo *info);
+
+int isAnIA(int id);
+
 /********************************************************************************************
 *
 * FUNCTION NAME: GetClusterSize

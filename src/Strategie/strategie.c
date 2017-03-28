@@ -68,18 +68,15 @@ int PlayTurn(const SMap *map, STurn *turn)
   }
 
   // Troisieme étape : on cherche le territoire avec la plus grosse probabilité de victoires
-  int* coup; //Contiendra l'adresse du résultat du test des voisins
-  for(i = 0; i < count+1; i++) //parcours des cellules
+  int* coup = malloc(sizeof(int)); //Contiendra l'adresse du résultat du test des voisins
+  for(i = 0; i < count; i++) //parcours des cellules
   {
-    if(i == 0)
-    {
+    if(i == 0) {
       coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); // attribution par défaut
       coup[0] -= tab[i].nbDices; //On décrémente par le nombre de dés que l'on a
       turn->cellFrom = tab[i].id; //attribution temporaire
       turn->cellTo = tab[i].neighbors[coup[1]]->id; //attribution temporaire
-    }
-    else if(MiniSCell(tab[i].neighbors, tab[i].nbNeighbors)[0]-tab[i].nbDices < coup[0]) //On vérifie en enlevant directement le nb de dés si c'est inférieur
-    {
+    } else if(MiniSCell(tab[i].neighbors, tab[i].nbNeighbors)[0]-tab[i].nbDices < coup[0]) {//On vérifie en enlevant directement le nb de dés si c'est inférieur
       coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); //On change stock notre adresse de tableau
       coup[0] -= tab[i].nbDices; //On doit décrémenter pour pouvoir vérifier le suivant
       turn->cellFrom = tab[i].id; //nouvelle attribution
@@ -374,7 +371,7 @@ int* MiniSCell(SCell **voisins, int nbVoisins)
       }
     }
   }
-  int *tableau = malloc(2*sizeof(int));//Création du tableau de retour
+  int* tableau = malloc(2*sizeof(int));//Création du tableau de retour
   tableau[0] = mini;
   tableau[1] = rang;
   return tableau;

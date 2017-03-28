@@ -3,6 +3,8 @@
 #include "../Interface/fenetre.h"
 
 int idJoueurActuel;
+int* idIA;
+int nbIA;
 
 /********************************************************************************************
 *
@@ -20,20 +22,32 @@ int idJoueurActuel;
 *
 *********************************************************************************************/
 void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
-  int nbIA = nbArg - nbPlayer;
-  printf("Nombre d'IA : %d", nbIA);
+  nbIA = nbArg - nbPlayer - 1;
+  idIA = malloc(nbIA * sizeof(int));
+  printf("Nombre d'IA : %d\n", nbIA);
 
-  SPlayerInfo **sp = malloc(2*sizeof(SPlayerInfo*));
+  SPlayerInfo **sp = malloc(nbIA*sizeof(SPlayerInfo*));
 
   int i;
   for (i = 0; i < nbIA; i++) {
-    sp[i-nbIA] = malloc(sizeof(SPlayerInfo));
-    InitGame(i, nbPlayer, sp[i-nbIA]);
+    sp[i] = malloc(sizeof(SPlayerInfo));
+    InitGame(i, nbPlayer, sp[i]);
+    idIA[i] = nbPlayer-nbIA+i;
   }
 
   idJoueurActuel = 0;
 
-  fenetre();
+  fenetre(nbPlayer);
+}
+
+int isAnIA(int id) {
+  int i = 0;
+  for (i = 0; i < nbIA; i++) {
+    if (id == idIA[i]) {
+      return 1;
+    }
+  }
+  return 0;
 }
 
 /********************************************************************************************
@@ -85,6 +99,7 @@ int getIdJoueurActuel() {
 *
 *********************************************************************************************/
 void setIdJoueurActuel(int id, int nbJoueurs) {
+  printf("%d\n", id);
   if (id > nbJoueurs-1) {
     id = 0;
   }

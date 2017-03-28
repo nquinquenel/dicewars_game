@@ -18,6 +18,22 @@ void attaquer_territoire(int cord_x, int cord_y, int h, int w, int *tab_comparai
   cell->owner = idPlayer;
 }
 
+void attaquer_territoireSansCoord(int id_atq, int h, int w, int *tab_comparaison, int** tab_id, SDL_Renderer* renderer, SMap *map, int idPlayer, int couleurs[8][3]) {
+  int i, j, id;
+  tab_comparaison[id_atq] = idPlayer;
+  for (i = 0; i < h; i++) {
+    for (j = 0; j < w; j++) {
+      if (tab_id[i+1][j+1] == id_atq) {
+        SDL_SetRenderDrawColor(renderer, couleurs[idPlayer][0], couleurs[idPlayer][1], couleurs[idPlayer][2], 0);
+        SDL_RenderDrawPoint(renderer, i, j);
+      }
+    }
+  }
+  SDL_RenderPresent(renderer);
+  SCell *cell = &(map->cells[id]);
+  cell->owner = idPlayer;
+}
+
 int territoireSelec(int cord_x, int cord_y, int** tab_id) {
   return tab_id[cord_x][cord_y];
 }

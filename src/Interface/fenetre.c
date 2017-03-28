@@ -14,7 +14,7 @@ int IMG_DICES_H = 52; //la dimension de l'image des dés en hauteur
 * DESCRIPTION: Génère la fenêtre de jeu SDL2 et départ du programme (boucle du jeu)
 *
 *********************************************************************************************/
-void fenetre() {
+void fenetre(int nbJoueurs) {
   //Condition pour faire tourner le jeu en boucle
   int running = 1;
   int i, p;
@@ -37,6 +37,13 @@ void fenetre() {
   //Tableau pour remettre les bordures blanches par défaut
   int** tab_borduresBlanches = malloc(799*sizeof(int*));
 
+  //Tableau de points
+  int** tab_points = malloc(50*sizeof(int*));
+
+  for (i = 0; i < 50; i++) {
+    tab_points[i] = malloc(2*sizeof(int));
+  }
+
   for (i = 0; i < 799; i++) {
     tab_borduresBlanches[i] = malloc(599*sizeof(int));
     for (p = 0; p < 599; p++) {
@@ -58,7 +65,7 @@ void fenetre() {
 
   SMap *map;
 
-  map = generer_map(renderer, 800, 600, 6, 50, tab_comparaison, tab_id);
+  map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
 
   // allocation mémoire pour 2 tableaux de pointeurs pour gérer l'affichage des images de dés des cellules
   // Tableau de pointeurs de SDL_Surface pour les images de dés
@@ -68,11 +75,39 @@ void fenetre() {
 
   SDL_Event e;
 
-  int res, cellUn, cellDeux, idJoueurActuel;
+  int res, cellUn, cellDeux, idJoueurActuel, playIA, id;
   int phase = 0;
   while (running == 1) {
     while(SDL_PollEvent(&e) != 0) {
       idJoueurActuel = getIdJoueurActuel();
+      //Au tour de l'IA de jouer
+      if (isAnIA(idJoueurActuel) == 1) {
+        STurn *turn = malloc(sizeof(turn));
+        playIA = PlayTurn(map, turn);
+        printf("WWW: %d\n", playIA);
+        if (playIA == 1) {
+          playIA = demandeAttaque(map, turn, idJoueurActuel);
+          id = turn->cellTo;
+          if (playIA == 1) {
+            attaquer_territoireSansCoord(id,800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
+          }
+          int nbDes;
+          nbDes = map->cells[id].nbDices;
+          displayDices(renderer, tab_points[id][0], tab_points[id][1], id, nbDes);
+          id = turn->cellFrom;
+          nbDes = map->cells[id].nbDices;
+          displayDices(renderer, tab_points[id][0], tab_points[id][1], id, nbDes);
+        } else {
+          //On passe au joueur suivant
+          idJoueurActuel++;
+          setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+          printf("Au joueur %d de jouer\n", getIdJoueurActuel());
+        }
+
+        //On free le turn
+        free(turn);
+      }
+
       switch (e.type) {
 
         //On appuie sur la croix rouge de la fenêtre
@@ -105,6 +140,12 @@ void fenetre() {
             attaquer_territoire(e.button.x, e.button.y, 800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
           }
 
+          int nbDes;
+          nbDes = map->cells[cellUn].nbDices;
+          displayDices(renderer, tab_points[cellUn][0], tab_points[cellUn][1], cellUn, nbDes);
+          nbDes = map->cells[cellDeux].nbDices;
+          displayDices(renderer, tab_points[cellDeux][0], tab_points[cellDeux][1], cellDeux, nbDes);
+
           //On enlève les bordures internes blanches de notre territoire
           for (i = 1; i < 799; i++) {
             for (p = 1; p < 599; p++) {
@@ -119,6 +160,7 @@ void fenetre() {
 
           //On free le turn
           free(turn);
+
           //On repasse à la phase 1
           phase = 0;
         }
@@ -146,7 +188,7 @@ void fenetre() {
 
           //On passe au joueur suivant
           idJoueurActuel++;
-          setIdJoueurActuel(idJoueurActuel, 6);
+          setIdJoueurActuel(idJoueurActuel, nbJoueurs);
           printf("Au joueur %d de jouer\n", getIdJoueurActuel());
 
           break;
@@ -188,11 +230,37 @@ void displayDices(SDL_Renderer* renderer, int pixel_x, int pixel_y, int idCell, 
   img_pos.w = IMG_DICES_W;
   img_pos.h = IMG_DICES_H;
 
-  background_surface = SDL_LoadBMP("Images/3dés.bmp");
+  switch (nbDices) {
+    case 1:
+    background_surface = SDL_LoadBMP("Images/1dés.bmp");
+    break;
+    case 2:
+    background_surface = SDL_LoadBMP("Images/2dés.bmp");
+    break;
+    case 3:
+    background_surface = SDL_LoadBMP("Images/3dés.bmp");
+    break;
+    case 4:
+    background_surface = SDL_LoadBMP("Images/4dés.bmp");
+    break;
+    case 5:
+    background_surface = SDL_LoadBMP("Images/5dés.bmp");
+    break;
+    case 6:
+    background_surface = SDL_LoadBMP("Images/6dés.bmp");
+    break;
+    case 7:
+    background_surface = SDL_LoadBMP("Images/7dés.bmp");
+    break;
+    case 8:
+    background_surface = SDL_LoadBMP("Images/8dés.bmp");
+    break;
+  }
   background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
 
   //background_surface_tab[idCell] = background_surface;
   //background_texture_tab[idCell] = background_texture;
 
   SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
+  SDL_RenderPresent(renderer);
 }

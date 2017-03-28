@@ -21,7 +21,7 @@
 * nbTerritoires int              Nombre de cellules
 *
 *********************************************************************************************/
-SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerritoires, int *tab_comparaison, int** tab_id) {
+SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTerritoires, int *tab_comparaison, int** tab_id, int** tab_points) {
 
   //Itérateurs
   int i, p, j;
@@ -55,13 +55,10 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
     }
   }
 
-  //Tableau de points
-  int** tab_points = malloc(nbTerritoires*sizeof(int*));
   int** tab_couleurs = malloc(nbTerritoires*sizeof(int*));
 
   //Initalise certains tableaux et génère les points ainsi que les couleurs
   for (i = 0; i < nbTerritoires; i++) {
-    tab_points[i] = malloc(2*sizeof(int));
     tab_couleurs[i] = malloc(3*sizeof(int));
     couleur_aleatoire(tab_couleurs, i, &couleur_actuelle, couleurs, nbJoueurs);
     point_aleatoire(h, w, tab_points, i);
