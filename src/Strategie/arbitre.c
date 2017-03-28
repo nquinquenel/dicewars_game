@@ -31,7 +31,8 @@ void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
   int i;
   for (i = 0; i < nbIA; i++) {
     sp[i] = malloc(sizeof(SPlayerInfo));
-    InitGame(i, nbPlayer, sp[i]);
+    InitGame((i+(nbPlayer - nbIA)), nbPlayer, sp[i]);
+    printf("id ia : %d\n", i);
     idIA[i] = nbPlayer-nbIA+i;
   }
 

@@ -55,6 +55,8 @@ int PlayTurn(const SMap *map, STurn *turn)
     }
   }
 
+  printf("count : %d\n", count);
+
   // Deuxieme étape : attribution des cellules de notre territoire dans un tableau
   SCell *tab = malloc((count)*sizeof(SCell)); // On malloc notre tableau
   count = 0; // On réinitialise le compteur

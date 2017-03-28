@@ -76,32 +76,46 @@ void fenetre(int nbJoueurs) {
   SDL_Event e;
 
   int res, cellUn, cellDeux, idJoueurActuel, playIA, id;
+  int tourFini = 0;
   int phase = 0;
   while (running == 1) {
     while(SDL_PollEvent(&e) != 0) {
+      tourFini = 0;
       idJoueurActuel = getIdJoueurActuel();
       //Au tour de l'IA de jouer
       if (isAnIA(idJoueurActuel) == 1) {
         STurn *turn = malloc(sizeof(turn));
-        playIA = PlayTurn(map, turn);
-        printf("WWW: %d\n", playIA);
-        if (playIA == 1) {
-          playIA = demandeAttaque(map, turn, idJoueurActuel);
-          id = turn->cellTo;
+        while (tourFini == 0) {
+          playIA = PlayTurn(map, turn);
+          printf("WWW: %d\n", playIA);
           if (playIA == 1) {
-            attaquer_territoireSansCoord(id,800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
+            playIA = demandeAttaque(map, turn, idJoueurActuel);
+            printf("play ok : %d\n", playIA);
+            id = turn->cellTo;
+            if (playIA == 1) {
+              attaquer_territoireSansCoord(id,800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
+            }
+            if (playIA != -1) {
+              int nbDes;
+              nbDes = map->cells[id].nbDices;
+              displayDices(renderer, tab_points[id][0], tab_points[id][1], id, nbDes);
+              id = turn->cellFrom;
+              nbDes = map->cells[id].nbDices;
+              displayDices(renderer, tab_points[id][0], tab_points[id][1], id, nbDes);
+            } else {
+              tourFini = 1;
+              //On passe au joueur suivant
+              idJoueurActuel++;
+              setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+              printf("Au joueur %d de jouer\n", getIdJoueurActuel());
+            }
+          } else {
+            tourFini = 1;
+            //On passe au joueur suivant
+            idJoueurActuel++;
+            setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+            printf("Au joueur %d de jouer\n", getIdJoueurActuel());
           }
-          int nbDes;
-          nbDes = map->cells[id].nbDices;
-          displayDices(renderer, tab_points[id][0], tab_points[id][1], id, nbDes);
-          id = turn->cellFrom;
-          nbDes = map->cells[id].nbDices;
-          displayDices(renderer, tab_points[id][0], tab_points[id][1], id, nbDes);
-        } else {
-          //On passe au joueur suivant
-          idJoueurActuel++;
-          setIdJoueurActuel(idJoueurActuel, nbJoueurs);
-          printf("Au joueur %d de jouer\n", getIdJoueurActuel());
         }
 
         //On free le turn
