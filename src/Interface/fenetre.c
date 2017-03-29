@@ -69,9 +69,9 @@ void fenetre(int nbJoueurs) {
 
   // allocation mémoire pour 2 tableaux de pointeurs pour gérer l'affichage des images de dés des cellules
   // Tableau de pointeurs de SDL_Surface pour les images de dés
-  SDL_Surface** background_surface_tab = malloc(50*sizeof(SDL_Surface *));
+  //SDL_Surface** background_surface_tab = malloc(50*sizeof(SDL_Surface *));
   // Tableau de pointeurs de SDL_Texture pour les images de dés
-  SDL_Texture** background_texture_tab = malloc(50*sizeof(SDL_Texture *));
+  //SDL_Texture** background_texture_tab = malloc(50*sizeof(SDL_Texture *));
 
   SDL_Event e;
 
@@ -82,19 +82,24 @@ void fenetre(int nbJoueurs) {
     while(SDL_PollEvent(&e) != 0) {
       tourFini = 0;
       idJoueurActuel = getIdJoueurActuel();
+
       //Au tour de l'IA de jouer
       if (isAnIA(idJoueurActuel) == 1) {
         STurn *turn = malloc(sizeof(turn));
+
+        //Tant que l'IA n'a pas fini de jouer
         while (tourFini == 0) {
+          //L'IA joue son tour
           playIA = PlayTurn(map, turn);
-          printf("WWW: %d\n", playIA);
+          //Si elle souhaite attaquer
           if (playIA == 1) {
             playIA = demandeAttaque(map, turn, idJoueurActuel);
-            printf("play ok : %d\n", playIA);
             id = turn->cellTo;
+            //Si l'IA a gagné son attaque
             if (playIA == 1) {
               attaquer_territoireSansCoord(id,800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
             }
+            //Si l'IA a fait une attaque autorisé (gagné ou perdue)
             if (playIA != -1) {
               int nbDes;
               nbDes = map->cells[id].nbDices;
@@ -102,6 +107,7 @@ void fenetre(int nbJoueurs) {
               id = turn->cellFrom;
               nbDes = map->cells[id].nbDices;
               displayDices(renderer, tab_points[id][0], tab_points[id][1], id, nbDes);
+            //Si l'IA fait un mouvement interdit
             } else {
               tourFini = 1;
               //On passe au joueur suivant
@@ -109,6 +115,7 @@ void fenetre(int nbJoueurs) {
               setIdJoueurActuel(idJoueurActuel, nbJoueurs);
               printf("Au joueur %d de jouer\n", getIdJoueurActuel());
             }
+          //Si elle passe son tour
           } else {
             tourFini = 1;
             //On passe au joueur suivant
@@ -199,12 +206,10 @@ void fenetre(int nbJoueurs) {
             SDL_RenderPresent(renderer);
             phase = 0;
           }
-
           //On passe au joueur suivant
           idJoueurActuel++;
           setIdJoueurActuel(idJoueurActuel, nbJoueurs);
           printf("Au joueur %d de jouer\n", getIdJoueurActuel());
-
           break;
         }
         break;

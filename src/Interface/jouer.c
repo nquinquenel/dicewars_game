@@ -19,7 +19,7 @@ void attaquer_territoire(int cord_x, int cord_y, int h, int w, int *tab_comparai
 }
 
 void attaquer_territoireSansCoord(int id_atq, int h, int w, int *tab_comparaison, int** tab_id, SDL_Renderer* renderer, SMap *map, int idPlayer, int couleurs[8][3]) {
-  int i, j, id;
+  int i, j;
   tab_comparaison[id_atq] = idPlayer;
   for (i = 0; i < h; i++) {
     for (j = 0; j < w; j++) {
@@ -30,7 +30,7 @@ void attaquer_territoireSansCoord(int id_atq, int h, int w, int *tab_comparaison
     }
   }
   SDL_RenderPresent(renderer);
-  SCell *cell = &(map->cells[id]);
+  SCell *cell = &(map->cells[id_atq]);
   cell->owner = idPlayer;
 }
 

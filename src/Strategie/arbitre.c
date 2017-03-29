@@ -22,7 +22,7 @@ int nbIA;
 *
 *********************************************************************************************/
 void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
-  nbIA = nbArg - nbPlayer - 1;
+  nbIA = nbArg - 3;
   idIA = malloc(nbIA * sizeof(int));
   printf("Nombre d'IA : %d\n", nbIA);
 
@@ -31,8 +31,8 @@ void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
   int i;
   for (i = 0; i < nbIA; i++) {
     sp[i] = malloc(sizeof(SPlayerInfo));
-    InitGame((i+(nbPlayer - nbIA)), nbPlayer, sp[i]);
-    printf("id ia : %d\n", i);
+    InitGame(i+(nbPlayer-nbIA), nbPlayer, sp[i]);
+    printf("Id IA : %d\n", i+(nbPlayer-nbIA));
     idIA[i] = nbPlayer-nbIA+i;
   }
 

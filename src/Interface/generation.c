@@ -152,7 +152,7 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
     printf("\n");
   }*/
 
-  SCell *map_cellules = generer_cellules(tab_voisins, nbTerritoires, tab_comparaison, renderer, tab_points);
+  SCell *map_cellules = generer_cellules(tab_voisins, nbTerritoires, tab_comparaison, renderer, tab_points, nbJoueurs);
   SMap *map = generer_territoire(map_cellules, nbTerritoires);
 
   //Render tout ce qui a été modifié au niveau graphique
@@ -229,20 +229,70 @@ void couleur_aleatoire(int **tab, int row, int *couleur_actuelle, int couleur[8]
 * RETURNS: Retourne un tableau de SCell
 *
 *********************************************************************************************/
-SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison, SDL_Renderer* renderer, int** tab_points) {
+SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison, SDL_Renderer* renderer, int** tab_points, int nbJoueurs) {
   SCell *tab_cell = malloc(nbTerritoires*sizeof(SCell));
 
   int i, j, voisin;
 
+  int total = ((nbTerritoires / nbJoueurs)*3)-nbJoueurs;
+  int** desParTerr = malloc(nbJoueurs*sizeof(int*));
+  int* cmpt = malloc(nbJoueurs*sizeof(int));
+  int* nbTerr = malloc(nbJoueurs*sizeof(int));
+
+  for (i = 0; i < nbJoueurs; i++) {
+    nbTerr[i] = 0;
+  }
+
+  for (i = 0; i < nbTerritoires; i++) {
+    nbTerr[tab_comparaison[i]]++;
+  }
+
+  for (i = 0; i < nbJoueurs; i++) {
+    desParTerr[i] = malloc(nbTerr[i]*sizeof(int));
+    cmpt[i] = 0;
+    for (j = 0; j < nbTerr[i]; j++) {
+      desParTerr[i][j] = 1;
+    }
+  }
+
+  int nbRandom = 0;
+  i = 0;
+  j = 0;
+
+  while (total > 0) {
+    nbRandom = rand()%8;
+    if ((total - nbRandom) < 0) {
+      nbRandom = total;
+    }
+    if (desParTerr[j][i] + nbRandom > 8) {
+      nbRandom = (8 - desParTerr[j][i]);
+    }
+    desParTerr[j][i] += nbRandom;
+    total = total - nbRandom;
+    i++;
+    if (total > 0 && i > nbTerr[j]) {
+      i = 0;
+    } else if (total == 0 && j < nbJoueurs) {
+      j++;
+      i = 0;
+      if (total == 0 && j == nbJoueurs) {
+        total = 0;
+      } else {
+        total = ((nbTerritoires / nbJoueurs)*3)-nbJoueurs;
+      }
+    }
+  }
+
   for (i = 0; i < nbTerritoires; i++) {
     tab_cell[i].id = i;
     tab_cell[i].owner = tab_comparaison[i];
+
     //20 voisins max (très peu probable plus)
     tab_cell[i].neighbors = malloc(20*sizeof(SCell*));
     //Implémenter le nombre de dés aléatoires
-    tab_cell[i].nbDices = 3;
 
-    displayDices(renderer, tab_points[i][0], tab_points[i][1], i, 3);
+    tab_cell[i].nbDices = desParTerr[tab_comparaison[i]][cmpt[tab_comparaison[i]]];
+    displayDices(renderer, tab_points[i][0], tab_points[i][1], i, tab_cell[i].nbDices);
 
     voisin = 0;
     for (j = 0; j < nbTerritoires; j++) {
@@ -253,7 +303,14 @@ SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison, 
       }
     }
     tab_cell[i].nbNeighbors = voisin;
+    cmpt[tab_comparaison[i]]++;
   }
+  for (i = 0; i < nbJoueurs; i++) {
+    free(desParTerr[i]);
+  }
+  free(desParTerr);
+  free(cmpt);
+  free(nbTerr);
 
   return tab_cell;
 }
@@ -272,7 +329,7 @@ SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison, 
 *
 *********************************************************************************************/
 SMap* generer_territoire(SCell* cellules, int nbTerritoires) {
-  SMap *map;
+  SMap *map = malloc(sizeof(SMap));
 
   map->cells = cellules;
   map->nbCells = nbTerritoires;
@@ -283,4 +340,14 @@ SMap* generer_territoire(SCell* cellules, int nbTerritoires) {
 
 void lib_memoire() {
 
+}
+
+int compare( const void* a, const void* b)
+{
+     int int_a = * ( (int*) a );
+     int int_b = * ( (int*) b );
+
+     if ( int_a == int_b ) return 0;
+     else if ( int_a < int_b ) return -1;
+     else return 1;
 }
