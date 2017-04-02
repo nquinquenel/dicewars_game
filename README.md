@@ -12,6 +12,16 @@ Sélectionner un terrain à attaquer.
 
 Appuyer sur la touche entrée pour passer son tour.
 
+Comment lancer l'éxécutable ?
+===================
+
+./DiceWars.exe 4 5 ia1 ia2 ia3
+
+4: Nombre de partie à faire (non implémenté)
+5: Nombre de joueurs
+ia1 ia2 ia3: Nom des IA (et nombre d'IA qui jouent)
+
+Note: Les noms des IA ne servent à rien, ils seront bientôt changés par les noms des librairies (.dll par exemple)
 
 Comment compiler ?
 ===================
