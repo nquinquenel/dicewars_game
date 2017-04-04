@@ -9,6 +9,14 @@ typedef struct SIa
 	int nbPlayer; // Nombre de joueurs dans la partie
 } SIa;
 
+// Structure définissant les caractéristiques de l'ia courante
+typedef struct SContext
+{
+	int id;	// Id de l'ia
+	int nbPlayer; // Nombre de joueurs dans la partie
+	int highestCluster; // la taille de la plus grosse grappe de cellules alliées
+} SContext;
+
 void createGame(int nbParties, int nbPlayer, int nbArg, char** noms);
 int demandeAttaque(SMap *map, STurn *turn, int idPlayer);
 int getIdJoueurActuel();
@@ -78,9 +86,9 @@ int IsValueInArray(int val, int *arr, int size);
 int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size);
 /********************************************************************************************
 *
-* FUNCTION NAME: UpdateStack
+* FUNCTION NAME: UpdateHighestCluster
 *
-* DESCRIPTION: met à jour la pile de dés du joueur suite à une attaque / défense
+* DESCRIPTION: met à jour highestCluster du SContext du joueur
 *              on ne fera rien si startingCell est la cellule qui a été attaquée et que l'attaque a échoué
 *
 * ARGUMENT      TYPE             DESCRIPTION
@@ -91,7 +99,7 @@ int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size);
 * idPlayer      int              l'id du joueur pour lequel il faut mettre à jour la pile de dés après l'attaque / défense
 *
 *********************************************************************************************/
-void UpdateStack(const SMap *map, SCell *startingCell, int attacking, int success, int idPlayer);
+void UpdateHighestCluster(const SMap *map, SCell *startingCell, int attacking, int success, int idPlayer);
 /********************************************************************************************
 *
 * FUNCTION NAME: MiniSCell

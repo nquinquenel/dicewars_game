@@ -5,6 +5,7 @@
 int idJoueurActuel;
 int* idIA;
 int nbIA;
+SContext **contexts; // tableau de pointeurs de SContext
 
 /********************************************************************************************
 *
@@ -22,33 +23,33 @@ int nbIA;
 *
 *********************************************************************************************/
 void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
-  nbIA = nbArg - 3;
-  idIA = malloc(nbIA * sizeof(int));
-  printf("Nombre d'IA : %d\n", nbIA);
+    nbIA = nbArg - 3;
+    idIA = malloc(nbIA * sizeof(int));
+    printf("Nombre d'IA : %d\n", nbIA);
 
-  SPlayerInfo **sp = malloc(nbIA*sizeof(SPlayerInfo*));
+    SPlayerInfo **sp = malloc(nbIA*sizeof(SPlayerInfo*));
 
-  int i;
-  for (i = 0; i < nbIA; i++) {
-    sp[i] = malloc(sizeof(SPlayerInfo));
-    InitGame(i+(nbPlayer-nbIA), nbPlayer, sp[i]);
-    printf("Id IA : %d\n", i+(nbPlayer-nbIA));
-    idIA[i] = nbPlayer-nbIA+i;
-  }
+    int i;
+    for (i = 0; i < nbIA; i++) {
+        sp[i] = malloc(sizeof(SPlayerInfo));
+        InitGame(i+(nbPlayer-nbIA), nbPlayer, sp[i]);
+        printf("Id IA : %d\n", i+(nbPlayer-nbIA));
+        idIA[i] = nbPlayer-nbIA+i;
+    }
 
-  idJoueurActuel = 0;
+    idJoueurActuel = 0;
 
-  fenetre(nbPlayer);
+    fenetre(nbPlayer);
 }
 
 int isAnIA(int id) {
-  int i = 0;
-  for (i = 0; i < nbIA; i++) {
-    if (id == idIA[i]) {
-      return 1;
+    int i = 0;
+    for (i = 0; i < nbIA; i++) {
+        if (id == idIA[i]) {
+            return 1;
+        }
     }
-  }
-  return 0;
+    return 0;
 }
 
 /********************************************************************************************
@@ -66,11 +67,11 @@ int isAnIA(int id) {
 *
 *********************************************************************************************/
 int demandeAttaque(SMap *map, STurn *turn, int idPlayer) {
-  if (ValidTurn(map, turn, idPlayer) == 1) {
-    return Attack(map, turn);
-  } else {
-    return -1;
-  }
+    if (ValidTurn(map, turn, idPlayer) == 1) {
+        return Attack(map, turn);
+    } else {
+        return -1;
+    }
 }
 
 /********************************************************************************************
@@ -85,7 +86,7 @@ int demandeAttaque(SMap *map, STurn *turn, int idPlayer) {
 *
 *********************************************************************************************/
 int getIdJoueurActuel() {
-  return idJoueurActuel;
+    return idJoueurActuel;
 }
 
 /********************************************************************************************
@@ -100,11 +101,11 @@ int getIdJoueurActuel() {
 *
 *********************************************************************************************/
 void setIdJoueurActuel(int id, int nbJoueurs) {
-  printf("%d\n", id);
-  if (id > nbJoueurs-1) {
-    id = 0;
-  }
-  idJoueurActuel = id;
+    printf("%d\n", id);
+    if (id > nbJoueurs-1) {
+        id = 0;
+    }
+    idJoueurActuel = id;
 }
 
 /********************************************************************************************
@@ -123,17 +124,17 @@ void setIdJoueurActuel(int id, int nbJoueurs) {
 *********************************************************************************************/
 SPlayerInfo* CreatePlayer(unsigned int idNewPlayer, char *name, SPlayerInfo *info)
 {
-  //MAJ du nom du joueur
-  snprintf(info -> members[idNewPlayer], sizeof(info -> members[idNewPlayer]), "%s", name); //copie des <arg2> 1ers char de <arg4> dans <arg1>, en rajoutant '\0'
+    //MAJ du nom du joueur
+    snprintf(info -> members[idNewPlayer], sizeof(info -> members[idNewPlayer]), "%s", name); //copie des <arg2> 1ers char de <arg4> dans <arg1>, en rajoutant '\0'
 
-  return info;
+    return info;
 }
 
 /********************************************************************************************
 *
-* FUNCTION NAME: UpdateStack
+* FUNCTION NAME: UpdateHighestCluster
 *
-* DESCRIPTION: met à jour la pile de dés du joueur suite à une attaque / défense
+* DESCRIPTION: met à jour highestCluster du SContext du joueur
 *              on ne fera rien si startingCell est la cellule qui a été attaquée et que l'attaque a échoué
 *
 * ARGUMENT      TYPE             DESCRIPTION
@@ -144,38 +145,36 @@ SPlayerInfo* CreatePlayer(unsigned int idNewPlayer, char *name, SPlayerInfo *inf
 * idPlayer      int              l'id du joueur pour lequel il faut mettre à jour la pile de dés après l'attaque / défense
 *
 *********************************************************************************************/
-void UpdateStack(const SMap *map, SCell *startingCell, int attacking, int success, int idPlayer)
+void UpdateHighestCluster(const SMap *map, SCell *startingCell, int attacking, int success, int idPlayer)
 {
-  int clusterSize = 0; //la taille de la plus grosse grappe
-  int i;
+    int clusterSize = 0; //la taille de la plus grosse grappe
+    int i;
 
-  if (attacking && success) //si startingCell est la cellule qui a attaqué et que l'attaque a réussi
-  {
-    clusterSize = GetClusterSize(map, startingCell); //récupération de la taille de la grappe
-
-    if ((map->stack[idPlayer]) < clusterSize) //si le nombre de dés a augmenté suite à l'attaque
+    if (attacking && success) //si startingCell est la cellule qui a attaqué et que l'attaque a réussi
     {
-      if (clusterSize>40) map->stack[idPlayer] = 40; //si taille > 40, on n'en met que 40, la taille maximum d'après les règles du jeu
-      else map->stack[idPlayer] = clusterSize;
-    }
-  }
+        clusterSize = GetClusterSize(map, startingCell); //récupération de la taille de la grappe
 
-  // sinon si startingCell est la cellule qui a attaqué et que l'attaque a échoué
-  // OU si startingCell est la cellule qui a été attaquée et que l'attaque a réussi
-  else if ((attacking && !success) || (!attacking && success))
-  {
-    SCell *allCells = map->cells; // toutes les cellules de la map
-    for (i = 0; i < (map->nbCells); i++) //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
-    {
-      if(allCells[i].owner == idPlayer) //si idPlayer est le propriétaire de la cellule
-      {
-        int tmp = GetClusterSize(map, &allCells[i]);
-        if (tmp > clusterSize) clusterSize = tmp;
-      }
+        if ((contexts[idPlayer]->highestCluster) < clusterSize) //si le territoire s'est agrandi suite à l'attaque
+        {
+            contexts[idPlayer]->highestCluster = clusterSize;
+        }
     }
-    if (clusterSize>40) map->stack[idPlayer] = 40; //si taille > 40, on n'en met que 40, la taille maximum d'après les règles du jeu
-    else map->stack[idPlayer] = clusterSize;
-  }
+
+    // sinon si startingCell est la cellule qui a attaqué et que l'attaque a échoué
+    // OU si startingCell est la cellule qui a été attaquée et que l'attaque a réussi
+    else if ((attacking && !success) || (!attacking && success))
+    {
+        SCell *allCells = map->cells; // toutes les cellules de la map
+        for (i = 0; i < (map->nbCells); i++) //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
+        {
+            if(allCells[i].owner == idPlayer) //si idPlayer est le propriétaire de la cellule
+            {
+                int tmp = GetClusterSize(map, &allCells[i]);
+                if (tmp > clusterSize) clusterSize = tmp;
+            }
+        }
+        contexts[idPlayer]->highestCluster;
+    }
 }
 
 /********************************************************************************************
@@ -190,44 +189,53 @@ void UpdateStack(const SMap *map, SCell *startingCell, int attacking, int succes
 *********************************************************************************************/
 void DistributeDices(const SMap *map)
 {
-  int i, j;
-  SCell *allCells = map->cells; //tableau de toutes les SCell de la map
-  SCell **myCells = malloc((map->nbCells)*sizeof(SCell *)); //tableau de pointeurs de SCell. Les cellules à tester lors du prochain while
-  for (i = 0; i < (map->nbCells); i++) {
-    myCells[i] = malloc(sizeof(SCell));
-  }
-  int myCellsSize = 0; //nb de cellules
-
-  for (j = 0; j < map->nbCells; j++) //remplissage de myCells
-  {
-  //  if ((IA.id == allCells[i].owner) && (allCells[i].nbDices<8)) //si la cellule m'appartient et qu'elle a moins de 8 dés
-  //  {
-  //    myCells[myCellsSize] = &(allCells[i]);
-  //    myCellsSize++;
-  //  }
-  //  else
-  //  {
-  //    myCells[myCellsSize] = NULL;
-  //    myCellsSize++;
-  //  }
-  }
-  int nbDices = 0;
-//  int nbDices = map->stack[IA.id]; // le nb de dés à distribuer
-  srand(time(NULL)); // initialisation de rand
-  int randCell; //place de la cellule dans myCells tirée aléatoirement
-  while (nbDices && myCellsSize) //tant qu'il reste des dés à distribuer et qu'il reste des cellules qui ont moins de 8 dés
-  {
-    randCell = rand()%myCellsSize;
-    if (myCells[randCell] != NULL)
-    {
-      myCells[randCell]->nbDices++; //incrémentation du nombre de dés de la cellule
-      if ((myCells[randCell]->nbDices) == 8) //si la cellule a 8 dés
-      {
-        myCells[randCell] = NULL; //on la supprime de myCells pour ne pas augmenter le nombre de dés à nouveau
-        myCellsSize--;
-      }
+    printf("%s\n", "dans DistributeDices");
+    int i, j;
+    SCell *allCells = map->cells; //tableau de toutes les SCell de la map
+    SCell **myCells = malloc((map->nbCells)*sizeof(SCell *)); //tableau de pointeurs de SCell. Les cellules à tester lors du prochain while
+    for (i = 0; i < (map->nbCells); i++) {
+        myCells[i] = malloc(sizeof(SCell));
     }
-  }
+    int myCellsSize = 0; //nb de cellules
+
+    for (j = 0; j < map->nbCells; j++) //remplissage de myCells
+    {
+        if ((idJoueurActuel == allCells[i].owner) && (allCells[i].nbDices<8)) //si la cellule m'appartient et qu'elle a moins de 8 dés
+        {
+            myCells[myCellsSize] = &(allCells[i]);
+            myCellsSize++;
+        }
+        else
+        {
+            myCells[myCellsSize] = NULL;
+            myCellsSize++;
+        }
+    }
+
+    int nbDicesToDistribute = (map->stack[idJoueurActuel]) + contexts[idJoueurActuel]->highestCluster; // le nb de dés à distribuer = la taille de la pile + la taille de la plus grosse grappe
+    printf("nb de dés à distribuer = %d\n", nbDicesToDistribute);
+    srand(time(NULL)); // initialisation de rand
+    int randCell; //place de la cellule dans myCells tirée aléatoirement
+    while (nbDicesToDistribute && myCellsSize) //tant qu'il reste des dés à distribuer et qu'il reste des cellules qui ont moins de 8 dés
+    {
+        randCell = rand()%myCellsSize;
+        if (myCells[randCell] != NULL)
+        {
+            myCells[randCell]->nbDices++; //incrémentation du nombre de dés de la cellule
+            nbDicesToDistribute--; //décrémentation du nb de dés restant à distribuer
+            if ((myCells[randCell]->nbDices) == 8) //si la cellule a 8 dés
+            {
+                myCells[randCell] = NULL; //on la supprime de myCells pour ne pas augmenter le nombre de dés à nouveau
+                myCellsSize--;
+            }
+        }
+    }
+
+    //maj de la stack du joueur courant apres la distribution des dés
+    if (nbDicesToDistribute<=40) map->stack[idJoueurActuel] = nbDicesToDistribute;
+    else map->stack[idJoueurActuel] = 40; //si plus de 40 dés restant à distribuer
+
+    printf("%s\n", "sortie DistributeDices");
 }
 
 /********************************************************************************************
@@ -246,16 +254,16 @@ void DistributeDices(const SMap *map)
 *********************************************************************************************/
 int ValidTurn(const SMap *map, STurn *turn, int idPlayer)
 {
-  SCell *attackingCell = GetCell(map, turn->cellFrom); //adresse de la cellule attaquante
-  SCell *defendingCell = GetCell(map, turn->cellTo);  //adresse de la cellule défendante
+    SCell *attackingCell = GetCell(map, turn->cellFrom); //adresse de la cellule attaquante
+    SCell *defendingCell = GetCell(map, turn->cellTo);  //adresse de la cellule défendante
 
-  //teste si les cellules sont bien voisines
-  if (!AreNeighbors(attackingCell, defendingCell)) return 0; //si les cellules ne sont pas voisines
-  if(attackingCell->nbDices == 1) return 0; //si la cellule attaquante n'a qu'un dés
+    //teste si les cellules sont bien voisines
+    if (!AreNeighbors(attackingCell, defendingCell)) return 0; //si les cellules ne sont pas voisines
+    if(attackingCell->nbDices == 1) return 0; //si la cellule attaquante n'a qu'un dés
 
-  if(attackingCell->owner != idPlayer) return 0; //si la cellule attaquante n'appartient pas au joueur courant
-  if(defendingCell->owner == idPlayer) return 0; //si la cellule attaquée appartient au joueur courant
-  return 1;
+    if(attackingCell->owner != idPlayer) return 0; //si la cellule attaquante n'appartient pas au joueur courant
+    if(defendingCell->owner == idPlayer) return 0; //si la cellule attaquée appartient au joueur courant
+    return 1;
 }
 
 /********************************************************************************************
@@ -273,36 +281,36 @@ int ValidTurn(const SMap *map, STurn *turn, int idPlayer)
 *********************************************************************************************/
 int Attack(const SMap *map, STurn *turn)
 {
-  srand(time(NULL)); // initialisation de rand
-  SCell *attackingCell = GetCell(map, turn->cellFrom); //adresse de la cellule attaquante
-  SCell *defendingCell = GetCell(map, turn->cellTo);  //adresse de la cellule défendante
-  int i, j;
+    srand(time(NULL)); // initialisation de rand
+    SCell *attackingCell = GetCell(map, turn->cellFrom); //adresse de la cellule attaquante
+    SCell *defendingCell = GetCell(map, turn->cellTo);  //adresse de la cellule défendante
+    int i, j;
 
-  //on lance les dés de la cellule attaquante
-  int attackScore = 0;
-  for (i = 0; i < attackingCell->nbDices; i++)
-  {
-    attackScore += (rand()%5)+1;
-  }
+    //on lance les dés de la cellule attaquante
+    int attackScore = 0;
+    for (i = 0; i < attackingCell->nbDices; i++)
+    {
+        attackScore += (rand()%5)+1;
+    }
 
-  //on lance les dés de la cellule attaquée
-  int defenseScore = 0;
-  for (j = 0; j < defendingCell->nbDices; j++)
-  {
-    defenseScore += (rand()%5)+1;
-  }
+    //on lance les dés de la cellule attaquée
+    int defenseScore = 0;
+    for (j = 0; j < defendingCell->nbDices; j++)
+    {
+        defenseScore += (rand()%5)+1;
+    }
 
-  if (attackScore>defenseScore) //si l'attaque gagne
-  {
-    defendingCell->owner = attackingCell->owner;
-    defendingCell->nbDices = (attackingCell->nbDices)-1;
-    attackingCell->nbDices = 1;
+    if (attackScore>defenseScore) //si l'attaque gagne
+    {
+        defendingCell->owner = attackingCell->owner;
+        defendingCell->nbDices = (attackingCell->nbDices)-1;
+        attackingCell->nbDices = 1;
 
-    return 1; //on a gagné l'attaque
-  }
+        return 1; //on a gagné l'attaque
+    }
 
-  attackingCell->nbDices = 1; //le nombre de dés de la cellule attaquante descendent à 1
-  return 0; //on a perdu l'attaque
+    attackingCell->nbDices = 1; //le nombre de dés de la cellule attaquante descendent à 1
+    return 0; //on a perdu l'attaque
 }
 
 /********************************************************************************************
@@ -320,14 +328,14 @@ int Attack(const SMap *map, STurn *turn)
 *********************************************************************************************/
 int AreNeighbors(SCell *cell1, SCell *cell2)
 {
-  int i;
-  for (i = 0; i < cell1->nbNeighbors; i++) {
-    if (cell2 == cell1->neighbors[i]) //si les 2 cellules sont voisines
-    {
-      return 1;
+    int i;
+    for (i = 0; i < cell1->nbNeighbors; i++) {
+        if (cell2 == cell1->neighbors[i]) //si les 2 cellules sont voisines
+        {
+            return 1;
+        }
     }
-  }
-  return 0;
+    return 0;
 }
 
 /********************************************************************************************
@@ -345,17 +353,17 @@ int AreNeighbors(SCell *cell1, SCell *cell2)
 *********************************************************************************************/
 SCell* GetCell(const SMap *map, int idCell)
 {
-  int i;
-  SCell *allCells = map->cells; //tableau de toutes les SCell de la map
+    int i;
+    SCell *allCells = map->cells; //tableau de toutes les SCell de la map
 
-  for (i = 0; i <( map->nbCells); i++)
-  {
-    if (allCells[i].id == idCell) {
-      return &(allCells[i]);
+    for (i = 0; i < (map->nbCells); i++)
+    {
+        if (allCells[i].id == idCell) {
+            return &(allCells[i]);
+        }
     }
-  }
 
-  return NULL;
+    return NULL;
 }
 
 /********************************************************************************************
@@ -373,45 +381,73 @@ SCell* GetCell(const SMap *map, int idCell)
 *********************************************************************************************/
 int GetClusterSize(const SMap *map, SCell *startingCell)
 {
-  int i, j, k;
-  int idPlayer = startingCell->owner; //l'id du joueur propriétaire de la cellule de référence
+    printf("%s\n", "dans GetClusterSize");
+    int i, j, k;
+    int idPlayer = startingCell->owner; //l'id du joueur propriétaire de la cellule de référence
 
-  //int clusterIds[map->nbCells]; //tableau des id des cellules de la grappe, de taille le nombre de cellules de la map, car taille maximale
-  int clusterIdsSize = 0; //la taille de la grappe de cellules
+    //int clusterIds[map->nbCells]; //tableau des id des cellules de la grappe, de taille le nombre de cellules de la map, car taille maximale
+    int clusterIdsSize = 0; //la taille de la grappe de cellules
 
-  SCell **cellsToTest = malloc((map->nbCells)*sizeof(SCell *)); //tableau de pointeurs de SCell. Les cellules à tester lors du prochain while
-  for (i = 0; i < (map->nbCells); i++) {
-    cellsToTest[i] = malloc(sizeof(SCell));
-  }
-
-  cellsToTest[0] = startingCell; //la premiere cellule à tester dans le while est startingCell
-  int cellsToTestSize = 1; //la taille du tableau de cellules à tester
-  int nextCellToTest = 0; //indice de la prochaine cellule à tester
-
-  while (cellsToTestSize != nextCellToTest) //tant qu'il reste des cellules alliées dont on n'a pas regardé les voisins
-  {
-    SCell *currentCell = cellsToTest[nextCellToTest]; //adresse de la cellule courante à tester
-    //clusterIds[clusterIdsSize] = currentCell->id; //on rajoute l'id de la cellule courante aux cellules parcourues
-    clusterIdsSize++;
-    SCell **voisins = currentCell->neighbors; // Tableau de pointeur vers les cellules voisines de la cellule courante
-    int nbVoisins = currentCell->nbNeighbors;
-
-    for(j = 0; (j < nbVoisins) ; j++) //parcours des voisins
-    {
-      if ((voisins[j]->owner == idPlayer) && !IsCellInArrayOfCellPointer(voisins[j], cellsToTest, cellsToTestSize)) //si le cellule voisine est un cellule alliée et qu'elle n'a pas déjà dans cellsToTest
-      {
-        cellsToTest[cellsToTestSize] = voisins[j]; //on l'a rajoute dans la liste des cellules à tester
-        cellsToTestSize++;
-      }
+    SCell **cellsToTest = malloc((map->nbCells)*sizeof(SCell *)); //tableau de pointeurs de SCell. Les cellules à tester lors du prochain while
+    for (i = 0; i < (map->nbCells); i++) {
+        cellsToTest[i] = malloc(sizeof(SCell));
     }
-    nextCellToTest++;
-  }
 
-  //libération allocation mémoire
-  for (k = 0; k < (map->nbCells); k++) {
-    free(cellsToTest[k]);
-  }
-  free(cellsToTest);
+    cellsToTest[0] = startingCell; //la premiere cellule à tester dans le while est startingCell
+    int cellsToTestSize = 1; //la taille du tableau de cellules à tester
+    int nextCellToTest = 0; //indice de la prochaine cellule à tester
+    printf("%s\n", "avant while");
+    while (cellsToTestSize != nextCellToTest) //tant qu'il reste des cellules alliées dont on n'a pas regardé les voisins
+    {
+        SCell *currentCell = cellsToTest[nextCellToTest]; //adresse de la cellule courante à tester
+        //clusterIds[clusterIdsSize] = currentCell->id; //on rajoute l'id de la cellule courante aux cellules parcourues
+        clusterIdsSize++;
+        SCell **voisins = currentCell->neighbors; // Tableau de pointeur vers les cellules voisines de la cellule courante
+        int nbVoisins = currentCell->nbNeighbors;
 
-  return clusterIdsSize;
+        for(j = 0; (j < nbVoisins) ; j++) //parcours des voisins
+        {
+            if ((voisins[j]->owner == idPlayer) && !IsCellInArrayOfCellPointer(voisins[j], cellsToTest, cellsToTestSize)) //si le cellule voisine est un cellule alliée et qu'elle n'a pas déjà dans cellsToTest
+            {
+                printf("cellsToTestSize = %d\n", cellsToTestSize);
+                cellsToTest[cellsToTestSize] = voisins[j]; //on l'a rajoute dans la liste des cellules à tester
+                cellsToTestSize++;
+            }
+        }
+        nextCellToTest++;
+    }
+
+    //libération allocation mémoire
+    for (k = 0; k < (map->nbCells); k++) {
+        free(cellsToTest[k]);
+    }
+    free(cellsToTest);
+
+    printf("%s\n", "dans GetClusterSize");
+
+    return clusterIdsSize;
 }
+
+/********************************************************************************************
+*
+* FUNCTION NAME: IsCellInArrayOfCellPointer
+*
+* DESCRIPTION: teste si une adresse de cellule est dans un tableau d'adresses de cellules
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* cell          *SCell           l'adresse de la cellule à rechercher
+* arrCell       **SCell          le tableau d'adresses de cellules
+* size          int              la taille du tableau
+*
+* RETURNS: 1 si cell est dans arrCell, 0 sinon
+*
+*********************************************************************************************/
+// int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size)
+// {
+//   int i;
+//   for (i=0; i < size; i++) {
+//     if (arrCell[i] == cell) return 1;
+//   }
+//
+//   return 0;
+// }
