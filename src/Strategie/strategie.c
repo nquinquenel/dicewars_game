@@ -69,8 +69,10 @@ int PlayTurn(const SMap *map, STurn *turn)
         }
     }
 
+    printf("%s\n", "tableau de SCell initialisé");
+
     // Troisieme étape : on cherche le territoire avec la plus grosse probabilité de victoires
-    int* coup = malloc(sizeof(int)); //Contiendra l'adresse du résultat du test des voisins
+    int *coup = malloc(sizeof(int)); //Contiendra l'adresse du résultat du test des voisins
     for(i = 0; i < count; i++) //parcours des cellules
     {
         if(i == 0) {
@@ -86,8 +88,12 @@ int PlayTurn(const SMap *map, STurn *turn)
     }
 }
 
+
 if(coup[0] >= 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
 {
+    //libération de l'allocation mémoire
+    free(tab);
+    free(coup);
     return 0; //on passera notre tour
 }
 
@@ -95,6 +101,7 @@ if(coup[0] >= 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 
 free(tab);
 free(coup);
 
+printf("%s\n", "sortie de PlayTurn");
 return 1; //on effectuera notre attaque
 }
 
@@ -164,6 +171,8 @@ int PlayTurn2(const SMap *map, STurn *turn)
 
     if(coup[0] > 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
     {
+        free(tab);
+        free(coup);
         return 0; //on passera notre tour
     }
 
@@ -243,6 +252,8 @@ int PlayTurn3(const SMap *map, STurn *turn)
     }
     if(coup[0] >= 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
     {
+        free(tab);
+        free(coup);
         return 0; //on passera notre tour
     }
 

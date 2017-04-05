@@ -222,7 +222,6 @@ void fenetre(int nbJoueurs) {
                 switch (e.key.keysym.sym) {
                     //Touche entrée
                     case SDLK_RETURN:
-
                     // on distribue aléatoirement les dés sur les territoires alliés
                     DistributeDices(map);
                     int z;
@@ -230,6 +229,7 @@ void fenetre(int nbJoueurs) {
                     {
                         displayDices(renderer, tab_points[(map->cells[z]).id][0], tab_points[(map->cells[z]).id][1], (map->cells[z]).id, (map->cells[z]).nbDices);
                     }
+
                     // TODO appliquer la distribution des dés sur l'interface
 
                     //On enlève les bordures internes blanches
