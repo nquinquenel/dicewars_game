@@ -433,13 +433,3 @@ int GetClusterSize(const SMap *map, SCell *startingCell)
 SContext** GetContexts(){
     return contexts;
 }
-
-void writetoLog(char *s){
-	FILE *logfile = fopen("logfile.txt","a");
-	if(logfile==NULL){
-        printf("cant open file");
-    }
-    fprintf(logfile,"%s",str);
-    fclose(logfile);
-	
-}
