@@ -153,7 +153,7 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
   }*/
 
   SCell *map_cellules = generer_cellules(tab_voisins, nbTerritoires, tab_comparaison, renderer, tab_points, nbJoueurs);
-  SMap *map = generer_territoire(map_cellules, nbTerritoires);
+  SMap *map = generer_territoire(map_cellules, nbTerritoires, nbJoueurs);
 
   //Render tout ce qui a été modifié au niveau graphique
   SDL_RenderPresent(renderer);
@@ -324,16 +324,21 @@ SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison, 
 * ARGUMENT      TYPE             DESCRIPTION
 * cellules      SCell*           Tableau qui contient toutes les cellules de la carte
 * nbTerritoires int              Nombre de cellules
+* nbJoueurs     int              Nombre de joueurs
 *
 * RETURNS: Retourne la SMap générée
 *
 *********************************************************************************************/
-SMap* generer_territoire(SCell* cellules, int nbTerritoires) {
+SMap* generer_territoire(SCell* cellules, int nbTerritoires, int nbJoueurs) {
   SMap *map = malloc(sizeof(SMap));
+  int i;
 
   map->cells = cellules;
   map->nbCells = nbTerritoires;
-  map->stack = 0;
+  map->stack = malloc(nbJoueurs*(sizeof(int))); //tableau des stack des joueurs. Donc de dimension nbJoueurs
+  for (i = 0; i < nbJoueurs; i++) {
+       map->stack[i] = 0;
+  }
 
   return map;
 }

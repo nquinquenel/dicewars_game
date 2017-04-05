@@ -89,17 +89,16 @@ int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size);
 * FUNCTION NAME: UpdateHighestCluster
 *
 * DESCRIPTION: met à jour highestCluster du SContext du joueur
-*              on ne fera rien si startingCell est la cellule qui a été attaquée et que l'attaque a échoué
+*              on ne fera rien dans le cas d'une attaque ratée, car pas de modification au niveau des propriétaires des territoires
 *
 * ARGUMENT      TYPE             DESCRIPTION
 * map           const *SMap      la carte
-* startingCell  *SCell           l'adresse de la cellule attaquante / attaquée
-* attacking     int              1 si startingCell est la cellule qui a attaqué, 0 si c'est la cellule qui a été attaquée
-* success       int              1 si l'attaque a réussi, 0 sinon
+* startingCell  *SCell           l'adresse de la cellule qui a attaquante si idjoueur = joueur attaquant
+*                                NULL si idjoueur = joueur attaqué
 * idPlayer      int              l'id du joueur pour lequel il faut mettre à jour la pile de dés après l'attaque / défense
 *
 *********************************************************************************************/
-void UpdateHighestCluster(const SMap *map, SCell *startingCell, int attacking, int success, int idPlayer);
+void UpdateHighestCluster(const SMap *map, SCell *startingCell, int idPlayer);
 /********************************************************************************************
 *
 * FUNCTION NAME: MiniSCell
@@ -237,3 +236,14 @@ int AreNeighbors(SCell *cell1, SCell *cell2);
 *
 *********************************************************************************************/
 int* MiniCoupSCell(SCell **voisins, int nbVoisins, int nbDes);
+
+/********************************************************************************************
+*
+* FUNCTION NAME: GetContexts
+*
+* DESCRIPTION: renvoie contexts, le tableau de pointeur de struct SContext
+*
+* RETURNS: le tableau de pointeur de struct SContext
+*
+*********************************************************************************************/
+SContext** GetContexts();

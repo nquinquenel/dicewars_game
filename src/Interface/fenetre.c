@@ -17,7 +17,7 @@ int IMG_DICES_H = 52; //la dimension de l'image des dés en hauteur
 void fenetre(int nbJoueurs) {
     //Condition pour faire tourner le jeu en boucle
     int running = 1;
-    int i, p;
+    int i, p, s;
     SDL_Window* window = NULL;
     window = SDL_CreateWindow
     (
@@ -73,6 +73,24 @@ void fenetre(int nbJoueurs) {
     // Tableau de pointeurs de SDL_Texture pour les images de dés
     //SDL_Texture** background_texture_tab = malloc(50*sizeof(SDL_Texture *));
 
+    // initialisation de highestCluster de la struct SContext
+    SContext **contexts = GetContexts();
+    for (s = 0; s < nbJoueurs; s++) //pour chaque joueur
+    {
+        int t;
+        int clusterSize = 0; //la taille de la plus grosse grappe
+        SCell *allCells = map->cells; // toutes les cellules de la map
+        for (t = 0; t < (map->nbCells); t++) //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
+        {
+            if(allCells[t].owner == s) //si le joueur est le propriétaire de la cellule
+            {
+                int tmp = GetClusterSize(map, &allCells[t]);
+                if (tmp > clusterSize) clusterSize = tmp;
+            }
+        }
+        contexts[s]->highestCluster = clusterSize;
+    }
+
     SDL_Event e;
 
     int res, cellUn, cellDeux, idJoueurActuel, playIA, id;
@@ -95,10 +113,15 @@ void fenetre(int nbJoueurs) {
                     if (playIA == 1) {
                         playIA = demandeAttaque(map, turn, idJoueurActuel);
                         id = turn->cellTo;
+                        int idJoueurDefense = (GetCell(map, id))->owner;
                         //Si l'IA a gagné son attaque
                         if (playIA == 1) {
                             attaquer_territoireSansCoord(id,800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
+                            // maj de highestCluster des 2 joueurs dans la cas d'une attaque réussie
+                            UpdateHighestCluster(map, GetCell(map, turn->cellFrom), idJoueurActuel); //MAJ pour le joueur en attaque
+                            UpdateHighestCluster(map, NULL, idJoueurDefense); //MAj pour le joueur en défense
                         }
+
                         //Si l'IA a fait une attaque autorisé (gagné ou perdue)
                         if (playIA != -1) {
                             int nbDes;
@@ -118,6 +141,8 @@ void fenetre(int nbJoueurs) {
                         //Si elle passe son tour
                     } else {
                         tourFini = 1;
+                        // on distribue aléatoirement les dés sur les territoires alliés
+                        DistributeDices(map);
                         //On passe au joueur suivant
                         idJoueurActuel++;
                         setIdJoueurActuel(idJoueurActuel, nbJoueurs);
@@ -154,12 +179,16 @@ void fenetre(int nbJoueurs) {
                     STurn *turn = malloc(sizeof(turn));
                     turn->cellFrom = cellUn;
                     turn->cellTo = cellDeux;
+                    int idJoueurDefense = (GetCell(map, cellDeux))->owner;
 
                     //On fait une demande d'attaque et on attaque (1 = attaque gagné, 0 = attaque perdue, -1 = attaque non valide)
                     res = demandeAttaque(map, turn, idJoueurActuel);
                     //Si res == 1 alors on a gagné l'attaque, on change la couleur du territoire attaqué
                     if (res == 1) {
                         attaquer_territoire(e.button.x, e.button.y, 800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
+                        // maj de highestCluster des 2 joueurs dans la cas d'une attaque réussie
+                        UpdateHighestCluster(map, GetCell(map, cellUn), idJoueurActuel); //MAJ pour le joueur en attaque
+                        UpdateHighestCluster(map, NULL, idJoueurDefense); //MAj pour le joueur en défense
                     }
 
                     int nbDes;
@@ -194,8 +223,18 @@ void fenetre(int nbJoueurs) {
                     //Touche entrée
                     case SDLK_RETURN:
 
+                    // on distribue aléatoirement les dés sur les territoires alliés
+                    DistributeDices(map);
+                    int z;
+                    for (z = 0; i < map->nbCells; i++) //affiche sur l'interface de la distribution des dés
+                    {
+                        displayDices(renderer, tab_points[(map->cells[z]).id][0], tab_points[(map->cells[z]).id][1], (map->cells[z]).id, (map->cells[z]).nbDices);
+                    }
+                    // TODO appliquer la distribution des dés sur l'interface
+
                     //On enlève les bordures internes blanches
-                    if (phase == 1) {
+                    if (phase == 1)
+                    {
                         for (i = 1; i < 799; i++) {
                             for (p = 1; p < 599; p++) {
                                 if (tab_borduresBlanches[i][p] == 1) {
@@ -208,6 +247,7 @@ void fenetre(int nbJoueurs) {
                         SDL_RenderPresent(renderer);
                         phase = 0;
                     }
+
                     //On passe au joueur suivant
                     idJoueurActuel++;
                     setIdJoueurActuel(idJoueurActuel, nbJoueurs);
