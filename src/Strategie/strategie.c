@@ -19,8 +19,8 @@ SIa IA;//variable globale permettant de garder accessible les caractéristiques 
 *********************************************************************************************/
 void InitGame(unsigned int id, unsigned int nbPlayer, SPlayerInfo *info)
 {
-  IA.id = id; //sauvegarde de l'id de l'IA
-  IA.nbPlayer = nbPlayer; //sauvegarde du nombre de joueurs
+    IA.id = id; //sauvegarde de l'id de l'IA
+    IA.nbPlayer = nbPlayer; //sauvegarde du nombre de joueurs
 }
 
 /********************************************************************************************
@@ -41,61 +41,61 @@ void InitGame(unsigned int id, unsigned int nbPlayer, SPlayerInfo *info)
 *********************************************************************************************/
 int PlayTurn(const SMap *map, STurn *turn)
 {
-  int nbTerritoires = map->nbCells;
-  SCell *territoires = map->cells; //tableau de SCell
+    int nbTerritoires = map->nbCells;
+    SCell *territoires = map->cells; //tableau de SCell
 
-  // Premiere étape : récupération du nombre de territoires nous appartenant
-  int i;
-  int count = 0;
-  for(i = 0; i < nbTerritoires; i++) //parcours des cellules
-  {
-    if (territoires[i].owner == IA.id ) //si je suis le propriétaire
+    // Premiere étape : récupération du nombre de territoires nous appartenant
+    int i;
+    int count = 0;
+    for(i = 0; i < nbTerritoires; i++) //parcours des cellules
     {
-      count++; // On incrémente pour chaque territoire nous appartenant
+        if (territoires[i].owner == IA.id ) //si je suis le propriétaire
+        {
+            count++; // On incrémente pour chaque territoire nous appartenant
+        }
     }
-  }
 
-  printf("count : %d\n", count);
+    printf("count : %d\n", count);
 
-  // Deuxieme étape : attribution des cellules de notre territoire dans un tableau
-  SCell *tab = malloc((count)*sizeof(SCell)); // On malloc notre tableau
-  count = 0; // On réinitialise le compteur
-  for(i = 0; i < nbTerritoires; i++) // parcours des cellules
-  {
-    if (territoires[i].owner == IA.id ) // si je suis le propriétaire
+    // Deuxieme étape : attribution des cellules de notre territoire dans un tableau
+    SCell *tab = malloc((count)*sizeof(SCell)); // On malloc notre tableau
+    count = 0; // On réinitialise le compteur
+    for(i = 0; i < nbTerritoires; i++) // parcours des cellules
     {
-      tab[count] = territoires[i]; // On ajoute chaque cellule à notre tableau
-      count++; // On incrémente le compteur
+        if (territoires[i].owner == IA.id ) // si je suis le propriétaire
+        {
+            tab[count] = territoires[i]; // On ajoute chaque cellule à notre tableau
+            count++; // On incrémente le compteur
+        }
     }
-  }
 
-  // Troisieme étape : on cherche le territoire avec la plus grosse probabilité de victoires
-  int* coup = malloc(sizeof(int)); //Contiendra l'adresse du résultat du test des voisins
-  for(i = 0; i < count; i++) //parcours des cellules
-  {
-    if(i == 0) {
-      coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); // attribution par défaut
-      coup[0] -= tab[i].nbDices; //On décrémente par le nombre de dés que l'on a
-      turn->cellFrom = tab[i].id; //attribution temporaire
-      turn->cellTo = tab[i].neighbors[coup[1]]->id; //attribution temporaire
-    } else if(MiniSCell(tab[i].neighbors, tab[i].nbNeighbors)[0]-tab[i].nbDices < coup[0]) {//On vérifie en enlevant directement le nb de dés si c'est inférieur
-      coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); //On change stock notre adresse de tableau
-      coup[0] -= tab[i].nbDices; //On doit décrémenter pour pouvoir vérifier le suivant
-      turn->cellFrom = tab[i].id; //nouvelle attribution
-      turn->cellTo = tab[i].neighbors[coup[1]]->id; //nouvelle attribution
+    // Troisieme étape : on cherche le territoire avec la plus grosse probabilité de victoires
+    int* coup = malloc(sizeof(int)); //Contiendra l'adresse du résultat du test des voisins
+    for(i = 0; i < count; i++) //parcours des cellules
+    {
+        if(i == 0) {
+            coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); // attribution par défaut
+            coup[0] -= tab[i].nbDices; //On décrémente par le nombre de dés que l'on a
+            turn->cellFrom = tab[i].id; //attribution temporaire
+            turn->cellTo = tab[i].neighbors[coup[1]]->id; //attribution temporaire
+        } else if(MiniSCell(tab[i].neighbors, tab[i].nbNeighbors)[0]-tab[i].nbDices < coup[0]) {//On vérifie en enlevant directement le nb de dés si c'est inférieur
+        coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); //On change stock notre adresse de tableau
+        coup[0] -= tab[i].nbDices; //On doit décrémenter pour pouvoir vérifier le suivant
+        turn->cellFrom = tab[i].id; //nouvelle attribution
+        turn->cellTo = tab[i].neighbors[coup[1]]->id; //nouvelle attribution
     }
-  }
+}
 
-  if(coup[0] >= 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
-  {
+if(coup[0] >= 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
+{
     return 0; //on passera notre tour
-  }
+}
 
-  //libération de l'allocation mémoire
-  free(tab);
-  free(coup);
+//libération de l'allocation mémoire
+free(tab);
+free(coup);
 
-  return 1; //on effectuera notre attaque
+return 1; //on effectuera notre attaque
 }
 
 /********************************************************************************************
@@ -116,62 +116,62 @@ int PlayTurn(const SMap *map, STurn *turn)
 *********************************************************************************************/
 int PlayTurn2(const SMap *map, STurn *turn)
 {
-  int nbTerritoires = map->nbCells;
-  SCell *territoires = map->cells; //tableau de SCell
+    int nbTerritoires = map->nbCells;
+    SCell *territoires = map->cells; //tableau de SCell
 
-  // Premiere étape : récupération du nombre de territoires nous appartenant
-  int i;
-  int count = 0;
-  for(i = 0; i < nbTerritoires; i++) //parcours des cellules
-  {
-    if (territoires[i].owner == IA.id ) //si je suis le propriétaire
+    // Premiere étape : récupération du nombre de territoires nous appartenant
+    int i;
+    int count = 0;
+    for(i = 0; i < nbTerritoires; i++) //parcours des cellules
     {
-      count++; // On incrémente pour chaque territoire nous appartenant
+        if (territoires[i].owner == IA.id ) //si je suis le propriétaire
+        {
+            count++; // On incrémente pour chaque territoire nous appartenant
+        }
     }
-  }
 
-  // Deuxieme étape : attribution des cellules de notre territoire dans un tableau
-  SCell *tab = malloc((count)*sizeof(SCell)); // On malloc notre tableau
-  count = 0; // On réinitialise le compteur
-  for(i = 0; i < nbTerritoires; i++) // parcours des cellules
-  {
-    if (territoires[i].owner == IA.id ) // si je suis le propriétaire
+    // Deuxieme étape : attribution des cellules de notre territoire dans un tableau
+    SCell *tab = malloc((count)*sizeof(SCell)); // On malloc notre tableau
+    count = 0; // On réinitialise le compteur
+    for(i = 0; i < nbTerritoires; i++) // parcours des cellules
     {
-      tab[count] = territoires[i]; // On ajoute chaque cellule à notre tableau
-      count++; // On incrémente le compteur
+        if (territoires[i].owner == IA.id ) // si je suis le propriétaire
+        {
+            tab[count] = territoires[i]; // On ajoute chaque cellule à notre tableau
+            count++; // On incrémente le compteur
+        }
     }
-  }
 
-  // Troisieme étape : on cherche le territoire avec la plus grosse probabilité de victoires
-  int* coup; //Contiendra l'adresse du résultat du test des voisins
-  for(i = 0; i < count+1; i++) //parcours des cellules
-  {
-    if(i == 0)
+    // Troisieme étape : on cherche le territoire avec la plus grosse probabilité de victoires
+    int* coup; //Contiendra l'adresse du résultat du test des voisins
+    for(i = 0; i < count+1; i++) //parcours des cellules
     {
-      coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); // attribution par défaut
-      coup[0] -= tab[i].nbDices; //On décrémente par le nombre de dés que l'on a
-      turn->cellFrom = tab[i].id; //attribution temporaire
-      turn->cellTo = tab[i].neighbors[coup[1]]->id; //attribution temporaire
+        if(i == 0)
+        {
+            coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); // attribution par défaut
+            coup[0] -= tab[i].nbDices; //On décrémente par le nombre de dés que l'on a
+            turn->cellFrom = tab[i].id; //attribution temporaire
+            turn->cellTo = tab[i].neighbors[coup[1]]->id; //attribution temporaire
+        }
+        else if(MiniSCell(tab[i].neighbors, tab[i].nbNeighbors)[0]-tab[i].nbDices < coup[0]) //On vérifie en enlevant directement le nb de dés si c'est inférieur
+        {
+            coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); //On change stock notre adresse de tableau
+            coup[0] -= tab[i].nbDices; //On doit décrémenter pour pouvoir vérifier le suivant
+            turn->cellFrom = tab[i].id; //nouvelle attribution
+            turn->cellTo = tab[i].neighbors[coup[1]]->id; //nouvelle attribution
+        }
     }
-    else if(MiniSCell(tab[i].neighbors, tab[i].nbNeighbors)[0]-tab[i].nbDices < coup[0]) //On vérifie en enlevant directement le nb de dés si c'est inférieur
+
+    if(coup[0] > 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
     {
-      coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); //On change stock notre adresse de tableau
-      coup[0] -= tab[i].nbDices; //On doit décrémenter pour pouvoir vérifier le suivant
-      turn->cellFrom = tab[i].id; //nouvelle attribution
-      turn->cellTo = tab[i].neighbors[coup[1]]->id; //nouvelle attribution
+        return 0; //on passera notre tour
     }
-  }
 
-  if(coup[0] > 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
-  {
-    return 0; //on passera notre tour
-  }
+    //libération de l'allocation mémoire
+    free(tab);
+    free(coup);
 
-  //libération de l'allocation mémoire
-  free(tab);
-  free(coup);
-
-  return 1; //on effectuera notre attaque
+    return 1; //on effectuera notre attaque
 }
 
 /********************************************************************************************
@@ -192,65 +192,65 @@ int PlayTurn2(const SMap *map, STurn *turn)
 *********************************************************************************************/
 int PlayTurn3(const SMap *map, STurn *turn)
 {
-  int nbTerritoires = map->nbCells;
-  SCell *territoires = map->cells; //tableau de SCell
+    int nbTerritoires = map->nbCells;
+    SCell *territoires = map->cells; //tableau de SCell
 
-  // Premiere étape : récupération du nombre de territoires nous appartenant
-  int i;
-  int count = 0;
-  for(i = 0; i < nbTerritoires; i++) //parcours des cellules
-  {
-    if (territoires[i].owner == IA.id ) //si je suis le propriétaire
+    // Premiere étape : récupération du nombre de territoires nous appartenant
+    int i;
+    int count = 0;
+    for(i = 0; i < nbTerritoires; i++) //parcours des cellules
     {
-      count++; // On incrémente pour chaque territoire nous appartenant
+        if (territoires[i].owner == IA.id ) //si je suis le propriétaire
+        {
+            count++; // On incrémente pour chaque territoire nous appartenant
+        }
     }
-  }
 
-  // Deuxieme étape : attribution des cellules de notre territoire dans un tableau
-  SCell *tab = malloc((count)*sizeof(SCell)); // On malloc notre tableau
-  count = 0; // On réinitialise le compteur
-  for(i = 0; i < nbTerritoires; i++) // parcours des cellules
-  {
-    if (territoires[i].owner == IA.id ) // si je suis le propriétaire
+    // Deuxieme étape : attribution des cellules de notre territoire dans un tableau
+    SCell *tab = malloc((count)*sizeof(SCell)); // On malloc notre tableau
+    count = 0; // On réinitialise le compteur
+    for(i = 0; i < nbTerritoires; i++) // parcours des cellules
     {
-      tab[count] = territoires[i]; // On ajoute chaque cellule à notre tableau
-      count++; // On incrémente le compteur
+        if (territoires[i].owner == IA.id ) // si je suis le propriétaire
+        {
+            tab[count] = territoires[i]; // On ajoute chaque cellule à notre tableau
+            count++; // On incrémente le compteur
+        }
     }
-  }
 
-  // Troisieme étape : on cherche le territoire avec la plus grosse probabilité de victoires
-  int* coup; //Contiendra l'adresse du résultat du test des voisins
-  for(i = 0; i < count+1; i++) //parcours des cellules
-  {
-    if(i == 0)
+    // Troisieme étape : on cherche le territoire avec la plus grosse probabilité de victoires
+    int* coup; //Contiendra l'adresse du résultat du test des voisins
+    for(i = 0; i < count+1; i++) //parcours des cellules
     {
-      coup = MiniCoupSCell(tab[i].neighbors, tab[i].nbNeighbors, tab[i].nbDices); // attribution par défaut
-      coup[0] -= tab[i].nbDices; //On décrémente par le nombre de dés que l'on a
-      turn->cellFrom = tab[i].id; //attribution temporaire
-      turn->cellTo = tab[i].neighbors[coup[1]]->id; //attribution temporaire
+        if(i == 0)
+        {
+            coup = MiniCoupSCell(tab[i].neighbors, tab[i].nbNeighbors, tab[i].nbDices); // attribution par défaut
+            coup[0] -= tab[i].nbDices; //On décrémente par le nombre de dés que l'on a
+            turn->cellFrom = tab[i].id; //attribution temporaire
+            turn->cellTo = tab[i].neighbors[coup[1]]->id; //attribution temporaire
+        }
+        else if(MiniCoupSCell(tab[i].neighbors, tab[i].nbNeighbors, tab[i].nbDices)[0]-tab[i].nbDices < coup[0])
+        {
+            coup = MiniCoupSCell(tab[i].neighbors, tab[i].nbNeighbors,tab[i].nbDices); //On change stock notre adresse de tableau
+            coup[0] -= tab[i].nbDices; //On doit décrémenter pour pouvoir vérifier le suivant
+            turn->cellFrom = tab[i].id; //nouvelle attribution
+            turn->cellTo = tab[i].neighbors[coup[1]]->id; //nouvelle attribution
+        }
+        if(coup[0]==1)
+        {
+            return 1;
+        }
     }
-    else if(MiniCoupSCell(tab[i].neighbors, tab[i].nbNeighbors, tab[i].nbDices)[0]-tab[i].nbDices < coup[0])
+    if(coup[0] >= 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
     {
-      coup = MiniCoupSCell(tab[i].neighbors, tab[i].nbNeighbors,tab[i].nbDices); //On change stock notre adresse de tableau
-      coup[0] -= tab[i].nbDices; //On doit décrémenter pour pouvoir vérifier le suivant
-      turn->cellFrom = tab[i].id; //nouvelle attribution
-      turn->cellTo = tab[i].neighbors[coup[1]]->id; //nouvelle attribution
+        return 0; //on passera notre tour
     }
-    if(coup[0]==1)
-    {
-      return 1;
-    }
-  }
-  if(coup[0] >= 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
-  {
-    return 0; //on passera notre tour
-  }
 
-  //libération de l'allocation mémoire
-  free(tab);
-  free(coup);
+    //libération de l'allocation mémoire
+    free(tab);
+    free(coup);
 
-  return 1; //on effectuera notre attaque
+    return 1; //on effectuera notre attaque
 }
 
 /********************************************************************************************
@@ -265,15 +265,15 @@ int PlayTurn3(const SMap *map, STurn *turn)
 *********************************************************************************************/
 void EndGame(unsigned int idWinner)
 {
-  //free tous les objets
-  //afficher gagnant et score (le nombre de tours
-  FILE *logfile = fopen("logfile.txt","a");
-  char str[256] = "/tgame winner: idWinner";
-  if(logfile==NULL){
-	printf("cant open file");
-  }
-  fprintf(logfile,"%s",str);
-  fclose(logfile);
+    //free tous les objets
+    //afficher gagnant et score (le nombre de tours
+    FILE *logfile = fopen("logfile.txt","a");
+    char str[256] = "/tgame winner: idWinner";
+    if(logfile==NULL){
+        printf("cant open file");
+    }
+    fprintf(logfile,"%s",str);
+    fclose(logfile);
 }
 
 /********************************************************************************************
@@ -291,47 +291,47 @@ void EndGame(unsigned int idWinner)
 *********************************************************************************************/
 int GetClusterSizeStrat(const SMap *map, SCell *startingCell)
 {
-  int i, j, k;
-  int idPlayer = startingCell->owner; //l'id du joueur propriétaire de la cellule de référence
+    int i, j, k;
+    int idPlayer = startingCell->owner; //l'id du joueur propriétaire de la cellule de référence
 
-  //int clusterIds[map->nbCells]; //tableau des id des cellules de la grappe, de taille le nombre de cellules de la map, car taille maximale
-  int clusterIdsSize = 0; //la taille de la grappe de cellules
+    //int clusterIds[map->nbCells]; //tableau des id des cellules de la grappe, de taille le nombre de cellules de la map, car taille maximale
+    int clusterIdsSize = 0; //la taille de la grappe de cellules
 
-  SCell **cellsToTest = malloc((map->nbCells)*sizeof(SCell *)); //tableau de pointeurs de SCell. Les cellules à tester lors du prochain while
-  for (i = 0; i < (map->nbCells); i++) {
-    cellsToTest[i] = malloc(sizeof(SCell));
-  }
-
-  cellsToTest[0] = startingCell; //la premiere cellule à tester dans le while est startingCell
-  int cellsToTestSize = 1; //la taille du tableau de cellules à tester
-  int nextCellToTest = 0; //indice de la prochaine cellule à tester
-
-  while (cellsToTestSize != nextCellToTest) //tant qu'il reste des cellules alliées dont on n'a pas regardé les voisins
-  {
-    SCell *currentCell = cellsToTest[nextCellToTest]; //adresse de la cellule courante à tester
-    //clusterIds[clusterIdsSize] = currentCell->id; //on rajoute l'id de la cellule courante aux cellules parcourues
-    clusterIdsSize++;
-    SCell **voisins = currentCell->neighbors; // Tableau de pointeur vers les cellules voisines de la cellule courante
-    int nbVoisins = currentCell->nbNeighbors;
-
-    for(j = 0; (j < nbVoisins) ; j++) //parcours des voisins
-    {
-      if ((voisins[j]->owner == idPlayer) && !IsCellInArrayOfCellPointer(voisins[j], cellsToTest, cellsToTestSize)) //si le cellule voisine est un cellule alliée et qu'elle n'a pas déjà dans cellsToTest
-      {
-        cellsToTest[cellsToTestSize] = voisins[j]; //on l'a rajoute dans la liste des cellules à tester
-        cellsToTestSize++;
-      }
+    SCell **cellsToTest = malloc((map->nbCells)*sizeof(SCell *)); //tableau de pointeurs de SCell. Les cellules à tester lors du prochain while
+    for (i = 0; i < (map->nbCells); i++) {
+        cellsToTest[i] = malloc(sizeof(SCell));
     }
-    nextCellToTest++;
-  }
 
-  //libération allocation mémoire
-  for (k = 0; k < (map->nbCells); k++) {
-    free(cellsToTest[k]);
-  }
-  free(cellsToTest);
+    cellsToTest[0] = startingCell; //la premiere cellule à tester dans le while est startingCell
+    int cellsToTestSize = 1; //la taille du tableau de cellules à tester
+    int nextCellToTest = 0; //indice de la prochaine cellule à tester
 
-  return clusterIdsSize;
+    while (cellsToTestSize != nextCellToTest) //tant qu'il reste des cellules alliées dont on n'a pas regardé les voisins
+    {
+        SCell *currentCell = cellsToTest[nextCellToTest]; //adresse de la cellule courante à tester
+        //clusterIds[clusterIdsSize] = currentCell->id; //on rajoute l'id de la cellule courante aux cellules parcourues
+        clusterIdsSize++;
+        SCell **voisins = currentCell->neighbors; // Tableau de pointeur vers les cellules voisines de la cellule courante
+        int nbVoisins = currentCell->nbNeighbors;
+
+        for(j = 0; (j < nbVoisins) ; j++) //parcours des voisins
+        {
+            if ((voisins[j]->owner == idPlayer) && !IsCellInArrayOfCellPointer(voisins[j], cellsToTest, cellsToTestSize)) //si le cellule voisine est un cellule alliée et qu'elle n'a pas déjà dans cellsToTest
+            {
+                cellsToTest[cellsToTestSize] = voisins[j]; //on l'a rajoute dans la liste des cellules à tester
+                cellsToTestSize++;
+            }
+        }
+        nextCellToTest++;
+    }
+
+    //libération allocation mémoire
+    for (k = 0; k < (map->nbCells); k++) {
+        free(cellsToTest[k]);
+    }
+    free(cellsToTest);
+
+    return clusterIdsSize;
 }
 
 /********************************************************************************************
@@ -349,34 +349,34 @@ int GetClusterSizeStrat(const SMap *map, SCell *startingCell)
 *********************************************************************************************/
 int* MiniSCell(SCell **voisins, int nbVoisins)
 {
-  int k;
-  int mini; // le nombre de dés minimale
-  int rang; //le rang du voisins
-  int boo = 1;
-  for(k = 0; k < nbVoisins; k++)
-  {
-    if(boo)
+    int k;
+    int mini; // le nombre de dés minimale
+    int rang; //le rang du voisins
+    int boo = 1;
+    for(k = 0; k < nbVoisins; k++)
     {
-      if(voisins[k]->owner != IA.id) // si je suis le propriétaire pour éviter d'attaquer son territoire
-      {
-        mini = voisins[k]->nbDices;
-        rang = k;
-        boo = 0;
-      }
+        if(boo)
+        {
+            if(voisins[k]->owner != IA.id) // si je suis le propriétaire pour éviter d'attaquer son territoire
+            {
+                mini = voisins[k]->nbDices;
+                rang = k;
+                boo = 0;
+            }
+        }
+        else if(voisins[k]->nbDices < mini)
+        {
+            if (voisins[k]->owner != IA.id ) // si je suis le propriétaire pour éviter d'attaquer son territoire
+            {
+                mini = voisins[k]->nbDices;
+                rang = k;
+            }
+        }
     }
-    else if(voisins[k]->nbDices < mini)
-    {
-      if (voisins[k]->owner != IA.id ) // si je suis le propriétaire pour éviter d'attaquer son territoire
-      {
-        mini = voisins[k]->nbDices;
-        rang = k;
-      }
-    }
-  }
-  int* tableau = malloc(2*sizeof(int));//Création du tableau de retour
-  tableau[0] = mini;
-  tableau[1] = rang;
-  return tableau;
+    int* tableau = malloc(2*sizeof(int));//Création du tableau de retour
+    tableau[0] = mini;
+    tableau[1] = rang;
+    return tableau;
 }
 
 /********************************************************************************************
@@ -395,48 +395,48 @@ int* MiniSCell(SCell **voisins, int nbVoisins)
 *********************************************************************************************/
 int* MiniCoupSCell(SCell **voisins, int nbVoisins, int nbDes)
 {
-  int k;
-  int mini; // le nombre de dés minimale
-  int rang; //le rang du voisins
-  int boo = 1;
-  int *tableau = malloc(2*sizeof(int));//Création du tableau de retour
+    int k;
+    int mini; // le nombre de dés minimale
+    int rang; //le rang du voisins
+    int boo = 1;
+    int *tableau = malloc(2*sizeof(int));//Création du tableau de retour
 
 
-  for(k = 0; k < nbVoisins; k++)
-  {
-    if(boo)
+    for(k = 0; k < nbVoisins; k++)
     {
-      if(voisins[k]->owner != IA.id) // si je suis le propriétaire pour éviter d'attaquer son territoire
-      {
-        mini = voisins[k]->nbDices;
-        rang = k;
-        boo = 0;
-        if(nbDes - mini == 1)
+        if(boo)
         {
-          tableau[0] = mini;
-          tableau[1] = rang;
-          return tableau;
+            if(voisins[k]->owner != IA.id) // si je suis le propriétaire pour éviter d'attaquer son territoire
+            {
+                mini = voisins[k]->nbDices;
+                rang = k;
+                boo = 0;
+                if(nbDes - mini == 1)
+                {
+                    tableau[0] = mini;
+                    tableau[1] = rang;
+                    return tableau;
+                }
+            }
         }
-      }
-    }
-    else if(voisins[k]->nbDices < mini)
-    {
-      if (voisins[k]->owner != IA.id ) // si je suis le propriétaire pour éviter d'attaquer son territoire
-      {
-        mini = voisins[k]->nbDices;
-        rang = k;
-        if(nbDes - mini == 1)
+        else if(voisins[k]->nbDices < mini)
         {
-          tableau[0] = mini;
-          tableau[1] = rang;
-          return tableau;
+            if (voisins[k]->owner != IA.id ) // si je suis le propriétaire pour éviter d'attaquer son territoire
+            {
+                mini = voisins[k]->nbDices;
+                rang = k;
+                if(nbDes - mini == 1)
+                {
+                    tableau[0] = mini;
+                    tableau[1] = rang;
+                    return tableau;
+                }
+            }
         }
-      }
     }
-  }
-  tableau[0] = mini;
-  tableau[1] = rang;
-  return tableau;
+    tableau[0] = mini;
+    tableau[1] = rang;
+    return tableau;
 }
 
 /********************************************************************************************
@@ -454,7 +454,7 @@ int* MiniCoupSCell(SCell **voisins, int nbVoisins, int nbDes)
 *********************************************************************************************/
 int PercentageOfOccupation(const SMap *map, int nbPlayerCells)
 {
-  return (int) ((nbPlayerCells*100)/map->nbCells);
+    return (int) ((nbPlayerCells*100)/map->nbCells);
 }
 
 /********************************************************************************************
@@ -472,16 +472,16 @@ int PercentageOfOccupation(const SMap *map, int nbPlayerCells)
 *********************************************************************************************/
 int GetNbPlayerCells(const SMap *map, int idPlayer)
 {
-  int nbPlayerCells = 0; //le nombre de cellules du joueur ayant l'id idPlayer
-  SCell *allCells = map->cells; //toutes les cellules de la map
-  int i;
+    int nbPlayerCells = 0; //le nombre de cellules du joueur ayant l'id idPlayer
+    SCell *allCells = map->cells; //toutes les cellules de la map
+    int i;
 
-  for (i = 0; i < map->nbCells; i++) //si la cellule appartient au joueur
-  {
-    if(allCells[i].owner == idPlayer) nbPlayerCells++; //on incrémente le compteur de son nombre de cellules
-  }
+    for (i = 0; i < map->nbCells; i++) //si la cellule appartient au joueur
+    {
+        if(allCells[i].owner == idPlayer) nbPlayerCells++; //on incrémente le compteur de son nombre de cellules
+    }
 
-  return nbPlayerCells;
+    return nbPlayerCells;
 }
 
 /********************************************************************************************
@@ -497,12 +497,12 @@ int GetNbPlayerCells(const SMap *map, int idPlayer)
 *********************************************************************************************/
 void LiberationMemoireTab(int *tab, int taille)
 {
-  int i;
-  for(i = 0; i < taille; i++)
-  {
-    //free(tab[i]);
-  }
-  free(tab);
+    int i;
+    for(i = 0; i < taille; i++)
+    {
+        //free(tab[i]);
+    }
+    free(tab);
 }
 
 /********************************************************************************************
@@ -521,13 +521,13 @@ void LiberationMemoireTab(int *tab, int taille)
 *********************************************************************************************/
 int IsIntInArray(int val, int *arr, int size)
 {
-  int i;
+    int i;
 
-  for (i=0; i < size; i++) {
-    if (arr[i] == val) return 1;
-  }
+    for (i=0; i < size; i++) {
+        if (arr[i] == val) return 1;
+    }
 
-  return 0;
+    return 0;
 }
 
 /********************************************************************************************
@@ -546,10 +546,11 @@ int IsIntInArray(int val, int *arr, int size)
 *********************************************************************************************/
 int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size)
 {
-  int i;
-  for (i=0; i < size; i++) {
-    if (arrCell[i] == cell) return 1;
-  }
+    printf("%s\n", "dans IsCellInArrayOfCellPointer de strategie.c");
+    int i;
+    for (i=0; i < size; i++) {
+        if (arrCell[i] == cell) return 1;
+    }
 
-  return 0;
+    return 0;
 }

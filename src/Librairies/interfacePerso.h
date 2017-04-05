@@ -12,7 +12,7 @@ typedef struct SIa
 // Structure définissant les caractéristiques de l'ia courante
 typedef struct SContext
 {
-	int id;	// Id de l'ia
+	int id;	// Id du joueur
 	int nbPlayer; // Nombre de joueurs dans la partie
 	int highestCluster; // la taille de la plus grosse grappe de cellules alliées
 } SContext;

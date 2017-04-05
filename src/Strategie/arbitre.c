@@ -23,18 +23,27 @@ SContext **contexts; // tableau de pointeurs de SContext
 *
 *********************************************************************************************/
 void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
+    int i, j;
+
+    contexts = malloc(nbPlayer*sizeof(SContext *)); //tableau de pointeurs de SContext
+    for (i = 0; i < nbPlayer; i++) {
+        contexts[i] = malloc(sizeof(SContext));
+        contexts[i]->id = i; //id du joueur
+        contexts[i]->highestCluster = 0; //taille de la plus grosse grappe de cellules alliées. 0 à l'initialisation
+        contexts[i]->nbPlayer = nbPlayer; //nb de joueurs dans la partie
+    }
+
     nbIA = nbArg - 3;
     idIA = malloc(nbIA * sizeof(int));
     printf("Nombre d'IA : %d\n", nbIA);
 
     SPlayerInfo **sp = malloc(nbIA*sizeof(SPlayerInfo*));
 
-    int i;
-    for (i = 0; i < nbIA; i++) {
-        sp[i] = malloc(sizeof(SPlayerInfo));
-        InitGame(i+(nbPlayer-nbIA), nbPlayer, sp[i]);
-        printf("Id IA : %d\n", i+(nbPlayer-nbIA));
-        idIA[i] = nbPlayer-nbIA+i;
+    for (j = 0; j < nbIA; j++) {
+        sp[j] = malloc(sizeof(SPlayerInfo));
+        InitGame(j+(nbPlayer-nbIA), nbPlayer, sp[j]);
+        printf("Id IA : %d\n", j+(nbPlayer-nbIA));
+        idIA[j] = nbPlayer-nbIA+j;
     }
 
     idJoueurActuel = 0;
@@ -381,7 +390,6 @@ SCell* GetCell(const SMap *map, int idCell)
 *********************************************************************************************/
 int GetClusterSize(const SMap *map, SCell *startingCell)
 {
-    printf("%s\n", "dans GetClusterSize");
     int i, j, k;
     int idPlayer = startingCell->owner; //l'id du joueur propriétaire de la cellule de référence
 
@@ -396,7 +404,6 @@ int GetClusterSize(const SMap *map, SCell *startingCell)
     cellsToTest[0] = startingCell; //la premiere cellule à tester dans le while est startingCell
     int cellsToTestSize = 1; //la taille du tableau de cellules à tester
     int nextCellToTest = 0; //indice de la prochaine cellule à tester
-    printf("%s\n", "avant while");
     while (cellsToTestSize != nextCellToTest) //tant qu'il reste des cellules alliées dont on n'a pas regardé les voisins
     {
         SCell *currentCell = cellsToTest[nextCellToTest]; //adresse de la cellule courante à tester
@@ -409,7 +416,6 @@ int GetClusterSize(const SMap *map, SCell *startingCell)
         {
             if ((voisins[j]->owner == idPlayer) && !IsCellInArrayOfCellPointer(voisins[j], cellsToTest, cellsToTestSize)) //si le cellule voisine est un cellule alliée et qu'elle n'a pas déjà dans cellsToTest
             {
-                printf("cellsToTestSize = %d\n", cellsToTestSize);
                 cellsToTest[cellsToTestSize] = voisins[j]; //on l'a rajoute dans la liste des cellules à tester
                 cellsToTestSize++;
             }
@@ -418,36 +424,7 @@ int GetClusterSize(const SMap *map, SCell *startingCell)
     }
 
     //libération allocation mémoire
-    for (k = 0; k < (map->nbCells); k++) {
-        free(cellsToTest[k]);
-    }
     free(cellsToTest);
-
-    printf("%s\n", "dans GetClusterSize");
 
     return clusterIdsSize;
 }
-
-/********************************************************************************************
-*
-* FUNCTION NAME: IsCellInArrayOfCellPointer
-*
-* DESCRIPTION: teste si une adresse de cellule est dans un tableau d'adresses de cellules
-*
-* ARGUMENT      TYPE             DESCRIPTION
-* cell          *SCell           l'adresse de la cellule à rechercher
-* arrCell       **SCell          le tableau d'adresses de cellules
-* size          int              la taille du tableau
-*
-* RETURNS: 1 si cell est dans arrCell, 0 sinon
-*
-*********************************************************************************************/
-// int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size)
-// {
-//   int i;
-//   for (i=0; i < size; i++) {
-//     if (arrCell[i] == cell) return 1;
-//   }
-//
-//   return 0;
-// }
