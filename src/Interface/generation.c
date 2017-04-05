@@ -180,7 +180,7 @@ void point_aleatoire(int h, int w, int **tab, int row) {
   int i;
 
   for (i = 0; i < row; i++) {
-    while (coord_x > (h-24) || coord_y < 52 || (fabs(tab[i][0] - coord_x) + fabs(tab[i][1] - coord_y)) < 55) {
+    while (coord_x > (h-35) || coord_y < 60 || (fabs(tab[i][0] - coord_x) + fabs(tab[i][1] - coord_y)) < 60) {
       coord_x = rand()%(h);
       coord_y = rand()%(w);
       i = 0;

@@ -4,8 +4,8 @@
 #include "jouer.h"
 #include "../Librairies/interfacePerso.h"
 
-int IMG_DICES_W = 24;//la dimension de l'image des dés en largeur
-int IMG_DICES_H = 52; //la dimension de l'image des dés en hauteur
+int IMG_DICES_W = 34;//la dimension de l'image des dés en largeur
+int IMG_DICES_H = 59; //la dimension de l'image des dés en hauteur
 
 /********************************************************************************************
 *
@@ -318,7 +318,13 @@ void displayDices(SDL_Renderer* renderer, int pixel_x, int pixel_y, int idCell, 
     background_surface = SDL_LoadBMP("Images/8dés.bmp");
     break;
   }
+
+  Uint32 colorkey = SDL_MapRGB(background_surface->format, 255, 255, 255);
+  SDL_SetColorKey(background_surface, SDL_TRUE, colorkey);
+
   background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+
+  SDL_FreeSurface(background_surface);
 
   //background_surface_tab[idCell] = background_surface;
   //background_texture_tab[idCell] = background_texture;
