@@ -4,7 +4,7 @@
 #include <string.h>
 #include "jouer.h"
 #include "../Librairies/interfacePerso.h"
-
+#define INT_BUFFER_SIZE 10
 int IMG_DICES_W = 34;//la dimension de l'image des dés en largeur
 int IMG_DICES_H = 59; //la dimension de l'image des dés en hauteur
 
@@ -107,22 +107,22 @@ void fenetre(int nbJoueurs) {
 
         //Tant que l'IA n'a pas fini de jouer
         while (tourFini == 0) {
-			char turnNumber[10];
+			char turnNumber[INT_BUFFER_SIZE];
 			sprintf(turnNumber,"%d",nbTurn);
-			output=concat(output,turnNumber);
+			output=concatint(output,turnNumber);
           //L'IA joue son tour
           playIA = PlayTurn(idJoueurActuel,map, turn);
           //Si elle souhaite attaquer
           if (playIA == 1) {
             playIA = demandeAttaque(map, turn, idJoueurActuel);
-			char idAct[10];
+			char idAct[INT_BUFFER_SIZE];
 			sprintf(idAct,"%d",idJoueurActuel);
-			output=concat(output, idAct);
+			output=concatint(output, idAct);
             id = turn->cellTo;
             int idJoueurDefense = (GetCell(map, id))->owner;
-			char idDef[10];
+			char idDef[INT_BUFFER_SIZE];
 			sprintf(idDef,"%d",idJoueurDefense);
-			output=concat(output, idDef);
+			output=concatint(output, idDef);
             //Si l'IA a gagné son attaque
             if (playIA == 1) {
               attaquer_territoireSansCoord(id,800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
@@ -375,5 +375,13 @@ char* concat( char *s1,  char *s2)
     return finals;
 }
 
+char* concatint(char *s1, char s2[INT_BUFFER_SIZE])
+{
+	char *finals = malloc(strlen(s1)+strlen(s2)+3);//+1 for the zero-terminator
+    strcpy(finals, s1);
+    strcat(finals, s2);
+	strcat(finals,"\t");
+	return finals;
+}
 
 //COPYRIGHT Nicolas

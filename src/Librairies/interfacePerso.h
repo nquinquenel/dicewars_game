@@ -2,6 +2,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#define INT_BUFFER_SIZE 10
+
+
 // Structure définissant les caractéristiques de l'ia courante
 typedef struct SIa
 {
@@ -252,3 +255,5 @@ SContext** GetContexts();
 char* concat( char *s1,  char *s2);
 
 void writetoLog(char *s);
+
+char* concatint(char *s1, char s2[INT_BUFFER_SIZE]);
