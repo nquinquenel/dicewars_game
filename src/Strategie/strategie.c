@@ -39,7 +39,7 @@ void InitGame(unsigned int id, unsigned int nbPlayer, SPlayerInfo *info)
 * RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
 *
 *********************************************************************************************/
-int PlayTurn(const SMap *map, STurn *turn)
+int PlayTurn(unsigned int id, const SMap *map, STurn *turn)
 {
     int nbTerritoires = map->nbCells;
     SCell *territoires = map->cells; //tableau de SCell
@@ -121,7 +121,7 @@ return 1; //on effectuera notre attaque
 * RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
 *
 *********************************************************************************************/
-int PlayTurn2(const SMap *map, STurn *turn)
+int PlayTurn2(unsigned int id, const SMap *map, STurn *turn)
 {
     int nbTerritoires = map->nbCells;
     SCell *territoires = map->cells; //tableau de SCell
@@ -199,7 +199,7 @@ int PlayTurn2(const SMap *map, STurn *turn)
 * RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
 *
 *********************************************************************************************/
-int PlayTurn3(const SMap *map, STurn *turn)
+int PlayTurn3(unsigned int id, const SMap *map, STurn *turn)
 {
     int nbTerritoires = map->nbCells;
     SCell *territoires = map->cells; //tableau de SCell
@@ -274,7 +274,7 @@ int PlayTurn3(const SMap *map, STurn *turn)
 * idWinner    unsigned int     l'id du joueur gagnant
 *
 *********************************************************************************************/
-void EndGame(unsigned int idWinner)
+void EndGame(unsigned int id, unsigned int idWinner)
 {
     //free tous les objets
     //afficher gagnant et score (le nombre de tours

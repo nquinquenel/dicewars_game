@@ -1,6 +1,7 @@
 #include <SDL2/SDL.h>
 #include "fenetre.h"
 #include <stdio.h>
+#include <string.h>
 #include "jouer.h"
 #include "../Librairies/interfacePerso.h"
 
@@ -93,7 +94,8 @@ void fenetre(int nbJoueurs) {
   int res, cellUn, cellDeux, idJoueurActuel, playIA, id;
   int tourFini = 0;
   int phase = 0;
-
+  int nbTurn = 0;
+  char *output;
   while (running == 1) {
     while(SDL_PollEvent(&e) != 0) {
       tourFini = 0;
@@ -105,13 +107,22 @@ void fenetre(int nbJoueurs) {
 
         //Tant que l'IA n'a pas fini de jouer
         while (tourFini == 0) {
+			char turnNumber[10];
+			sprintf(turnNumber,"%d",nbTurn);
+			output=concat(output,turnNumber);
           //L'IA joue son tour
-          playIA = PlayTurn(map, turn);
+          playIA = PlayTurn(idJoueurActuel,map, turn);
           //Si elle souhaite attaquer
           if (playIA == 1) {
             playIA = demandeAttaque(map, turn, idJoueurActuel);
+			char idAct[10];
+			sprintf(idAct,"%d",idJoueurActuel);
+			output=concat(output, idAct);
             id = turn->cellTo;
             int idJoueurDefense = (GetCell(map, id))->owner;
+			char idDef[10];
+			sprintf(idDef,"%d",idJoueurDefense);
+			output=concat(output, idDef);
             //Si l'IA a gagné son attaque
             if (playIA == 1) {
               attaquer_territoireSansCoord(id,800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
@@ -343,6 +354,25 @@ void displayDices(SDL_Renderer* renderer, int pixel_x, int pixel_y, int idCell, 
   //background_surface_tab[idCell] = background_surface;
   //background_texture_tab[idCell] = background_texture;
   SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
+}
+
+void writetoLog(char *s){
+	FILE *logfile = fopen("logfile.txt","a");
+	if(logfile==NULL){
+        printf("cant open file");
+    }
+    fprintf(logfile,"%s",s);
+    fclose(logfile);
+	
+}
+
+char* concat( char *s1,  char *s2)
+{
+    char *finals = malloc(strlen(s1)+strlen(s2)+3);//+1 for the zero-terminator
+    strcpy(finals, s1);
+    strcat(finals, s2);
+	strcat(finals,"\t");
+    return finals;
 }
 
 

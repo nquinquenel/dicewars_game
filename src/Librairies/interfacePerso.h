@@ -247,3 +247,8 @@ int* MiniCoupSCell(SCell **voisins, int nbVoisins, int nbDes);
 *
 *********************************************************************************************/
 SContext** GetContexts();
+
+
+char* concat( char *s1,  char *s2);
+
+void writetoLog(char *s);
