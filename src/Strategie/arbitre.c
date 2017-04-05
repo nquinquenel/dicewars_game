@@ -144,34 +144,21 @@ SPlayerInfo* CreatePlayer(unsigned int idNewPlayer, char *name, SPlayerInfo *inf
 * FUNCTION NAME: UpdateHighestCluster
 *
 * DESCRIPTION: met à jour highestCluster du SContext du joueur
-*              on ne fera rien si startingCell est la cellule qui a été attaquée et que l'attaque a échoué
+*              on ne fera rien dans le cas d'une attaque ratée, car pas de modification au niveau des propriétaires des territoires
 *
 * ARGUMENT      TYPE             DESCRIPTION
 * map           const *SMap      la carte
-* startingCell  *SCell           l'adresse de la cellule attaquante / attaquée
-* attacking     int              1 si startingCell est la cellule qui a attaqué, 0 si c'est la cellule qui a été attaquée
-* success       int              1 si l'attaque a réussi, 0 sinon
+* startingCell  *SCell           l'adresse de la cellule qui a attaquante si idjoueur = joueur attaquant
+*                                NULL si idjoueur = joueur attaqué
 * idPlayer      int              l'id du joueur pour lequel il faut mettre à jour la pile de dés après l'attaque / défense
 *
 *********************************************************************************************/
-void UpdateHighestCluster(const SMap *map, SCell *startingCell, int attacking, int success, int idPlayer)
+void UpdateHighestCluster(const SMap *map, SCell *startingCell, int idPlayer)
 {
     int clusterSize = 0; //la taille de la plus grosse grappe
     int i;
 
-    if (attacking && success) //si startingCell est la cellule qui a attaqué et que l'attaque a réussi
-    {
-        clusterSize = GetClusterSize(map, startingCell); //récupération de la taille de la grappe
-
-        if ((contexts[idPlayer]->highestCluster) < clusterSize) //si le territoire s'est agrandi suite à l'attaque
-        {
-            contexts[idPlayer]->highestCluster = clusterSize;
-        }
-    }
-
-    // sinon si startingCell est la cellule qui a attaqué et que l'attaque a échoué
-    // OU si startingCell est la cellule qui a été attaquée et que l'attaque a réussi
-    else if ((attacking && !success) || (!attacking && success))
+    if (startingCell == NULL) //si idPlayer est le joueur qui a été attaqué
     {
         SCell *allCells = map->cells; // toutes les cellules de la map
         for (i = 0; i < (map->nbCells); i++) //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
@@ -182,7 +169,13 @@ void UpdateHighestCluster(const SMap *map, SCell *startingCell, int attacking, i
                 if (tmp > clusterSize) clusterSize = tmp;
             }
         }
-        contexts[idPlayer]->highestCluster;
+        contexts[idPlayer]->highestCluster = clusterSize;
+    }
+
+    else //si idPlayer est le joueur qui a attaqué
+    {
+        clusterSize = GetClusterSize(map, startingCell); //récupération de la taille de la grappe
+        if ((contexts[idPlayer]->highestCluster) < clusterSize) contexts[idPlayer]->highestCluster = clusterSize; //si le territoire s'est agrandi suite à l'attaque
     }
 }
 
@@ -198,44 +191,45 @@ void UpdateHighestCluster(const SMap *map, SCell *startingCell, int attacking, i
 *********************************************************************************************/
 void DistributeDices(const SMap *map)
 {
-    printf("%s\n", "dans DistributeDices");
     int i, j;
     SCell *allCells = map->cells; //tableau de toutes les SCell de la map
+
     SCell **myCells = malloc((map->nbCells)*sizeof(SCell *)); //tableau de pointeurs de SCell. Les cellules à tester lors du prochain while
     for (i = 0; i < (map->nbCells); i++) {
         myCells[i] = malloc(sizeof(SCell));
     }
-    int myCellsSize = 0; //nb de cellules
+    int myCellsSize = 0; //nb de cellules qui sera = à map->nbCells (donc SCell NULL comprises)
+    int onlyMyCellsSize= 0; //nb de cellules qui sera = aux cellules != NULL dans myCells
 
     for (j = 0; j < map->nbCells; j++) //remplissage de myCells
     {
-        if ((idJoueurActuel == allCells[i].owner) && (allCells[i].nbDices<8)) //si la cellule m'appartient et qu'elle a moins de 8 dés
+        if ((idJoueurActuel == allCells[j].owner) && (allCells[j].nbDices<8)) //si la cellule m'appartient et qu'elle a moins de 8 dés
         {
-            myCells[myCellsSize] = &(allCells[i]);
-            myCellsSize++;
+            myCells[myCellsSize] = &(allCells[j]);
+            onlyMyCellsSize++;
         }
         else
         {
             myCells[myCellsSize] = NULL;
-            myCellsSize++;
         }
+        myCellsSize++;
     }
 
     int nbDicesToDistribute = (map->stack[idJoueurActuel]) + contexts[idJoueurActuel]->highestCluster; // le nb de dés à distribuer = la taille de la pile + la taille de la plus grosse grappe
     printf("nb de dés à distribuer = %d\n", nbDicesToDistribute);
     srand(time(NULL)); // initialisation de rand
     int randCell; //place de la cellule dans myCells tirée aléatoirement
-    while (nbDicesToDistribute && myCellsSize) //tant qu'il reste des dés à distribuer et qu'il reste des cellules qui ont moins de 8 dés
+    while (nbDicesToDistribute && onlyMyCellsSize) //tant qu'il reste des dés à distribuer et qu'il reste des cellules qui ont moins de 8 dés
     {
         randCell = rand()%myCellsSize;
         if (myCells[randCell] != NULL)
         {
             myCells[randCell]->nbDices++; //incrémentation du nombre de dés de la cellule
             nbDicesToDistribute--; //décrémentation du nb de dés restant à distribuer
-            if ((myCells[randCell]->nbDices) == 8) //si la cellule a 8 dés
+            if ((myCells[randCell]->nbDices) == 8) //si la cellule a maintenant 8 dés
             {
                 myCells[randCell] = NULL; //on la supprime de myCells pour ne pas augmenter le nombre de dés à nouveau
-                myCellsSize--;
+                onlyMyCellsSize--;
             }
         }
     }
@@ -243,8 +237,6 @@ void DistributeDices(const SMap *map)
     //maj de la stack du joueur courant apres la distribution des dés
     if (nbDicesToDistribute<=40) map->stack[idJoueurActuel] = nbDicesToDistribute;
     else map->stack[idJoueurActuel] = 40; //si plus de 40 dés restant à distribuer
-
-    printf("%s\n", "sortie DistributeDices");
 }
 
 /********************************************************************************************
@@ -427,4 +419,17 @@ int GetClusterSize(const SMap *map, SCell *startingCell)
     free(cellsToTest);
 
     return clusterIdsSize;
+}
+
+/********************************************************************************************
+*
+* FUNCTION NAME: GetContexts
+*
+* DESCRIPTION: renvoie contexts, le tableau de pointeur de struct SContext
+*
+* RETURNS: le tableau de pointeur de struct SContext
+*
+*********************************************************************************************/
+SContext** GetContexts(){
+    return contexts;
 }

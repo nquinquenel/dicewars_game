@@ -546,7 +546,6 @@ int IsIntInArray(int val, int *arr, int size)
 *********************************************************************************************/
 int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size)
 {
-    printf("%s\n", "dans IsCellInArrayOfCellPointer de strategie.c");
     int i;
     for (i=0; i < size; i++) {
         if (arrCell[i] == cell) return 1;
