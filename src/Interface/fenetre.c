@@ -131,6 +131,14 @@ void fenetre(int nbJoueurs) {
               //Si l'IA fait un mouvement interdit
             } else {
               tourFini = 1;
+              DistributeDices(map);
+              int z;
+              for (z = 0; z < map->nbCells; z++) {
+                if ((map->cells[z]).owner == idJoueurActuel) {
+                  displayDices(renderer, tab_points[(map->cells[z]).id][0], tab_points[(map->cells[z]).id][1], (map->cells[z]).id, (map->cells[z]).nbDices);
+                }
+              }
+              SDL_RenderPresent(renderer);
               //On passe au joueur suivant
               idJoueurActuel++;
               setIdJoueurActuel(idJoueurActuel, nbJoueurs);
@@ -141,6 +149,12 @@ void fenetre(int nbJoueurs) {
             tourFini = 1;
             // on distribue aléatoirement les dés sur les territoires alliés
             DistributeDices(map);
+            int z;
+            for (z = 0; z < map->nbCells; z++) {
+              if ((map->cells[z]).owner == idJoueurActuel) {
+                displayDices(renderer, tab_points[(map->cells[z]).id][0], tab_points[(map->cells[z]).id][1], (map->cells[z]).id, (map->cells[z]).nbDices);
+              }
+            }
             SDL_RenderPresent(renderer);
             //On passe au joueur suivant
             idJoueurActuel++;
