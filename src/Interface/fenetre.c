@@ -90,12 +90,6 @@ void fenetre(int nbJoueurs) {
 
   map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
 
-  // allocation mémoire pour 2 tableaux de pointeurs pour gérer l'affichage des images de dés des cellules
-  // Tableau de pointeurs de SDL_Surface pour les images de dés
-  //SDL_Surface** background_surface_tab = malloc(50*sizeof(SDL_Surface *));
-  // Tableau de pointeurs de SDL_Texture pour les images de dés
-  //SDL_Texture** background_texture_tab = malloc(50*sizeof(SDL_Texture *));
-
   // initialisation de highestCluster de la struct SContext
   SContext **contexts = GetContexts();
   for (s = 0; s < nbJoueurs; s++) { //pour chaque joueur
@@ -167,26 +161,12 @@ void fenetre(int nbJoueurs) {
             }
             //Si l'IA a fait une attaque autorisé (gagné ou perdue)
             if (playIA != -1) {
-              /*int nbDes;
-              nbDes = map->cells[id].nbDices;
-              displayDices(renderer, tab_points[id][0], tab_points[id][1], id, nbDes);
-              id = turn->cellFrom;
-              nbDes = map->cells[id].nbDices;
-              displayDices(renderer, tab_points[id][0], tab_points[id][1], id, nbDes);
-              */
               update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
               //Si l'IA fait un mouvement interdit
             } else {
               tourFini = 1;
               DistributeDices(map);
-              /*int z;
-              for (z = 0; z < map->nbCells; z++) {
-                if ((map->cells[z]).owner == idJoueurActuel) {
-                  displayDices(renderer, tab_points[(map->cells[z]).id][0], tab_points[(map->cells[z]).id][1], (map->cells[z]).id, (map->cells[z]).nbDices);
-                }
-              }
-              SDL_RenderPresent(renderer);*/
               update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
               //On passe au joueur suivant
@@ -202,13 +182,6 @@ void fenetre(int nbJoueurs) {
             tourFini = 1;
             // on distribue aléatoirement les dés sur les territoires alliés
             DistributeDices(map);
-          /*  int z;
-            for (z = 0; z < map->nbCells; z++) {
-              if ((map->cells[z]).owner == idJoueurActuel) {
-                displayDices(renderer, tab_points[(map->cells[z]).id][0], tab_points[(map->cells[z]).id][1], (map->cells[z]).id, (map->cells[z]).nbDices);
-              }
-            }
-            SDL_RenderPresent(renderer);*/
             update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
             //On passe au joueur suivant
@@ -241,7 +214,7 @@ void fenetre(int nbJoueurs) {
           if (cellUn != -1 && tab_comparaison[cellUn] == idJoueurActuel) {
             notifTerrains(cellUn, tab_id, renderer, 800, 600, tab_borduresBlanches);
             phase = 1;
-          } else if (e.button.x > 459 && e.button.x < 661 && e.button.y > 612 && e.button.y < 688) {
+          } else if (e.button.x > 359 && e.button.x < 461 && e.button.y > 612 && e.button.y < 688) {
             DistributeDices(map);
             update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
             idJoueurActuel++;
@@ -282,6 +255,7 @@ void fenetre(int nbJoueurs) {
               }
             }
 
+            idJoueurActuel = 0;
             map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
 
             SContext **contexts = GetContexts();
@@ -320,13 +294,6 @@ void fenetre(int nbJoueurs) {
               UpdateHighestCluster(map, NULL, idJoueurDefense); //MAj pour le joueur en défense
             }
           }
-
-          /*int nbDes;
-          nbDes = map->cells[cellUn].nbDices;
-          displayDices(renderer, tab_points[cellUn][0], tab_points[cellUn][1], cellUn, nbDes);
-          nbDes = map->cells[cellDeux].nbDices;
-          displayDices(renderer, tab_points[cellDeux][0], tab_points[cellDeux][1], cellDeux, nbDes);
-*/
           //On enlève les bordures internes blanches de notre territoire
           for (i = 1; i < 799; i++) {
             for (p = 1; p < 599; p++) {
@@ -362,35 +329,9 @@ void fenetre(int nbJoueurs) {
           //Touche entrée
           case SDLK_RETURN:
 
-          // TODO appliquer la distribution des dés sur l'interface
-
-          //On enlève les bordures internes blanches
-        /*  if (phase == 1) {
-            for (i = 1; i < 799; i++) {
-              for (p = 1; p < 599; p++) {
-                if (tab_borduresBlanches[i][p] == 1) {
-                  SDL_SetRenderDrawColor(renderer, couleurs[idJoueurActuel][0], couleurs[idJoueurActuel][1], couleurs[idJoueurActuel][2], 0);
-                  SDL_RenderDrawPoint(renderer, i, p);
-                  tab_borduresBlanches[i][p] = 0;
-                }
-              }
-            }
-            SDL_RenderPresent(renderer);
-            phase = 0;
-          }*/
-
+          DistributeDices(map);
           update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
-          // on distribue aléatoirement les dés sur les territoires alliés
-          DistributeDices(map);
-    /*      int z;
-          for (z = 0; z < map->nbCells; z++) {
-            if ((map->cells[z]).owner == idJoueurActuel) {
-              displayDices(renderer, tab_points[(map->cells[z]).id][0], tab_points[(map->cells[z]).id][1], (map->cells[z]).id, (map->cells[z]).nbDices);
-            }
-          }
-          SDL_RenderPresent(renderer);
-*/
           //On passe au joueur suivant
           idJoueurActuel++;
           setIdJoueurActuel(idJoueurActuel, nbJoueurs);
@@ -495,33 +436,33 @@ void update_affichage(SMap* map, int x, int y, int h, int w, int** tab_points, i
 
 
 void writetoLog(char *s){
-    FILE *logfile = fopen("logfile.txt","a");
-    if(logfile==NULL){
-        printf("cant open file");
-    }
-    fprintf(logfile,"%s",s);
-    fclose(logfile);
+  FILE *logfile = fopen("logfile.txt","a");
+  if(logfile==NULL){
+    printf("cant open file");
+  }
+  fprintf(logfile,"%s",s);
+  fclose(logfile);
 
 }
 
 char* concat( char *s1,  char *s2)
 {
-    char *finals = malloc(strlen(s1)+strlen(s2)+3);//+1 for the zero-terminator
-    strcpy(finals, s1);
-    strcat(finals, s2);
-    strcat(finals,"\t");
-    return finals;
+  char *finals = malloc(strlen(s1)+strlen(s2)+3);//+1 for the zero-terminator
+  strcpy(finals, s1);
+  strcat(finals, s2);
+  strcat(finals,"\t");
+  return finals;
 }
 
 char* concatint(char *s1, int n)
 {
-    char tempbuff[INT_BUFFER_SIZE];
-    sprintf(tempbuff,"%d",n);
-    char *finals = malloc(strlen(s1)+strlen(tempbuff)+3);//+1 for the zero-terminator
-    strcpy(finals, s1);
-    strcat(finals, tempbuff);
-    strcat(finals,"\t");
-    return finals;
+  char tempbuff[INT_BUFFER_SIZE];
+  sprintf(tempbuff,"%d",n);
+  char *finals = malloc(strlen(s1)+strlen(tempbuff)+3);//+1 for the zero-terminator
+  strcpy(finals, s1);
+  strcat(finals, tempbuff);
+  strcat(finals,"\t");
+  return finals;
 }
 
 //COPYRIGHT Nicolas
