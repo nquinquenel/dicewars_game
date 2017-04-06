@@ -106,7 +106,7 @@ void fenetre(int nbJoueurs) {
         //Tant que l'IA n'a pas fini de jouer
         while (tourFini == 0) {
           //L'IA joue son tour
-          playIA = PlayTurn(map, turn);
+          playIA = PlayTurn1(idJoueurActuel,map, turn);
           //Si elle souhaite attaquer
           if (playIA == 1) {
             playIA = demandeAttaque(map, turn, idJoueurActuel);

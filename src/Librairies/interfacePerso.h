@@ -2,13 +2,14 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
+#define INT_BUFFER_SIZE 10
 // Structure définissant les caractéristiques de l'ia courante
 typedef struct SIa
 {
 	int id;	// Id de l'ia
 	int nbPlayer; // Nombre de joueurs dans la partie
 } SIa;
-
 // Structure définissant les caractéristiques de l'ia courante
 typedef struct SContext
 {
@@ -16,12 +17,10 @@ typedef struct SContext
 	int nbPlayer; // Nombre de joueurs dans la partie
 	int highestCluster; // la taille de la plus grosse grappe de cellules alliées
 } SContext;
-
 void createGame(int nbParties, int nbPlayer, int nbArg, char** noms);
 int demandeAttaque(SMap *map, STurn *turn, int idPlayer);
 int getIdJoueurActuel();
 void setIdJoueurActuel(int id, int nbJoueurs);
-
 /********************************************************************************************
 *
 * FUNCTION NAME: CreatePlayer
@@ -37,9 +36,7 @@ void setIdJoueurActuel(int id, int nbJoueurs);
 *
 *********************************************************************************************/
 SPlayerInfo* CreatePlayer(unsigned int idNewPlayer, char *name, SPlayerInfo *info);
-
 int isAnIA(int id);
-
 /********************************************************************************************
 *
 * FUNCTION NAME: GetClusterSize
@@ -206,7 +203,6 @@ int PercentageOfOccupation(const SMap *map, int nbPlayerCells);
 *
 *********************************************************************************************/
 int GetNbPlayerCells(const SMap *map, int idPlayer);
-
 /********************************************************************************************
 *
 * FUNCTION NAME: AreNeighbors
@@ -236,7 +232,6 @@ int AreNeighbors(SCell *cell1, SCell *cell2);
 *
 *********************************************************************************************/
 int* MiniCoupSCell(SCell **voisins, int nbVoisins, int nbDes);
-
 /********************************************************************************************
 *
 * FUNCTION NAME: GetContexts
@@ -247,3 +242,16 @@ int* MiniCoupSCell(SCell **voisins, int nbVoisins, int nbDes);
 *
 *********************************************************************************************/
 SContext** GetContexts();
+/********************************************************************************************
+*
+* FUNCTION NAME: PlayTurn2
+*
+* DESCRIPTION: renvoie 1 si attaque possible ou 0 si impossible
+*
+* RETURNS: 0 ou 1
+*
+*********************************************************************************************/
+int PlayTurn1(unsigned int id, const SMap *map, STurn *turn);
+char* concat( char *s1,  char *s2);
+void writetoLog(char *s);
+char* concatint(char *s1, char s2[INT_BUFFER_SIZE]);
