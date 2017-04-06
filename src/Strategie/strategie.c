@@ -25,24 +25,24 @@ void InitGame(unsigned int id, unsigned int nbPlayer, SPlayerInfo *info)
 * FUNCTION NAME: PlayTurn1
 *
 * DESCRIPTION: attaque avec la 1ere cellule trouvée qui à une différence de dés maximale
-*              attaque si égalité
+*              attaque si attaque autant de dés que défense
 *
-* ARGUMENT    TYPE             DESCRIPTION
-* map         const *SMap      la carte
-* turn        *STurn           le tour courant
+* ARGUMENT          TYPE             DESCRIPTION
+* idjoueurActuel    unsigned int
+* map               const *SMap      la carte
+* turn              *STurn           le tour courant
 *
 * RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
 *
 *********************************************************************************************/
 int PlayTurn1(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
 {
-    // usleep(500000); //sleep de 0.5 sec
-    printf("idjoueurActuel : %d\n", idjoueurActuel);
     int idFrom = -1; //id cellule attaquante
     int idTo = -1; //id cellule attaquée
     int diff = -1; //différence nbDices entre cellule attaquante et cellule attaquée
     int i, j;
     SCell *territoires = map->cells; //tableau de SCell
+
     for(i = 0; i < (map->nbCells); i++) //parcours des cellules
     {
         if (territoires[i].owner == idjoueurActuel) //si le territoire appartient à l'IA
@@ -58,6 +58,7 @@ int PlayTurn1(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
             }
         }
     }
+
     if (diff>=0) //si on a une attaque possible
     {
         turn->cellFrom = idFrom;
@@ -67,35 +68,37 @@ int PlayTurn1(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
     printf("%s\n", "IA passe son tour");
     return 0; //on passera notre tour
 }
+
 /********************************************************************************************
 *
 * FUNCTION NAME: PlayTurn2
 *
 * DESCRIPTION: attaque avec la 1ere cellule trouvée qui à une différence de dés maximale
-*              n'attaque pas si égalité
+*              n'attaque pas si attaque autant de dés que défense
 *
-* ARGUMENT    TYPE             DESCRIPTION
-* map         const *SMap      la carte
-* turn        *STurn           le tour courant
+* ARGUMENT          TYPE             DESCRIPTION
+* idjoueurActuel    unsigned int
+* map               const *SMap      la carte
+* turn              *STurn           le tour courant
 *
 * RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
 *
 *********************************************************************************************/
-int PlayTurn2(unsigned int id, const SMap *map, STurn *turn)
+int PlayTurn2(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
 {
-    usleep(500000); //sleep de 0.5 sec
     int idFrom = -1; //id cellule attaquante
     int idTo = -1; //id cellule attaquée
     int diff = 0; //différence nbDices entre cellule attaquante et cellule attaquée
     int i, j;
     SCell *territoires = map->cells; //tableau de SCell
+
     for(i = 0; i < (map->nbCells); i++) //parcours des cellules
     {
-        if (territoires[i].owner == IA.id) //si le territoire appartient à l'IA
+        if (territoires[i].owner == idjoueurActuel) //si le territoire appartient à l'IA
         {
             for (j = 0; j < territoires[i].nbNeighbors; j++) //parcours des voisins de ce territoire
             {
-                if((((territoires[i].neighbors[j])->owner) != IA.id) && (territoires[i].nbDices != 1) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = ennemi && si nbDices cellule attaquante != 0 && si + gde diff de dés
+                if((((territoires[i].neighbors[j])->owner) != idjoueurActuel) && (territoires[i].nbDices != 1) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = ennemi && si nbDices cellule attaquante != 0 && si + gde diff de dés
                 {
                     idFrom = territoires[i].id;
                     idTo = (territoires[i].neighbors[j])->id;
@@ -104,7 +107,90 @@ int PlayTurn2(unsigned int id, const SMap *map, STurn *turn)
             }
         }
     }
+
     if (diff>=1) //si on a une attaque possible
+    {
+        turn->cellFrom = idFrom;
+        turn->cellTo = idTo;
+        return 1; //on effectuera notre attaque
+    }
+    printf("%s\n", "IA passe son tour");
+    return 0; //on passera notre tour
+}
+
+/********************************************************************************************
+*
+* FUNCTION NAME: PlayTurn3
+*
+* DESCRIPTION: attaque avec la cellule qui a le plus de dés et qui à la plus petite différence de dés avec la cellule attaquée
+*
+* ARGUMENT          TYPE             DESCRIPTION
+* idjoueurActuel    unsigned int
+* map               const *SMap      la carte
+* turn              *STurn           le tour courant
+*
+* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
+*
+*********************************************************************************************/
+int PlayTurn3(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
+{
+    printf("%s\n", "__________________________________________________________");
+    int idFrom = -1; //id cellule attaquante
+    int idTo = -1; //id cellule attaquée
+    int diff = -1; //différence nbDices entre cellule attaquante et cellule attaquée
+    int i, j;
+    SCell *territoires = map->cells; //tableau de SCell
+
+    for(i = 0; i < (map->nbCells); i++) //parcours des cellules
+    {
+        if (territoires[i].owner == idjoueurActuel) //si le territoire appartient à l'IA
+        {
+            for (j = 0; j < territoires[i].nbNeighbors; j++) //parcours des voisins de ce territoire
+            {
+                if (((territoires[i].neighbors[j])->owner) != idjoueurActuel)
+                {
+                    if ( (territoires[i].nbDices > 1) && ((territoires[i].nbDices) >= ((territoires[i].neighbors[j])->nbDices)) )
+                    {
+                        if (diff == -1) {
+                            printf("%s\n", "dans IF n.1");
+                            idFrom = territoires[i].id;
+                            idTo = (territoires[i].neighbors[j])->id;
+                            printf("territoires[i].nbDices = %d\n", territoires[i].nbDices);
+                            diff = ((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices);
+                            printf("diff = %d\n",diff );
+                        }
+                        else{
+
+
+                            if(((territoires[i].nbDices) - ((territoires[i].neighbors[j])->nbDices)) == diff)
+                            {
+                                if  ((GetCell(map, idFrom)->nbDices) < (territoires[i].nbDices))
+                                {
+                                    printf("%s\n", "dans IF n.2");
+                                    idFrom = territoires[i].id;
+                                    idTo = (territoires[i].neighbors[j])->id;
+                                    printf("territoires[i].nbDices = %d\n", territoires[i].nbDices);
+                                    diff = ((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices);
+                                    printf("diff = %d\n",diff );
+                                }
+                            }
+                            else if(((territoires[i].nbDices) - ((territoires[i].neighbors[j])->nbDices)) < diff)
+                            {
+                                printf("%s\n", "dans IF n.3");
+                                idFrom = territoires[i].id;
+                                idTo = (territoires[i].neighbors[j])->id;
+                                printf("territoires[i].nbDices = %d\n", territoires[i].nbDices);
+                                diff = ((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices);
+                                printf("diff = %d\n",diff );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (diff>=0) //si on a une attaque possible
     {
         turn->cellFrom = idFrom;
         turn->cellTo = idTo;

@@ -219,31 +219,48 @@ SContext** GetContexts();
 * FUNCTION NAME: PlayTurn1
 *
 * DESCRIPTION: attaque avec la 1ere cellule trouvée qui à une différence de dés maximale
-*              attaque si égalité
+*              attaque si attaque autant de dés que défense
 *
-* ARGUMENT    TYPE             DESCRIPTION
-* map         const *SMap      la carte
-* turn        *STurn           le tour courant
+* ARGUMENT          TYPE             DESCRIPTION
+* idjoueurActuel    unsigned int
+* map               const *SMap      la carte
+* turn              *STurn           le tour courant
 *
 * RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
 *
 *********************************************************************************************/
-int PlayTurn1(unsigned int id, const SMap *map, STurn *turn);
+int PlayTurn1(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
 /********************************************************************************************
 *
 * FUNCTION NAME: PlayTurn2
 *
 * DESCRIPTION: attaque avec la 1ere cellule trouvée qui à une différence de dés maximale
-*              n'attaque pas si égalité
+*              n'attaque pas si attaque autant de dés que défense
 *
-* ARGUMENT    TYPE             DESCRIPTION
-* map         const *SMap      la carte
-* turn        *STurn           le tour courant
+* ARGUMENT          TYPE             DESCRIPTION
+* idjoueurActuel    unsigned int
+* map               const *SMap      la carte
+* turn              *STurn           le tour courant
 *
 * RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
 *
 *********************************************************************************************/
-int PlayTurn2(unsigned int id, const SMap *map, STurn *turn);
+int PlayTurn2(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
+/********************************************************************************************
+*
+* FUNCTION NAME: PlayTurn3
+*
+* DESCRIPTION: attaque avec la cellule qui a le plus de dés et qui à la plus petite différence de dés avec la cellule attaquée
+*
+* ARGUMENT          TYPE             DESCRIPTION
+* idjoueurActuel    unsigned int
+* map               const *SMap      la carte
+* turn              *STurn           le tour courant
+*
+* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
+*
+*********************************************************************************************/
+int PlayTurn3(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
 char* concat( char *s1,  char *s2);
 void writetoLog(char *s);
 char* concatint(char *s1, int n);
