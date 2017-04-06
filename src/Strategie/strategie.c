@@ -25,179 +25,6 @@ void InitGame(unsigned int id, unsigned int nbPlayer, SPlayerInfo *info)
 
 /********************************************************************************************
 *
-* FUNCTION NAME: PlayTurn
-*
-* DESCRIPTION: Fonction à appeler à chaque tour sur la stratégie et tant que le retour de
-*              fonction est vrai et qu'il n'y a pas d'erreur.
-*              - Ne pas oublier pour l'arbitre de dupliquer toute la structure map pour chaque appel !
-*              - En cas d'erreur, rétablir la carte dans l'état initial avant le premier tour du joueur.
-*
-* ARGUMENT    TYPE             DESCRIPTION
-* map         const *SMap      la carte
-* turn        *STurn           le tour courant
-*
-* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
-*
-*********************************************************************************************/
-int PlayTurn(unsigned int id, const SMap *map, STurn *turn)
-{
-    printf("%s\n", "entree playturn");
-    sleep(1);
-    int nbTerritoires = map->nbCells;
-    SCell *territoires = map->cells; //tableau de SCell
-
-    // Premiere étape : récupération du nombre de territoires nous appartenant
-    int i;
-    int count = 0;
-    for(i = 0; i < nbTerritoires; i++) //parcours des cellules
-    {
-        if (territoires[i].owner == IA.id ) //si je suis le propriétaire
-        {
-            count++; // On incrémente pour chaque territoire nous appartenant
-        }
-    }
-
-    // Deuxieme étape : attribution des cellules de notre territoire dans un tableau
-    SCell *tab = malloc((count)*sizeof(SCell)); // On malloc notre tableau
-    count = 0; // On réinitialise le compteur
-    for(i = 0; i < nbTerritoires; i++) // parcours des cellules
-    {
-        if (territoires[i].owner == IA.id && territoires[i].nbDices != 1) // si je suis le propriétaire
-        {
-            tab[count] = territoires[i]; // On ajoute chaque cellule à notre tableau
-            count++; // On incrémente le compteur
-        }
-    }
-
-    // Troisieme étape : on cherche le territoire avec la plus grosse probabilité de victoires
-    int *coup = malloc(sizeof(int)); //Contiendra l'adresse du résultat du test des voisins
-    int test = 1;
-    for(i = 0; i < count; i++) //parcours des cellules
-    {
-        if(test) {
-            coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); // attribution par défaut
-            if(coup[0] != -1 && coup[1] != -1)
-            {
-                coup[0] -= tab[i].nbDices; //On décrémente par le nombre de dés que l'on a
-                turn->cellFrom = tab[i].id; //attribution temporaire
-                turn->cellTo = tab[i].neighbors[coup[1]]->id; //attribution temporaire
-                test = 0;
-            }
-        }
-        else{
-            int *coup2 = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors);
-            if(coup2[0] != -1 && coup2[1] != -1)
-            {
-                if((coup2[0]-tab[i].nbDices) < coup[0]) //On vérifie en enlevant directement le nb de dés si c'est inférieur
-                {
-                    coup = coup2;
-                    coup[0] -= tab[i].nbDices; //On doit décrémenter pour pouvoir vérifier le suivant
-                    turn->cellFrom = tab[i].id; //nouvelle attribution
-                    turn->cellTo = ((tab[i].neighbors)[coup[1]])->id; //nouvelle attribution
-                }
-            }
-        }
-
-    }
-
-    if(coup[0] >= 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
-    {
-        //libération de l'allocation mémoire
-        free(tab);
-        printf("%s\n", "sortie playturn");
-
-        return 0; //on passera notre tour
-    }
-    else
-    {
-        //libération de l'allocation mémoire
-        free(tab);
-        printf("%s\n", "sortie playturn");
-
-        return 1; //on effectuera notre attaque
-    }
-}
-
-/********************************************************************************************
-*
-* FUNCTION NAME: PlayTurn2
-*
-* DESCRIPTION: Fonction à appeler à chaque tour sur la stratégie et tant que le retour de
-*              fonction est vrai et qu'il n'y a pas d'erreur.
-*              - Ne pas oublier pour l'arbitre de dupliquer toute la structure map pour chaque appel !
-*              - En cas d'erreur, rétablir la carte dans l'état initial avant le premier tour du joueur.
-*
-* ARGUMENT    TYPE             DESCRIPTION
-* map         const *SMap      la carte
-* turn        *STurn           le tour courant
-*
-* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
-*
-*********************************************************************************************/
-int PlayTurn2(unsigned int id, const SMap *map, STurn *turn)
-{
-    int nbTerritoires = map->nbCells;
-    SCell *territoires = map->cells; //tableau de SCell
-
-    // Premiere étape : récupération du nombre de territoires nous appartenant
-    int i;
-    int count = 0;
-    for(i = 0; i < nbTerritoires; i++) //parcours des cellules
-    {
-        if (territoires[i].owner == IA.id ) //si je suis le propriétaire
-        {
-            count++; // On incrémente pour chaque territoire nous appartenant
-        }
-    }
-
-    // Deuxieme étape : attribution des cellules de notre territoire dans un tableau
-    SCell *tab = malloc((count)*sizeof(SCell)); // On malloc notre tableau
-    count = 0; // On réinitialise le compteur
-    for(i = 0; i < nbTerritoires; i++) // parcours des cellules
-    {
-        if (territoires[i].owner == IA.id ) // si je suis le propriétaire
-        {
-            tab[count] = territoires[i]; // On ajoute chaque cellule à notre tableau
-            count++; // On incrémente le compteur
-        }
-    }
-
-    // Troisieme étape : on cherche le territoire avec la plus grosse probabilité de victoires
-    int* coup; //Contiendra l'adresse du résultat du test des voisins
-    for(i = 0; i < count+1; i++) //parcours des cellules
-    {
-        if(i == 0)
-        {
-            coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); // attribution par défaut
-            coup[0] -= tab[i].nbDices; //On décrémente par le nombre de dés que l'on a
-            turn->cellFrom = tab[i].id; //attribution temporaire
-            turn->cellTo = tab[i].neighbors[coup[1]]->id; //attribution temporaire
-        }
-        else if(MiniSCell(tab[i].neighbors, tab[i].nbNeighbors)[0]-tab[i].nbDices < coup[0]) //On vérifie en enlevant directement le nb de dés si c'est inférieur
-        {
-            coup = MiniSCell(tab[i].neighbors, tab[i].nbNeighbors); //On change stock notre adresse de tableau
-            coup[0] -= tab[i].nbDices; //On doit décrémenter pour pouvoir vérifier le suivant
-            turn->cellFrom = tab[i].id; //nouvelle attribution
-            turn->cellTo = tab[i].neighbors[coup[1]]->id; //nouvelle attribution
-        }
-    }
-
-    if(coup[0] > 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
-    {
-        free(tab);
-        free(coup);
-        return 0; //on passera notre tour
-    }
-
-    //libération de l'allocation mémoire
-    free(tab);
-    free(coup);
-
-    return 1; //on effectuera notre attaque
-}
-
-/********************************************************************************************
-*
 * FUNCTION NAME: PlayTurn3
 *
 * DESCRIPTION: Fonction à appeler à chaque tour sur la stratégie et tant que le retour de
@@ -293,7 +120,7 @@ int PlayTurn3(unsigned int id, const SMap *map, STurn *turn)
 * RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
 *
 *********************************************************************************************/
-int PlayTurn4(unsigned int id, const SMap *map, STurn *turn)
+int PlayTurn1(unsigned int id, const SMap *map, STurn *turn)
 {
     printf("\t%s\n", "entree PlayTurn4");
     sleep(1);
@@ -321,6 +148,60 @@ int PlayTurn4(unsigned int id, const SMap *map, STurn *turn)
     }
     printf("diff = %d\n", diff);
     if (diff>=0) //si on a une attaque possible
+    {
+        turn->cellFrom = idFrom;
+        turn->cellTo = idTo;
+        printf("%s\n", "On attaque");
+        return 1; //on effectuera notre attaque
+    }
+    printf("%s\n", "On passe le tour ");
+    return 0; //on passera notre tour
+}
+
+/********************************************************************************************
+*
+* FUNCTION NAME: PlayTurn2
+*
+* DESCRIPTION: Fonction à appeler à chaque tour sur la stratégie et tant que le retour de
+*              fonction est vrai et qu'il n'y a pas d'erreur.
+*              - Ne pas oublier pour l'arbitre de dupliquer toute la structure map pour chaque appel !
+*              - En cas d'erreur, rétablir la carte dans l'état initial avant le premier tour du joueur.
+*
+* ARGUMENT    TYPE             DESCRIPTION
+* map         const *SMap      la carte
+* turn        *STurn           le tour courant
+*
+* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
+*
+*********************************************************************************************/
+int PlayTurn2(unsigned int id, const SMap *map, STurn *turn)
+{
+    printf("\t%s\n", "entree PlayTurn4");
+    sleep(1);
+
+    int idFrom = -1; //id cellule attaquante
+    int idTo = -1; //id cellule attaquée
+    int diff = 0; //différence nbDices entre cellule attaquante et cellule attaquée
+    int i, j;
+    SCell *territoires = map->cells; //tableau de SCell
+
+    for(i = 0; i < (map->nbCells); i++) //parcours des cellules
+    {
+        if (territoires[i].owner == IA.id) //si le territoire appartient à l'IA
+        {
+            for (j = 0; j < territoires[i].nbNeighbors; j++) //parcours des voisins de ce territoire
+            {
+                if((((territoires[i].neighbors[j])->owner) != IA.id) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = ennemi et si + gde diff de dés
+                {
+                    idFrom = territoires[i].id;
+                    idTo = (territoires[i].neighbors[j])->id;
+                    diff = ((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices);
+                }
+            }
+        }
+    }
+    printf("diff = %d\n", diff);
+    if (diff>=1) //si on a une attaque possible
     {
         turn->cellFrom = idFrom;
         turn->cellTo = idTo;
