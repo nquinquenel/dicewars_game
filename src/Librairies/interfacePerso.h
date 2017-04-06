@@ -261,7 +261,7 @@ SContext** GetContexts();
 * RETURNS: 0 ou 1
 *
 *********************************************************************************************/
-int PlayTurn2(unsigned int id, const SMap *map, STurn *turn);
+int PlayTurn1(unsigned int id, const SMap *map, STurn *turn);
 
 char* concat( char *s1,  char *s2);
 
