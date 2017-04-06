@@ -42,12 +42,10 @@ void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
     for (j = 0; j < nbIA; j++) {
         sp[j] = malloc(sizeof(SPlayerInfo));
         InitGame(j+(nbPlayer-nbIA), nbPlayer, sp[j]);
-        printf("Id IA : %d\n", j+(nbPlayer-nbIA));
         idIA[j] = nbPlayer-nbIA+j;
     }
 
     idJoueurActuel = 0;
-
     fenetre(nbPlayer);
 }
 
@@ -300,6 +298,8 @@ int Attack(const SMap *map, STurn *turn)
     {
         defenseScore += (rand()%5)+1;
     }
+
+    printf("%d VS %d\n", attackScore, defenseScore);
 
     if (attackScore>defenseScore) //si l'attaque gagne
     {

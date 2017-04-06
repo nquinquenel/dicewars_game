@@ -98,19 +98,6 @@ int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size);
 void UpdateHighestCluster(const SMap *map, SCell *startingCell, int idPlayer);
 /********************************************************************************************
 *
-* FUNCTION NAME: MiniSCell
-*
-* DESCRIPTION: fonction permettant de chercher le plus petit voisin existant
-*
-* ARGUMENT    TYPE             DESCRIPTION
-* voisins     **SCell          Le pointeur du tableau de pointeurs
-* nbVoisins   int              Le nombre de voisins de notre cellule
-* RETURNS: Un tableau de 2 entiers contenant le rang et le nombre de dés
-*
-*********************************************************************************************/
-int* MiniSCell(SCell **voisins, int nbVoisins);
-/********************************************************************************************
-*
 * FUNCTION NAME: LiberationMemoireTab
 *
 * DESCRIPTION: Fonction à appeler pour nettoyer un tableau de int
@@ -219,21 +206,6 @@ int GetNbPlayerCells(const SMap *map, int idPlayer);
 int AreNeighbors(SCell *cell1, SCell *cell2);
 /********************************************************************************************
 *
-* FUNCTION NAME: MiniCoupSCell
-*
-* DESCRIPTION: fonction permettant de chercher un voisin qui a une diffférence de 1 avec notre cellule
-*
-* ARGUMENT    TYPE             DESCRIPTION
-* voisins     **SCell          Le pointeur du tableau de pointeurs
-* nbVoisins   int              Le nombre de voisins de notre cellule
-* nbDes       int              Le nombre de dés de notre cellule
-*
-* RETURNS: Un tableau de 2 entiers contenant le rang et le nombre de dés
-*
-*********************************************************************************************/
-int* MiniCoupSCell(SCell **voisins, int nbVoisins, int nbDes);
-/********************************************************************************************
-*
 * FUNCTION NAME: GetContexts
 *
 * DESCRIPTION: renvoie contexts, le tableau de pointeur de struct SContext
@@ -244,14 +216,35 @@ int* MiniCoupSCell(SCell **voisins, int nbVoisins, int nbDes);
 SContext** GetContexts();
 /********************************************************************************************
 *
-* FUNCTION NAME: PlayTurn2
+* FUNCTION NAME: PlayTurn1
 *
-* DESCRIPTION: renvoie 1 si attaque possible ou 0 si impossible
+* DESCRIPTION: attaque avec la 1ere cellule trouvée qui à une différence de dés maximale
+*              attaque si égalité
 *
-* RETURNS: 0 ou 1
+* ARGUMENT    TYPE             DESCRIPTION
+* map         const *SMap      la carte
+* turn        *STurn           le tour courant
+*
+* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
 *
 *********************************************************************************************/
 int PlayTurn1(unsigned int id, const SMap *map, STurn *turn);
+/********************************************************************************************
+*
+* FUNCTION NAME: PlayTurn2
+*
+* DESCRIPTION: attaque avec la 1ere cellule trouvée qui à une différence de dés maximale
+*              n'attaque pas si égalité
+*
+* ARGUMENT    TYPE             DESCRIPTION
+* map         const *SMap      la carte
+* turn        *STurn           le tour courant
+*
+* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
+*
+*********************************************************************************************/
+int PlayTurn2(unsigned int id, const SMap *map, STurn *turn);
+
 char* concat( char *s1,  char *s2);
 void writetoLog(char *s);
 char* concatint(char *s1, int n);

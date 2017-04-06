@@ -66,7 +66,7 @@ void fenetre(int nbJoueurs) {
   SMap *map;
 
   map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
-
+  printf("%s\n", "Génération de la map");
   // allocation mémoire pour 2 tableaux de pointeurs pour gérer l'affichage des images de dés des cellules
   // Tableau de pointeurs de SDL_Surface pour les images de dés
   //SDL_Surface** background_surface_tab = malloc(50*sizeof(SDL_Surface *));

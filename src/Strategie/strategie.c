@@ -20,89 +20,13 @@ void InitGame(unsigned int id, unsigned int nbPlayer, SPlayerInfo *info)
     IA.id = id; //sauvegarde de l'id de l'IA
     IA.nbPlayer = nbPlayer; //sauvegarde du nombre de joueurs
 }
-/********************************************************************************************
-*
-* FUNCTION NAME: PlayTurn3
-*
-* DESCRIPTION: Fonction à appeler à chaque tour sur la stratégie et tant que le retour de
-*              fonction est vrai et qu'il n'y a pas d'erreur.
-*              - Ne pas oublier pour l'arbitre de dupliquer toute la structure map pour chaque appel !
-*              - En cas d'erreur, rétablir la carte dans l'état initial avant le premier tour du joueur.
-*
-* ARGUMENT    TYPE             DESCRIPTION
-* map         const *SMap      la carte
-* turn        *STurn           le tour courant
-*
-* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
-*
-*********************************************************************************************/
-int PlayTurn3(unsigned int id, const SMap *map, STurn *turn)
-{
-    int nbTerritoires = map->nbCells;
-    SCell *territoires = map->cells; //tableau de SCell
-    // Premiere étape : récupération du nombre de territoires nous appartenant
-    int i;
-    int count = 0;
-    for(i = 0; i < nbTerritoires; i++) //parcours des cellules
-    {
-        if (territoires[i].owner == IA.id ) //si je suis le propriétaire
-        {
-            count++; // On incrémente pour chaque territoire nous appartenant
-        }
-    }
-    // Deuxieme étape : attribution des cellules de notre territoire dans un tableau
-    SCell *tab = malloc((count)*sizeof(SCell)); // On malloc notre tableau
-    count = 0; // On réinitialise le compteur
-    for(i = 0; i < nbTerritoires; i++) // parcours des cellules
-    {
-        if (territoires[i].owner == IA.id ) // si je suis le propriétaire
-        {
-            tab[count] = territoires[i]; // On ajoute chaque cellule à notre tableau
-            count++; // On incrémente le compteur
-        }
-    }
-    // Troisieme étape : on cherche le territoire avec la plus grosse probabilité de victoires
-    int* coup; //Contiendra l'adresse du résultat du test des voisins
-    for(i = 0; i < count+1; i++) //parcours des cellules
-    {
-        if(i == 0)
-        {
-            coup = MiniCoupSCell(tab[i].neighbors, tab[i].nbNeighbors, tab[i].nbDices); // attribution par défaut
-            coup[0] -= tab[i].nbDices; //On décrémente par le nombre de dés que l'on a
-            turn->cellFrom = tab[i].id; //attribution temporaire
-            turn->cellTo = tab[i].neighbors[coup[1]]->id; //attribution temporaire
-        }
-        else if(MiniCoupSCell(tab[i].neighbors, tab[i].nbNeighbors, tab[i].nbDices)[0]-tab[i].nbDices < coup[0])
-        {
-            coup = MiniCoupSCell(tab[i].neighbors, tab[i].nbNeighbors,tab[i].nbDices); //On change stock notre adresse de tableau
-            coup[0] -= tab[i].nbDices; //On doit décrémenter pour pouvoir vérifier le suivant
-            turn->cellFrom = tab[i].id; //nouvelle attribution
-            turn->cellTo = tab[i].neighbors[coup[1]]->id; //nouvelle attribution
-        }
-        if(coup[0]==1)
-        {
-            return 1;
-        }
-    }
-    if(coup[0] >= 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
-    {
-        free(tab);
-        free(coup);
-        return 0; //on passera notre tour
-    }
-    //libération de l'allocation mémoire
-    free(tab);
-    free(coup);
-    return 1; //on effectuera notre attaque
-}
+
 /********************************************************************************************
 *
 * FUNCTION NAME: PlayTurn1
 *
-* DESCRIPTION: Fonction à appeler à chaque tour sur la stratégie et tant que le retour de
-*              fonction est vrai et qu'il n'y a pas d'erreur.
-*              - Ne pas oublier pour l'arbitre de dupliquer toute la structure map pour chaque appel !
-*              - En cas d'erreur, rétablir la carte dans l'état initial avant le premier tour du joueur.
+* DESCRIPTION: attaque avec la 1ere cellule trouvée qui à une différence de dés maximale
+*              attaque si égalité
 *
 * ARGUMENT    TYPE             DESCRIPTION
 * map         const *SMap      la carte
@@ -111,22 +35,24 @@ int PlayTurn3(unsigned int id, const SMap *map, STurn *turn)
 * RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
 *
 *********************************************************************************************/
-int PlayTurn1(unsigned int id, const SMap *map, STurn *turn)
+int PlayTurn1(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
 {
-    printf("\t%s\n", "entree PlayTurn4");
-    sleep(1);
+    // usleep(500000); //sleep de 0.5 sec
+    printf("idjoueurActuel : %d\n", idjoueurActuel);
+
     int idFrom = -1; //id cellule attaquante
     int idTo = -1; //id cellule attaquée
     int diff = -1; //différence nbDices entre cellule attaquante et cellule attaquée
     int i, j;
     SCell *territoires = map->cells; //tableau de SCell
+
     for(i = 0; i < (map->nbCells); i++) //parcours des cellules
     {
-        if (territoires[i].owner == IA.id) //si le territoire appartient à l'IA
+        if (territoires[i].owner == idjoueurActuel) //si le territoire appartient à l'IA
         {
             for (j = 0; j < territoires[i].nbNeighbors; j++) //parcours des voisins de ce territoire
             {
-                if((((territoires[i].neighbors[j])->owner) != IA.id) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = ennemi et si + gde diff de dés
+                if((((territoires[i].neighbors[j])->owner) != idjoueurActuel) && (territoires[i].nbDices != 1) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = ennemi && si nbDices cellule attaquante != 0 && si + gde diff de dés
                 {
                     idFrom = territoires[i].id;
                     idTo = (territoires[i].neighbors[j])->id;
@@ -135,25 +61,23 @@ int PlayTurn1(unsigned int id, const SMap *map, STurn *turn)
             }
         }
     }
-    printf("diff = %d\n", diff);
+
     if (diff>=0) //si on a une attaque possible
     {
         turn->cellFrom = idFrom;
         turn->cellTo = idTo;
-        printf("%s\n", "On attaque");
         return 1; //on effectuera notre attaque
     }
-    printf("%s\n", "On passe le tour ");
+    printf("%s\n", "IA passe son tour");
     return 0; //on passera notre tour
 }
+
 /********************************************************************************************
 *
 * FUNCTION NAME: PlayTurn2
 *
-* DESCRIPTION: Fonction à appeler à chaque tour sur la stratégie et tant que le retour de
-*              fonction est vrai et qu'il n'y a pas d'erreur.
-*              - Ne pas oublier pour l'arbitre de dupliquer toute la structure map pour chaque appel !
-*              - En cas d'erreur, rétablir la carte dans l'état initial avant le premier tour du joueur.
+* DESCRIPTION: attaque avec la 1ere cellule trouvée qui à une différence de dés maximale
+*              n'attaque pas si égalité
 *
 * ARGUMENT    TYPE             DESCRIPTION
 * map         const *SMap      la carte
@@ -164,20 +88,21 @@ int PlayTurn1(unsigned int id, const SMap *map, STurn *turn)
 *********************************************************************************************/
 int PlayTurn2(unsigned int id, const SMap *map, STurn *turn)
 {
-    printf("\t%s\n", "entree PlayTurn4");
-    sleep(1);
+    usleep(500000); //sleep de 0.5 sec
+
     int idFrom = -1; //id cellule attaquante
     int idTo = -1; //id cellule attaquée
     int diff = 0; //différence nbDices entre cellule attaquante et cellule attaquée
     int i, j;
     SCell *territoires = map->cells; //tableau de SCell
+
     for(i = 0; i < (map->nbCells); i++) //parcours des cellules
     {
         if (territoires[i].owner == IA.id) //si le territoire appartient à l'IA
         {
             for (j = 0; j < territoires[i].nbNeighbors; j++) //parcours des voisins de ce territoire
             {
-                if((((territoires[i].neighbors[j])->owner) != IA.id) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = ennemi et si + gde diff de dés
+                if((((territoires[i].neighbors[j])->owner) != IA.id) && (territoires[i].nbDices != 1) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = ennemi && si nbDices cellule attaquante != 0 && si + gde diff de dés
                 {
                     idFrom = territoires[i].id;
                     idTo = (territoires[i].neighbors[j])->id;
@@ -186,15 +111,14 @@ int PlayTurn2(unsigned int id, const SMap *map, STurn *turn)
             }
         }
     }
-    printf("diff = %d\n", diff);
+
     if (diff>=1) //si on a une attaque possible
     {
         turn->cellFrom = idFrom;
         turn->cellTo = idTo;
-        printf("%s\n", "On attaque");
         return 1; //on effectuera notre attaque
     }
-    printf("%s\n", "On passe le tour ");
+    printf("%s\n", "IA passe son tour");
     return 0; //on passera notre tour
 }
 /********************************************************************************************
@@ -268,107 +192,6 @@ int GetClusterSizeStrat(const SMap *map, SCell *startingCell)
     }
     free(cellsToTest);
     return clusterIdsSize;
-}
-/********************************************************************************************
-*
-* FUNCTION NAME: MiniSCell
-*
-* DESCRIPTION: fonction permettant de chercher le plus petit voisin existant
-*
-* ARGUMENT    TYPE             DESCRIPTION
-* voisins     **SCell          Le pointeur du tableau de pointeurs
-* nbVoisins   int              Le nombre de voisins de notre cellule
-*
-* RETURNS: Un tableau de 2 entiers contenant le rang et le nombre de dés
-*
-*********************************************************************************************/
-int* MiniSCell(SCell **voisins, int nbVoisins)
-{
-    int k;
-    int mini = -1; // le nombre de dés minimale
-    int rang = -1; //le rang du voisins
-    int boo = 1;
-    for(k = 0; k < nbVoisins; k++)
-    {
-        if(boo)
-        {
-            if(voisins[k]->owner != IA.id) // si je suis le propriétaire pour éviter d'attaquer son territoire
-            {
-                mini = voisins[k]->nbDices;
-                rang = k;
-                boo = 0;
-            }
-        }
-        else if(voisins[k]->nbDices < mini)
-        {
-            if (voisins[k]->owner != IA.id ) // si je suis le propriétaire pour éviter d'attaquer son territoire
-            {
-                mini = voisins[k]->nbDices;
-                rang = k;
-            }
-        }
-    }
-    int* tableau = malloc(2*sizeof(int));//Création du tableau de retour
-    tableau[0] = mini;
-    tableau[1] = rang;
-    return tableau;
-}
-/********************************************************************************************
-*
-* FUNCTION NAME: MiniCoupSCell
-*
-* DESCRIPTION: fonction permettant de chercher un voisin qui a une diffférence de 1 avec notre cellule
-*
-* ARGUMENT    TYPE             DESCRIPTION
-* voisins     **SCell          Le pointeur du tableau de pointeurs
-* nbVoisins   int              Le nombre de voisins de notre cellule
-* nbDes       int              Le nombre de dés de notre cellule
-*
-* RETURNS: Un tableau de 2 entiers contenant le rang et le nombre de dés
-*
-*********************************************************************************************/
-int* MiniCoupSCell(SCell **voisins, int nbVoisins, int nbDes)
-{
-    int k;
-    int mini; // le nombre de dés minimale
-    int rang; //le rang du voisins
-    int boo = 1;
-    int *tableau = malloc(2*sizeof(int));//Création du tableau de retour
-    for(k = 0; k < nbVoisins; k++)
-    {
-        if(boo)
-        {
-            if(voisins[k]->owner != IA.id) // si je suis le propriétaire pour éviter d'attaquer son territoire
-            {
-                mini = voisins[k]->nbDices;
-                rang = k;
-                boo = 0;
-                if(nbDes - mini == 1)
-                {
-                    tableau[0] = mini;
-                    tableau[1] = rang;
-                    return tableau;
-                }
-            }
-        }
-        else if(voisins[k]->nbDices < mini)
-        {
-            if (voisins[k]->owner != IA.id ) // si je suis le propriétaire pour éviter d'attaquer son territoire
-            {
-                mini = voisins[k]->nbDices;
-                rang = k;
-                if(nbDes - mini == 1)
-                {
-                    tableau[0] = mini;
-                    tableau[1] = rang;
-                    return tableau;
-                }
-            }
-        }
-    }
-    tableau[0] = mini;
-    tableau[1] = rang;
-    return tableau;
 }
 /********************************************************************************************
 *
