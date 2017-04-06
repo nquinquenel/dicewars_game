@@ -82,6 +82,11 @@ void fenetre(int nbJoueurs) {
     }
   }
 
+  int* tabPerdants = malloc(8*sizeof(int));
+  for (i = 0; i < 8; i++) {
+    tabPerdants[i] = -1;
+  }
+
   //Tableau des couleurs disponibles
   int couleurs[8][3] = {{0,0,255}, {0, 255, 0}, {255, 0, 0}, {128, 68, 188}, {255, 128, 0}, {0, 255, 255}, {102, 51, 0}, {255, 102, 255}};
   printf("Joueur 1 : bleu, Joueur 2 : vert, Joueur 3 : rouge, Joueur 4 : Mauve, Joueur 5 : Orange, Joueur 6 : bleu clair\n");
@@ -111,84 +116,214 @@ void fenetre(int nbJoueurs) {
   int tourFini = 0;
   int phase = 0;
   int nbTurn = 0;
+  int IAPause = 0;
+  int jeuFini = 0;
   char *output = {""};
 
   while (running == 1) {
-    while(SDL_PollEvent(&e) != 0) {
-      tourFini = 0;
-      idJoueurActuel = getIdJoueurActuel();
 
+    tourFini = 0;
+    idJoueurActuel = getIdJoueurActuel();
+    int cmptPerdants = 0;
+    for (i = 0; i < nbJoueurs; i++) {
+      if (tabPerdants[i] == 1) {
+        cmptPerdants++;
+      }
+    }
+    if (cmptPerdants == nbJoueurs-1) {
+      jeuFini = 1;
+    }
+
+    if (jeuFini == 0) {
       //Au tour de l'IA de jouer
       if (isAnIA(idJoueurActuel) == 1) {
         STurn *turn = malloc(sizeof(turn));
 
         //Tant que l'IA n'a pas fini de jouer
         while (tourFini == 0) {
-          //L'IA joue son tour
-          output=concat(output,"tour numero:");
-          output=concatint(output,nbTurn);
-          playIA = PlayTurn4(idJoueurActuel,map, turn);
-          //Si elle souhaite attaquer
-          if (playIA == 1) {
-            output=concat(output, "joueur:");
-            output=concatint(output, idJoueurActuel);
-            output=concat(output,"attaque avec");
-            output=concatint(output,GetCell(map,turn->cellFrom)->nbDices);
-            output=concat(output,"contre:");
-            output=concat(output,"joueur:");
-            output=concatint(output,GetCell(map,turn->cellTo)->owner);
-            output=concat(output,"avec");
-            output=concatint(output,GetCell(map,turn->cellTo)->nbDices);
+          if (running == 0) {
+            break;
+          }
+          if (SDL_PollEvent(&e) != 0) {
+            switch (e.type) {
 
-            playIA = demandeAttaque(map, turn, idJoueurActuel);
-            id = turn->cellTo;
-            int idJoueurDefense = (GetCell(map, id))->owner;
-            //Si l'IA a gagné son attaque
+              //On appuie sur la croix rouge de la fenêtre
+              case SDL_QUIT:
+              running = 0;
+              break;
+
+              //Clique souris
+              case SDL_MOUSEBUTTONDOWN:
+              if (e.button.x > 359 && e.button.x < 561 && e.button.y > 612 && e.button.y < 688) {
+                if (IAPause == 0) {
+                  IAPause = 1;
+                } else {
+                  IAPause = 0;
+                }
+                break;
+              } else if (e.button.x > 579 && e.button.x < 781 && e.button.y > 612 && e.button.y < 688) {
+                for (i = 0; i < 50; i++) {
+                  free(tab_points[i]);
+                }
+                free(tab_points);
+
+                for (i = 0; i < 799; i++) {
+                  free(tab_borduresBlanches[i]);
+                }
+                free(tab_borduresBlanches);
+
+                free(tab_comparaison);
+
+                for (i = 0; i < 802; i++) {
+                  free(tab_id[i]);
+                }
+                free(tab_id);
+                //Tableau pour remettre les bordures blanches par défaut
+                tab_id = malloc(802*sizeof(int*));
+                tab_borduresBlanches = malloc(799*sizeof(int*));
+                tab_points = malloc(50*sizeof(int*));
+                tab_comparaison = malloc(50*sizeof(int));
+
+                for (i = 0; i < 50; i++) {
+                  tab_points[i] = malloc(2*sizeof(int));
+                }
+
+                for (i = 0; i < 799; i++) {
+                  tab_borduresBlanches[i] = malloc(599*sizeof(int));
+                  for (p = 0; p < 599; p++) {
+                    tab_borduresBlanches[i][p] = 0;
+                  }
+                }
+
+                idJoueurActuel = 0;
+                map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
+
+                SContext **contexts = GetContexts();
+                for (s = 0; s < nbJoueurs; s++) { //pour chaque joueur
+                  int t;
+                  int clusterSize = 0; //la taille de la plus grosse grappe
+                  SCell *allCells = map->cells; // toutes les cellules de la map
+                  for (t = 0; t < (map->nbCells); t++) { //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
+                    if(allCells[t].owner == s) { //si le joueur est le propriétaire de la cellule
+                      int tmp = GetClusterSize(map, &allCells[t]);
+                      if (tmp > clusterSize) clusterSize = tmp;
+                    }
+                  }
+                  contexts[s]->highestCluster = clusterSize;
+                }
+
+                tourFini = 1;
+                break;
+              }
+            }
+          } else if (IAPause == 0) {
+
+            //L'IA joue son tour
+            output=concat(output,"tour numero:");
+            output=concatint(output,nbTurn);
+            playIA = PlayTurn4(idJoueurActuel,map, turn);
+            //Si elle souhaite attaquer
             if (playIA == 1) {
-              attaquer_territoireSansCoord(id,800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
-              // maj de highestCluster des 2 joueurs dans la cas d'une attaque réussie
-              UpdateHighestCluster(map, GetCell(map, turn->cellFrom), idJoueurActuel); //MAJ pour le joueur en attaque
-              UpdateHighestCluster(map, NULL, idJoueurDefense); //MAj pour le joueur en défense
-              output = concat(output,"gagnee  nouveau nb=");
-              output=concatint(output,contexts[idJoueurActuel]->highestCluster);
-              output=concat(output,"\n");
+              output=concat(output, "joueur:");
+              output=concatint(output, idJoueurActuel);
+              output=concat(output,"attaque avec");
+              output=concatint(output,GetCell(map,turn->cellFrom)->nbDices);
+              output=concat(output,"contre:");
+              output=concat(output,"joueur:");
+              output=concatint(output,GetCell(map,turn->cellTo)->owner);
+              output=concat(output,"avec");
+              output=concatint(output,GetCell(map,turn->cellTo)->nbDices);
 
-            }
-            if(playIA==0){
-              output=concat(output,"perdu nouveau nb=");
-              output=concatint(output,contexts[idJoueurActuel]->highestCluster);
-              output=concat(output,"\n");
-            }
-            //Si l'IA a fait une attaque autorisé (gagné ou perdue)
-            if (playIA != -1) {
-              update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+              playIA = demandeAttaque(map, turn, idJoueurActuel);
+              id = turn->cellTo;
+              int idJoueurDefense = (GetCell(map, id))->owner;
+              //Si l'IA a gagné son attaque
+              if (playIA == 1) {
+                attaquer_territoireSansCoord(id,800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
+                // maj de highestCluster des 2 joueurs dans la cas d'une attaque réussie
+                UpdateHighestCluster(map, GetCell(map, turn->cellFrom), idJoueurActuel); //MAJ pour le joueur en attaque
+                UpdateHighestCluster(map, NULL, idJoueurDefense); //MAj pour le joueur en défense
+                output = concat(output,"gagnee  nouveau nb=");
+                output=concatint(output,contexts[idJoueurActuel]->highestCluster);
+                output=concat(output,"\n");
 
-              //Si l'IA fait un mouvement interdit
+              }
+              if(playIA==0){
+                output=concat(output,"perdu nouveau nb=");
+                output=concatint(output,contexts[idJoueurActuel]->highestCluster);
+                output=concat(output,"\n");
+              }
+              //Si l'IA a fait une attaque autorisé (gagné ou perdue)
+              if (playIA != -1) {
+                update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+
+                //Si l'IA fait un mouvement interdit
+              } else {
+                tourFini = 1;
+                DistributeDices(map);
+                update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+
+                //On passe au joueur suivant
+                output=concat(output,"invalid");
+                output=concat(output,"\n");
+                idJoueurActuel++;
+                nbTurn++;
+                setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+                idJoueurActuel = getIdJoueurActuel();
+                int dicesIA = 0;
+                int noPerd = 0;
+                while (noPerd == 0) {
+                  for (i = 0; i < 50; i++) {
+                    if ((map->cells[i]).owner == idJoueurActuel) {
+                      dicesIA += (map->cells[i]).nbDices;
+                    }
+                  }
+                  if (dicesIA == 0) {
+                    tabPerdants[idJoueurActuel] = 1;
+                    idJoueurActuel++;
+                    setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+                    idJoueurActuel = getIdJoueurActuel();
+                    dicesIA = 0;
+                  } else {
+                    noPerd = 1;
+                  }
+                }
+
+                printf("Au joueur %d de jouer(A)\n", getIdJoueurActuel());
+              }
+              //Si elle passe son tour
             } else {
               tourFini = 1;
+              // on distribue aléatoirement les dés sur les territoires alliés
               DistributeDices(map);
               update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
               //On passe au joueur suivant
-              output=concat(output,"invalid");
-              output=concat(output,"\n");
               idJoueurActuel++;
               nbTurn++;
-              setIdJoueurActuel(idJoueurActuel, nbJoueurs);
-              printf("Au joueur %d de jouer\n", getIdJoueurActuel());
-            }
-            //Si elle passe son tour
-          } else {
-            tourFini = 1;
-            // on distribue aléatoirement les dés sur les territoires alliés
-            DistributeDices(map);
-            update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
-            //On passe au joueur suivant
-            idJoueurActuel++;
-            nbTurn++;
-            setIdJoueurActuel(idJoueurActuel, nbJoueurs);
-            printf("Au joueur %d de jouer\n", getIdJoueurActuel());
+              setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+              idJoueurActuel = getIdJoueurActuel();
+              int dicesIA = 0;
+              int noPerd = 0;
+              while (noPerd == 0) {
+                for (i = 0; i < 50; i++) {
+                  if ((map->cells[i]).owner == idJoueurActuel) {
+                    dicesIA += (map->cells[i]).nbDices;
+                  }
+                }
+                if (dicesIA == 0) {
+                  tabPerdants[idJoueurActuel] = 1;
+                  idJoueurActuel++;
+                  setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+                  idJoueurActuel = getIdJoueurActuel();
+                  dicesIA = 0;
+                } else {
+                  noPerd = 1;
+                }
+              }
+              printf("Au joueur %d de jouer(B)\n", getIdJoueurActuel());
+            }
           }
         }
 
@@ -197,6 +332,9 @@ void fenetre(int nbJoueurs) {
         writetoLog(output);
         output="";
       }
+    }
+
+    while(SDL_PollEvent(&e) != 0) {
 
       switch (e.type) {
 
@@ -215,11 +353,33 @@ void fenetre(int nbJoueurs) {
           if (cellUn != -1 && tab_comparaison[cellUn] == idJoueurActuel) {
             notifTerrains(cellUn, tab_id, renderer, 800, 600, tab_borduresBlanches);
             phase = 1;
-          } else if (e.button.x > 359 && e.button.x < 461 && e.button.y > 612 && e.button.y < 688) {
+          } else if (e.button.x > 359 && e.button.x < 561 && e.button.y > 612 && e.button.y < 688) {
             DistributeDices(map);
             update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
             idJoueurActuel++;
+
             setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+            idJoueurActuel = getIdJoueurActuel();
+
+            int dicesIA = 0;
+            int noPerd = 0;
+            while (noPerd == 0) {
+              for (i = 0; i < 50; i++) {
+                if ((map->cells[i]).owner == idJoueurActuel) {
+                  dicesIA += (map->cells[i]).nbDices;
+                }
+              }
+              if (dicesIA == 0) {
+                tabPerdants[idJoueurActuel] = 1;
+                printf("Joueur %d a perdu\n", idJoueurActuel);
+                idJoueurActuel++;
+                setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+                idJoueurActuel = getIdJoueurActuel();
+                dicesIA = 0;
+              } else {
+                noPerd = 1;
+              }
+            }
             printf("Au joueur %d de jouer\n", getIdJoueurActuel());
             break;
           } else if (e.button.x > 579 && e.button.x < 781 && e.button.y > 612 && e.button.y < 688) {
@@ -308,10 +468,10 @@ void fenetre(int nbJoueurs) {
               output=concat(output,"\n");
             }
             if (res==0){
-            output=concat(output,"perdu nouveau nb=");
-            output=concatint(output,contexts[idJoueurActuel]->highestCluster);
-            output=concat(output,"\n");
-          }
+              output=concat(output,"perdu nouveau nb=");
+              output=concatint(output,contexts[idJoueurActuel]->highestCluster);
+              output=concat(output,"\n");
+            }
           }
           //On enlève les bordures internes blanches de notre territoire
           for (i = 1; i < 799; i++) {
@@ -354,7 +514,28 @@ void fenetre(int nbJoueurs) {
           //On passe au joueur suivant
           idJoueurActuel++;
           nbTurn++;
+
           setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+          idJoueurActuel = getIdJoueurActuel();
+          int dicesIA = 0;
+          int noPerd = 0;
+          while (noPerd == 0) {
+            for (i = 0; i < 50; i++) {
+              if ((map->cells[i]).owner == idJoueurActuel) {
+                dicesIA += (map->cells[i]).nbDices;
+              }
+            }
+            if (dicesIA == 0) {
+              tabPerdants[idJoueurActuel] = 1;
+              printf("Joueur %d a perdu\n", idJoueurActuel);
+              idJoueurActuel++;
+              setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+              idJoueurActuel = getIdJoueurActuel();
+              dicesIA = 0;
+            } else {
+              noPerd = 1;
+            }
+          }
           printf("Au joueur %d de jouer\n", getIdJoueurActuel());
           writetoLog(output);
           output="";
