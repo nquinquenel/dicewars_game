@@ -5,7 +5,7 @@ void attaquer_territoire(int cord_x, int cord_y, int h, int w, int *tab_comparai
   int i, j, id;
   id = tab_id[cord_x][cord_y];
   tab_comparaison[id] = idPlayer;
-  for (i = 0; i < h; i++) {
+  /*for (i = 0; i < h; i++) {
     for (j = 0; j < w; j++) {
       if (tab_id[i+1][j+1] == id) {
         SDL_SetRenderDrawColor(renderer, couleurs[idPlayer][0], couleurs[idPlayer][1], couleurs[idPlayer][2], 0);
@@ -13,7 +13,7 @@ void attaquer_territoire(int cord_x, int cord_y, int h, int w, int *tab_comparai
       }
     }
   }
-  SDL_RenderPresent(renderer);
+  SDL_RenderPresent(renderer);*/
   SCell *cell = &(map->cells[id]);
   cell->owner = idPlayer;
 }
@@ -21,7 +21,7 @@ void attaquer_territoire(int cord_x, int cord_y, int h, int w, int *tab_comparai
 void attaquer_territoireSansCoord(int id_atq, int h, int w, int *tab_comparaison, int** tab_id, SDL_Renderer* renderer, SMap *map, int idPlayer, int couleurs[8][3]) {
   int i, j;
   tab_comparaison[id_atq] = idPlayer;
-  for (i = 0; i < h; i++) {
+  /*for (i = 0; i < h; i++) {
     for (j = 0; j < w; j++) {
       if (tab_id[i+1][j+1] == id_atq) {
         SDL_SetRenderDrawColor(renderer, couleurs[idPlayer][0], couleurs[idPlayer][1], couleurs[idPlayer][2], 0);
@@ -29,7 +29,7 @@ void attaquer_territoireSansCoord(int id_atq, int h, int w, int *tab_comparaison
       }
     }
   }
-  SDL_RenderPresent(renderer);
+  SDL_RenderPresent(renderer);*/
   SCell *cell = &(map->cells[id_atq]);
   cell->owner = idPlayer;
 }

@@ -2,10 +2,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
-#include <unistd.h>
-#define INT_BUFFER_SIZE 10
-
-
 // Structure définissant les caractéristiques de l'ia courante
 typedef struct SIa
 {
@@ -251,20 +247,3 @@ int* MiniCoupSCell(SCell **voisins, int nbVoisins, int nbDes);
 *
 *********************************************************************************************/
 SContext** GetContexts();
-
-/********************************************************************************************
-*
-* FUNCTION NAME: PlayTurn2
-*
-* DESCRIPTION: renvoie 1 si attaque possible ou 0 si impossible
-*
-* RETURNS: 0 ou 1
-*
-*********************************************************************************************/
-int PlayTurn1(unsigned int id, const SMap *map, STurn *turn);
-
-char* concat( char *s1,  char *s2);
-
-void writetoLog(char *s);
-
-char* concatint(char *s1, char s2[INT_BUFFER_SIZE]);
