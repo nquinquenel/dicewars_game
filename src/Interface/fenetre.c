@@ -242,6 +242,7 @@ void fenetre(int nbJoueurs) {
             notifTerrains(cellUn, tab_id, renderer, 800, 600, tab_borduresBlanches);
             phase = 1;
           } else if (e.button.x > 459 && e.button.x < 661 && e.button.y > 612 && e.button.y < 688) {
+            DistributeDices(map);
             update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
             idJoueurActuel++;
             setIdJoueurActuel(idJoueurActuel, nbJoueurs);
@@ -380,9 +381,9 @@ void fenetre(int nbJoueurs) {
 
           update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
-        /*  // on distribue aléatoirement les dés sur les territoires alliés
+          // on distribue aléatoirement les dés sur les territoires alliés
           DistributeDices(map);
-          int z;
+    /*      int z;
           for (z = 0; z < map->nbCells; z++) {
             if ((map->cells[z]).owner == idJoueurActuel) {
               displayDices(renderer, tab_points[(map->cells[z]).id][0], tab_points[(map->cells[z]).id][1], (map->cells[z]).id, (map->cells[z]).nbDices);
