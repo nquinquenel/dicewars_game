@@ -121,12 +121,12 @@ void fenetre(int nbJoueurs) {
       //Au tour de l'IA de jouer
       if (isAnIA(idJoueurActuel) == 1) {
         STurn *turn = malloc(sizeof(turn));
-        output=concat(output,"tour numero:");
-        output=concatint(output,nbTurn);
 
         //Tant que l'IA n'a pas fini de jouer
         while (tourFini == 0) {
           //L'IA joue son tour
+          output=concat(output,"tour numero:");
+          output=concatint(output,nbTurn);
           playIA = PlayTurn1(idJoueurActuel,map, turn);
           //Si elle souhaite attaquer
           if (playIA == 1) {
@@ -189,12 +189,13 @@ void fenetre(int nbJoueurs) {
             nbTurn++;
             setIdJoueurActuel(idJoueurActuel, nbJoueurs);
             printf("Au joueur %d de jouer\n", getIdJoueurActuel());
-            writetoLog(output);
           }
         }
 
         //On free le turn
         free(turn);
+        writetoLog(output);
+        output="";
       }
 
       switch (e.type) {
@@ -281,9 +282,19 @@ void fenetre(int nbJoueurs) {
           STurn *turn = malloc(sizeof(turn));
           turn->cellFrom = cellUn;
           turn->cellTo = cellDeux;
+          output=concat(output,"tour numero:");
+          output=concatint(output,nbTurn);
           if (cellDeux != -1) {
             int idJoueurDefense = (GetCell(map, cellDeux))->owner;
-
+            output=concat(output, "joueur:");
+            output=concatint(output, idJoueurActuel);
+            output=concat(output,"attaque avec");
+            output=concatint(output,GetCell(map,turn->cellFrom)->nbDices);
+            output=concat(output,"contre:");
+            output=concat(output,"joueur:");
+            output=concatint(output,GetCell(map,turn->cellTo)->owner);
+            output=concat(output,"avec");
+            output=concatint(output,GetCell(map,turn->cellTo)->nbDices);
             //On fait une demande d'attaque et on attaque (1 = attaque gagné, 0 = attaque perdue, -1 = attaque non valide)
             res = demandeAttaque(map, turn, idJoueurActuel);
             //Si res == 1 alors on a gagné l'attaque, on change la couleur du territoire attaqué
@@ -292,7 +303,15 @@ void fenetre(int nbJoueurs) {
               // maj de highestCluster des 2 joueurs dans la cas d'une attaque réussie
               UpdateHighestCluster(map, GetCell(map, cellUn), idJoueurActuel); //MAJ pour le joueur en attaque
               UpdateHighestCluster(map, NULL, idJoueurDefense); //MAj pour le joueur en défense
+              output = concat(output,"gagnee  nouveau nb=");
+              output=concatint(output,contexts[idJoueurActuel]->highestCluster);
+              output=concat(output,"\n");
             }
+            if (res==0){
+            output=concat(output,"perdu nouveau nb=");
+            output=concatint(output,contexts[idJoueurActuel]->highestCluster);
+            output=concat(output,"\n");
+          }
           }
           //On enlève les bordures internes blanches de notre territoire
           for (i = 1; i < 799; i++) {
@@ -334,8 +353,11 @@ void fenetre(int nbJoueurs) {
 
           //On passe au joueur suivant
           idJoueurActuel++;
+          nbTurn++;
           setIdJoueurActuel(idJoueurActuel, nbJoueurs);
           printf("Au joueur %d de jouer\n", getIdJoueurActuel());
+          writetoLog(output);
+          output="";
           break;
         }
         break;
