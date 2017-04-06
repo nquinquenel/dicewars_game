@@ -3,13 +3,17 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+
+// taille du buffer pour l'écriture dans le fichier de log
 #define INT_BUFFER_SIZE 10
+
 // Structure définissant les caractéristiques de l'ia courante
 typedef struct SIa
 {
 	int id;	// Id de l'ia
 	int nbPlayer; // Nombre de joueurs dans la partie
 } SIa;
+
 // Structure définissant les caractéristiques de l'ia courante
 typedef struct SContext
 {
@@ -17,6 +21,15 @@ typedef struct SContext
 	int nbPlayer; // Nombre de joueurs dans la partie
 	int highestCluster; // la taille de la plus grosse grappe de cellules alliées
 } SContext;
+
+// Structure définissant une grappe de cellules alliées voisins
+typedef struct SCluster
+{
+	int id;	// Id du cluster
+	int nbCells; // nombre de cellules dans le cluster
+	struct SCell **cells;	// Tableau de pointeurs vers les cellules du cluster
+} SCluster;
+
 void createGame(int nbParties, int nbPlayer, int nbArg, char** noms);
 int demandeAttaque(SMap *map, STurn *turn, int idPlayer);
 int getIdJoueurActuel();
@@ -53,6 +66,20 @@ int isAnIA(int id);
 int GetClusterSize(const SMap *map, SCell *startingCell);
 /********************************************************************************************
 *
+* FUNCTION NAME: GetClusterSizeStrat
+*
+* DESCRIPTION: renvoie la taille de la grappe de cellules
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* startingCell  *SCell           l'adresse de la cellule de départ
+*
+* RETURNS: la taille de la grappe de cellules
+*
+*********************************************************************************************/
+int GetClusterSizeStrat(const SMap *map, SCell *startingCell);
+/********************************************************************************************
+*
 * FUNCTION NAME: IsIntInArray
 *
 * DESCRIPTION: teste si un entier est dans un tableau d'entiers
@@ -81,6 +108,21 @@ int IsValueInArray(int val, int *arr, int size);
 *
 *********************************************************************************************/
 int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size);
+/********************************************************************************************
+*
+* FUNCTION NAME: IsCellInArrayOfCellPointerStrat
+*
+* DESCRIPTION: teste si une adresse de cellule est dans un tableau d'adresses de cellules
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* cell          *SCell           l'adresse de la cellule à rechercher
+* arrCell       **SCell          le tableau d'adresses de cellules
+* size          int              la taille du tableau
+*
+* RETURNS: 1 si cell est dans arrCell, 0 sinon
+*
+*********************************************************************************************/
+int IsCellInArrayOfCellPointerStrat(SCell *cell, SCell **arrCell, int size);
 /********************************************************************************************
 *
 * FUNCTION NAME: UpdateHighestCluster
@@ -206,6 +248,20 @@ int GetNbPlayerCells(const SMap *map, int idPlayer);
 int AreNeighbors(SCell *cell1, SCell *cell2);
 /********************************************************************************************
 *
+* FUNCTION NAME: AreNeighborsStrat
+*
+* DESCRIPTION: teste si deux cellules sont voisines
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* cell1          *SCell          l'adresse de la cellule n°1
+* cell1          *SCell          l'adresse de la cellule n°2
+*
+* RETURNS: 1 si les cellules sont voisines, 0 sinon
+*
+*********************************************************************************************/
+int AreNeighborsStrat(SCell *cell1, SCell *cell2);
+/********************************************************************************************
+*
 * FUNCTION NAME: GetContexts
 *
 * DESCRIPTION: renvoie contexts, le tableau de pointeur de struct SContext
@@ -278,6 +334,22 @@ int PlayTurn3(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
 *
 *********************************************************************************************/
 int PlayTurn4(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
+/********************************************************************************************
+*
+* FUNCTION NAME: PlayTurn5
+*
+* DESCRIPTION: attaque la cellule selon un chemin sûr pour se rapprocher / atteindre une grappe de cellules alliées.
+*              et ainsi former une grosse grappe de cellules pour avoir plus de dés distribués à la fin du tour
+*
+* ARGUMENT          TYPE             DESCRIPTION
+* idjoueurActuel    unsigned int
+* map               const *SMap      la carte
+* turn              *STurn           le tour courant
+*
+* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
+*
+*********************************************************************************************/
+int PlayTurn5(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
 char* concat( char *s1,  char *s2);
 void writetoLog(char *s);
 char* concatint(char *s1, int n);
