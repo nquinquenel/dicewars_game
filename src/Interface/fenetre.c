@@ -93,6 +93,8 @@ void fenetre(int nbJoueurs) {
   int res, cellUn, cellDeux, idJoueurActuel, playIA, id;
   int tourFini = 0;
   int phase = 0;
+  int nbTurn = 0;
+  char *output = {""};
 
   while (running == 1) {
     while(SDL_PollEvent(&e) != 0) {
@@ -102,6 +104,8 @@ void fenetre(int nbJoueurs) {
       //Au tour de l'IA de jouer
       if (isAnIA(idJoueurActuel) == 1) {
         STurn *turn = malloc(sizeof(turn));
+        output=concat(output,"tour numero:");
+        output=concatint(output,nbTurn);
 
         //Tant que l'IA n'a pas fini de jouer
         while (tourFini == 0) {
@@ -109,6 +113,16 @@ void fenetre(int nbJoueurs) {
           playIA = PlayTurn1(idJoueurActuel,map, turn);
           //Si elle souhaite attaquer
           if (playIA == 1) {
+            output=concat(output, "joueur:");
+            output=concatint(output, idJoueurActuel);
+            output=concat(output,"attaque avec");
+            output=concatint(output,GetCell(map,turn->cellFrom)->nbDices);
+            output=concat(output,"contre:");
+            output=concat(output,"joueur:");
+            output=concatint(output,GetCell(map,turn->cellTo)->owner);
+            output=concat(output,"avec");
+            output=concatint(output,GetCell(map,turn->cellTo)->nbDices);
+
             playIA = demandeAttaque(map, turn, idJoueurActuel);
             id = turn->cellTo;
             int idJoueurDefense = (GetCell(map, id))->owner;
@@ -118,8 +132,16 @@ void fenetre(int nbJoueurs) {
               // maj de highestCluster des 2 joueurs dans la cas d'une attaque réussie
               UpdateHighestCluster(map, GetCell(map, turn->cellFrom), idJoueurActuel); //MAJ pour le joueur en attaque
               UpdateHighestCluster(map, NULL, idJoueurDefense); //MAj pour le joueur en défense
-            }
+              output = concat(output,"gagnee  nouveau nb=");
+              output=concatint(output,contexts[idJoueurActuel]->highestCluster);
+              output=concat(output,"\n");
 
+            }
+            if(playIA==0){
+              output=concat(output,"perdu nouveau nb=");
+              output=concatint(output,contexts[idJoueurActuel]->highestCluster);
+              output=concat(output,"\n");
+            }
             //Si l'IA a fait une attaque autorisé (gagné ou perdue)
             if (playIA != -1) {
               /*int nbDes;
@@ -145,7 +167,10 @@ void fenetre(int nbJoueurs) {
               update_affichage(map, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
               //On passe au joueur suivant
+              output=concat(output,"invalid");
+              output=concat(output,"\n");
               idJoueurActuel++;
+              nbTurn++;
               setIdJoueurActuel(idJoueurActuel, nbJoueurs);
               printf("Au joueur %d de jouer\n", getIdJoueurActuel());
             }
@@ -165,8 +190,10 @@ void fenetre(int nbJoueurs) {
 
             //On passe au joueur suivant
             idJoueurActuel++;
+            nbTurn++;
             setIdJoueurActuel(idJoueurActuel, nbJoueurs);
             printf("Au joueur %d de jouer\n", getIdJoueurActuel());
+            writetoLog(output);
           }
         }
 
@@ -378,6 +405,37 @@ void update_affichage(SMap* map, int h, int w, int** tab_points, int** tab_bordu
     displayDices(renderer, tab_points[(map->cells[i]).id][0], tab_points[(map->cells[i]).id][1], (map->cells[i]).id, (map->cells[i]).nbDices);
   }
   SDL_RenderPresent(renderer);
+}
+
+
+void writetoLog(char *s){
+    FILE *logfile = fopen("logfile.txt","a");
+    if(logfile==NULL){
+        printf("cant open file");
+    }
+    fprintf(logfile,"%s",s);
+    fclose(logfile);
+
+}
+
+char* concat( char *s1,  char *s2)
+{
+    char *finals = malloc(strlen(s1)+strlen(s2)+3);//+1 for the zero-terminator
+    strcpy(finals, s1);
+    strcat(finals, s2);
+    strcat(finals,"\t");
+    return finals;
+}
+
+char* concatint(char *s1, int n)
+{
+    char tempbuff[INT_BUFFER_SIZE];
+    sprintf(tempbuff,"%d",n);
+    char *finals = malloc(strlen(s1)+strlen(tempbuff)+3);//+1 for the zero-terminator
+    strcpy(finals, s1);
+    strcat(finals, tempbuff);
+    strcat(finals,"\t");
+    return finals;
 }
 
 //COPYRIGHT Nicolas

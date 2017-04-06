@@ -254,4 +254,4 @@ SContext** GetContexts();
 int PlayTurn1(unsigned int id, const SMap *map, STurn *turn);
 char* concat( char *s1,  char *s2);
 void writetoLog(char *s);
-char* concatint(char *s1, char s2[INT_BUFFER_SIZE]);
+char* concatint(char *s1, int n);
