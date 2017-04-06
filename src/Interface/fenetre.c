@@ -111,7 +111,7 @@ void fenetre(int nbJoueurs) {
                     sprintf(turnNumber,"%d",nbTurn);
                     // output=concatint(output,turnNumber);
                     //L'IA joue son tour
-                    playIA = PlayTurn(idJoueurActuel,map, turn);
+                    playIA = PlayTurn4(idJoueurActuel,map, turn);
                     //Si elle souhaite attaquer
                     if (playIA == 1) {
                         playIA = demandeAttaque(map, turn, idJoueurActuel);

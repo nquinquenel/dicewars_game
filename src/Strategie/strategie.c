@@ -41,6 +41,7 @@ void InitGame(unsigned int id, unsigned int nbPlayer, SPlayerInfo *info)
 *********************************************************************************************/
 int PlayTurn(unsigned int id, const SMap *map, STurn *turn)
 {
+    printf("%s\n", "entree playturn");
     sleep(1);
     int nbTerritoires = map->nbCells;
     SCell *territoires = map->cells; //tableau de SCell
@@ -98,20 +99,21 @@ int PlayTurn(unsigned int id, const SMap *map, STurn *turn)
         }
 
     }
-    // printf("\t%s\n","_____________________" );
-    // printf("id joueur : %d\n", GetCell(map, (turn->cellFrom))->owner);
-    // printf("id joueur : %d\n", GetCell(map, (turn->cellTo))->owner);
-    // printf("\t%s\n","_____________________" );
+
     if(coup[0] >= 0) //Check si le coup est en notre défaveur (exemple : 2 dés VS 4 dés)
     {
         //libération de l'allocation mémoire
         free(tab);
+        printf("%s\n", "sortie playturn");
+
         return 0; //on passera notre tour
     }
     else
     {
         //libération de l'allocation mémoire
         free(tab);
+        printf("%s\n", "sortie playturn");
+
         return 1; //on effectuera notre attaque
     }
 }
@@ -273,6 +275,60 @@ int PlayTurn3(unsigned int id, const SMap *map, STurn *turn)
     free(coup);
 
     return 1; //on effectuera notre attaque
+}
+
+/********************************************************************************************
+*
+* FUNCTION NAME: PlayTurn4
+*
+* DESCRIPTION: Fonction à appeler à chaque tour sur la stratégie et tant que le retour de
+*              fonction est vrai et qu'il n'y a pas d'erreur.
+*              - Ne pas oublier pour l'arbitre de dupliquer toute la structure map pour chaque appel !
+*              - En cas d'erreur, rétablir la carte dans l'état initial avant le premier tour du joueur.
+*
+* ARGUMENT    TYPE             DESCRIPTION
+* map         const *SMap      la carte
+* turn        *STurn           le tour courant
+*
+* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
+*
+*********************************************************************************************/
+int PlayTurn4(unsigned int id, const SMap *map, STurn *turn)
+{
+    printf("\t%s\n", "entree PlayTurn4");
+    sleep(1);
+
+    int idFrom = -1; //id cellule attaquante
+    int idTo = -1; //id cellule attaquée
+    int diff = -1; //différence nbDices entre cellule attaquante et cellule attaquée
+    int i, j;
+    SCell *territoires = map->cells; //tableau de SCell
+
+    for(i = 0; i < (map->nbCells); i++) //parcours des cellules
+    {
+        if (territoires[i].owner == IA.id) //si le territoire appartient à l'IA
+        {
+            for (j = 0; j < territoires[i].nbNeighbors; j++) //parcours des voisins de ce territoire
+            {
+                if((((territoires[i].neighbors[j])->owner) != IA.id) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = ennemi et si + gde diff de dés
+                {
+                    idFrom = territoires[i].id;
+                    idTo = (territoires[i].neighbors[j])->id;
+                    diff = ((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices);
+                }
+            }
+        }
+    }
+    printf("diff = %d\n", diff);
+    if (diff>=0) //si on a une attaque possible
+    {
+        turn->cellFrom = idFrom;
+        turn->cellTo = idTo;
+        printf("%s\n", "On attaque");
+        return 1; //on effectuera notre attaque
+    }
+    printf("%s\n", "On passe le tour ");
+    return 0; //on passera notre tour
 }
 
 /********************************************************************************************
