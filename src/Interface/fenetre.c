@@ -297,7 +297,6 @@ void fenetre(int nbJoueurs) {
               tourFini = 1;
               // on distribue aléatoirement les dés sur les territoires alliés
               DistributeDices(map);
-              update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
               //On passe au joueur suivant
               idJoueurActuel++;
