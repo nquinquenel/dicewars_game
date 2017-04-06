@@ -28,6 +28,37 @@ void fenetre(int nbJoueurs) {
     SDL_WINDOW_SHOWN
   );
 
+  //Mise en place du renderer qui permet d'intérargir avec la fenêtre SDL2
+  SDL_Renderer* renderer = NULL;
+
+  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+  //Nettoie la fenêtre
+  SDL_RenderClear(renderer);
+
+  // positionnement et taille de l'image
+  SDL_Rect img_pos;
+  img_pos.x = 580;
+  img_pos.y = 612;
+  img_pos.w = 200;
+  img_pos.h = 75;
+
+  SDL_Surface* background_surface = SDL_LoadBMP("../Images/nouveau.bmp");
+  SDL_Texture* background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+  SDL_FreeSurface(background_surface);
+  SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
+
+  SDL_Rect img_pos2;
+  img_pos2.x = 360;
+  img_pos2.y = 612;
+  img_pos2.w = 200;
+  img_pos2.h = 75;
+
+  SDL_Surface* background_surface2 = SDL_LoadBMP("../Images/passer.bmp");
+  SDL_Texture* background_texture2 = SDL_CreateTextureFromSurface(renderer, background_surface2);
+  SDL_FreeSurface(background_surface2);
+  SDL_RenderCopy(renderer, background_texture2, NULL, &img_pos2);
+
   //Tableau de comparaison entre id et joueurs
   int *tab_comparaison = malloc(50*sizeof(int));
 
@@ -55,18 +86,10 @@ void fenetre(int nbJoueurs) {
   int couleurs[8][3] = {{0,0,255}, {0, 255, 0}, {255, 0, 0}, {128, 68, 188}, {255, 128, 0}, {0, 255, 255}, {102, 51, 0}, {255, 102, 255}};
   printf("Joueur 1 : bleu, Joueur 2 : vert, Joueur 3 : rouge, Joueur 4 : Mauve, Joueur 5 : Orange, Joueur 6 : bleu clair\n");
 
-  //Mise en place du renderer qui permet d'intérargir avec la fenêtre SDL2
-  SDL_Renderer* renderer = NULL;
-
-  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-
-  //Nettoie la fenêtre
-  SDL_RenderClear(renderer);
-
   SMap *map;
 
   map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
-  printf("%s\n", "Génération de la map");
+
   // allocation mémoire pour 2 tableaux de pointeurs pour gérer l'affichage des images de dés des cellules
   // Tableau de pointeurs de SDL_Surface pour les images de dés
   //SDL_Surface** background_surface_tab = malloc(50*sizeof(SDL_Surface *));
@@ -151,7 +174,7 @@ void fenetre(int nbJoueurs) {
               nbDes = map->cells[id].nbDices;
               displayDices(renderer, tab_points[id][0], tab_points[id][1], id, nbDes);
               */
-              update_affichage(map, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+              update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
               //Si l'IA fait un mouvement interdit
             } else {
@@ -164,7 +187,7 @@ void fenetre(int nbJoueurs) {
                 }
               }
               SDL_RenderPresent(renderer);*/
-              update_affichage(map, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+              update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
               //On passe au joueur suivant
               output=concat(output,"invalid");
@@ -186,7 +209,7 @@ void fenetre(int nbJoueurs) {
               }
             }
             SDL_RenderPresent(renderer);*/
-            update_affichage(map, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+            update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
             //On passe au joueur suivant
             idJoueurActuel++;
@@ -218,6 +241,63 @@ void fenetre(int nbJoueurs) {
           if (cellUn != -1 && tab_comparaison[cellUn] == idJoueurActuel) {
             notifTerrains(cellUn, tab_id, renderer, 800, 600, tab_borduresBlanches);
             phase = 1;
+          } else if (e.button.x > 459 && e.button.x < 661 && e.button.y > 612 && e.button.y < 688) {
+            update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+            idJoueurActuel++;
+            setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+            printf("Au joueur %d de jouer\n", getIdJoueurActuel());
+            break;
+          } else if (e.button.x > 579 && e.button.x < 781 && e.button.y > 612 && e.button.y < 688) {
+            for (i = 0; i < 50; i++) {
+              free(tab_points[i]);
+            }
+            free(tab_points);
+
+            for (i = 0; i < 799; i++) {
+              free(tab_borduresBlanches[i]);
+            }
+            free(tab_borduresBlanches);
+
+            free(tab_comparaison);
+
+            for (i = 0; i < 802; i++) {
+              free(tab_id[i]);
+            }
+            free(tab_id);
+            //Tableau pour remettre les bordures blanches par défaut
+            tab_id = malloc(802*sizeof(int*));
+            tab_borduresBlanches = malloc(799*sizeof(int*));
+            tab_points = malloc(50*sizeof(int*));
+            tab_comparaison = malloc(50*sizeof(int));
+
+            for (i = 0; i < 50; i++) {
+              tab_points[i] = malloc(2*sizeof(int));
+            }
+
+            for (i = 0; i < 799; i++) {
+              tab_borduresBlanches[i] = malloc(599*sizeof(int));
+              for (p = 0; p < 599; p++) {
+                tab_borduresBlanches[i][p] = 0;
+              }
+            }
+
+            map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
+
+            SContext **contexts = GetContexts();
+            for (s = 0; s < nbJoueurs; s++) { //pour chaque joueur
+              int t;
+              int clusterSize = 0; //la taille de la plus grosse grappe
+              SCell *allCells = map->cells; // toutes les cellules de la map
+              for (t = 0; t < (map->nbCells); t++) { //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
+                if(allCells[t].owner == s) { //si le joueur est le propriétaire de la cellule
+                  int tmp = GetClusterSize(map, &allCells[t]);
+                  if (tmp > clusterSize) clusterSize = tmp;
+                }
+              }
+              contexts[s]->highestCluster = clusterSize;
+            }
+
+            break;
           }
 
           //Phase 1 -> Quand on sélectionne le territoire à attaquer
@@ -226,16 +306,18 @@ void fenetre(int nbJoueurs) {
           STurn *turn = malloc(sizeof(turn));
           turn->cellFrom = cellUn;
           turn->cellTo = cellDeux;
-          int idJoueurDefense = (GetCell(map, cellDeux))->owner;
+          if (cellDeux != -1) {
+            int idJoueurDefense = (GetCell(map, cellDeux))->owner;
 
-          //On fait une demande d'attaque et on attaque (1 = attaque gagné, 0 = attaque perdue, -1 = attaque non valide)
-          res = demandeAttaque(map, turn, idJoueurActuel);
-          //Si res == 1 alors on a gagné l'attaque, on change la couleur du territoire attaqué
-          if (res == 1) {
-            attaquer_territoire(e.button.x, e.button.y, 800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
-            // maj de highestCluster des 2 joueurs dans la cas d'une attaque réussie
-            UpdateHighestCluster(map, GetCell(map, cellUn), idJoueurActuel); //MAJ pour le joueur en attaque
-            UpdateHighestCluster(map, NULL, idJoueurDefense); //MAj pour le joueur en défense
+            //On fait une demande d'attaque et on attaque (1 = attaque gagné, 0 = attaque perdue, -1 = attaque non valide)
+            res = demandeAttaque(map, turn, idJoueurActuel);
+            //Si res == 1 alors on a gagné l'attaque, on change la couleur du territoire attaqué
+            if (res == 1) {
+              attaquer_territoire(e.button.x, e.button.y, 800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
+              // maj de highestCluster des 2 joueurs dans la cas d'une attaque réussie
+              UpdateHighestCluster(map, GetCell(map, cellUn), idJoueurActuel); //MAJ pour le joueur en attaque
+              UpdateHighestCluster(map, NULL, idJoueurDefense); //MAj pour le joueur en défense
+            }
           }
 
           /*int nbDes;
@@ -257,8 +339,11 @@ void fenetre(int nbJoueurs) {
             }
           }
 
+          if (cellDeux == -1) {
+            update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+          }
           if (res != -1) {
-            update_affichage(map, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+            update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
           }
 
           SDL_RenderPresent(renderer);
@@ -293,7 +378,7 @@ void fenetre(int nbJoueurs) {
             phase = 0;
           }*/
 
-          update_affichage(map, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+          update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
         /*  // on distribue aléatoirement les dés sur les territoires alliés
           DistributeDices(map);
@@ -344,7 +429,7 @@ void displayDices(SDL_Renderer* renderer, int pixel_x, int pixel_y, int idCell, 
   // positionnement et taille de l'image
   SDL_Rect img_pos;
   img_pos.x = pixel_x;
-  img_pos.y = (pixel_y-52);
+  img_pos.y = (pixel_y-59);
   img_pos.w = IMG_DICES_W;
   img_pos.h = IMG_DICES_H;
 
@@ -387,10 +472,10 @@ void displayDices(SDL_Renderer* renderer, int pixel_x, int pixel_y, int idCell, 
   SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
 }
 
-void update_affichage(SMap* map, int h, int w, int** tab_points, int** tab_borduresBlanches, int** tab_id, int* tab_comparaison, int couleurs[8][3], SDL_Renderer* renderer) {
+void update_affichage(SMap* map, int x, int y, int h, int w, int** tab_points, int** tab_borduresBlanches, int** tab_id, int* tab_comparaison, int couleurs[8][3], SDL_Renderer* renderer) {
   int i, j;
-  for (i = 0; i < h; i++) {
-    for (j = 0; j < w; j++) {
+  for (i = (x-150); i < (x+150); i++) {
+    for (j = (y-150); j < (y+150); j++) {
       if (i > 0 && i < h && j > 0 && j < w) {
         if (tab_id[i+1][j+1] == -1) {
           SDL_SetRenderDrawColor(renderer, 0, 0, 0, 0);

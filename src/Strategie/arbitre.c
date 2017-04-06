@@ -1,12 +1,10 @@
 #include "../Librairies/interface.h"
 #include "../Librairies/interfacePerso.h"
 #include "../Interface/fenetre.h"
-
 int idJoueurActuel;
 int* idIA;
 int nbIA;
 SContext **contexts; // tableau de pointeurs de SContext
-
 /********************************************************************************************
 *
 * FUNCTION NAME: createGame //SUJET A DES CHANGEMENTS AU NIVEAU DES PARAMETRES
@@ -24,7 +22,6 @@ SContext **contexts; // tableau de pointeurs de SContext
 *********************************************************************************************/
 void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
     int i, j;
-
     contexts = malloc(nbPlayer*sizeof(SContext *)); //tableau de pointeurs de SContext
     for (i = 0; i < nbPlayer; i++) {
         contexts[i] = malloc(sizeof(SContext));
@@ -32,23 +29,18 @@ void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
         contexts[i]->highestCluster = 0; //taille de la plus grosse grappe de cellules alliées. 0 à l'initialisation
         contexts[i]->nbPlayer = nbPlayer; //nb de joueurs dans la partie
     }
-
     nbIA = nbArg - 3;
     idIA = malloc(nbIA * sizeof(int));
     printf("Nombre d'IA : %d\n", nbIA);
-
     SPlayerInfo **sp = malloc(nbIA*sizeof(SPlayerInfo*));
-
     for (j = 0; j < nbIA; j++) {
         sp[j] = malloc(sizeof(SPlayerInfo));
         InitGame(j+(nbPlayer-nbIA), nbPlayer, sp[j]);
         idIA[j] = nbPlayer-nbIA+j;
     }
-
     idJoueurActuel = 0;
     fenetre(nbPlayer);
 }
-
 int isAnIA(int id) {
     int i = 0;
     for (i = 0; i < nbIA; i++) {
@@ -58,7 +50,6 @@ int isAnIA(int id) {
     }
     return 0;
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: demandeAttaque
@@ -80,7 +71,6 @@ int demandeAttaque(SMap *map, STurn *turn, int idPlayer) {
         return -1;
     }
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: getIdJoueurActuel
@@ -95,7 +85,6 @@ int demandeAttaque(SMap *map, STurn *turn, int idPlayer) {
 int getIdJoueurActuel() {
     return idJoueurActuel;
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: setIdJoueurActuel
@@ -114,7 +103,6 @@ void setIdJoueurActuel(int id, int nbJoueurs) {
     }
     idJoueurActuel = id;
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: CreatePlayer
@@ -133,10 +121,8 @@ SPlayerInfo* CreatePlayer(unsigned int idNewPlayer, char *name, SPlayerInfo *inf
 {
     //MAJ du nom du joueur
     snprintf(info -> members[idNewPlayer], sizeof(info -> members[idNewPlayer]), "%s", name); //copie des <arg2> 1ers char de <arg4> dans <arg1>, en rajoutant '\0'
-
     return info;
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: UpdateHighestCluster
@@ -155,7 +141,6 @@ void UpdateHighestCluster(const SMap *map, SCell *startingCell, int idPlayer)
 {
     int clusterSize = 0; //la taille de la plus grosse grappe
     int i;
-
     if (startingCell == NULL) //si idPlayer est le joueur qui a été attaqué
     {
         SCell *allCells = map->cells; // toutes les cellules de la map
@@ -169,14 +154,12 @@ void UpdateHighestCluster(const SMap *map, SCell *startingCell, int idPlayer)
         }
         contexts[idPlayer]->highestCluster = clusterSize;
     }
-
     else //si idPlayer est le joueur qui a attaqué
     {
         clusterSize = GetClusterSize(map, startingCell); //récupération de la taille de la grappe
         if ((contexts[idPlayer]->highestCluster) < clusterSize) contexts[idPlayer]->highestCluster = clusterSize; //si le territoire s'est agrandi suite à l'attaque
     }
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: DistributeDices
@@ -191,14 +174,12 @@ void DistributeDices(const SMap *map)
 {
     int i, j;
     SCell *allCells = map->cells; //tableau de toutes les SCell de la map
-
     SCell **myCells = malloc((map->nbCells)*sizeof(SCell *)); //tableau de pointeurs de SCell. Les cellules à tester lors du prochain while
     for (i = 0; i < (map->nbCells); i++) {
         myCells[i] = malloc(sizeof(SCell));
     }
     int myCellsSize = 0; //nb de cellules qui sera = à map->nbCells (donc SCell NULL comprises)
     int onlyMyCellsSize= 0; //nb de cellules qui sera = aux cellules != NULL dans myCells
-
     for (j = 0; j < map->nbCells; j++) //remplissage de myCells
     {
         if ((idJoueurActuel == allCells[j].owner) && (allCells[j].nbDices<8)) //si la cellule m'appartient et qu'elle a moins de 8 dés
@@ -212,7 +193,6 @@ void DistributeDices(const SMap *map)
         }
         myCellsSize++;
     }
-
     int nbDicesToDistribute = (map->stack[idJoueurActuel]) + contexts[idJoueurActuel]->highestCluster; // le nb de dés à distribuer = la taille de la pile + la taille de la plus grosse grappe
     printf("nb de dés à distribuer = %d\n", nbDicesToDistribute);
     srand(time(NULL)); // initialisation de rand
@@ -231,12 +211,10 @@ void DistributeDices(const SMap *map)
             }
         }
     }
-
     //maj de la stack du joueur courant apres la distribution des dés
     if (nbDicesToDistribute<=40) map->stack[idJoueurActuel] = nbDicesToDistribute;
     else map->stack[idJoueurActuel] = 40; //si plus de 40 dés restant à distribuer
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: ValidTurn
@@ -255,16 +233,13 @@ int ValidTurn(const SMap *map, STurn *turn, int idPlayer)
 {
     SCell *attackingCell = GetCell(map, turn->cellFrom); //adresse de la cellule attaquante
     SCell *defendingCell = GetCell(map, turn->cellTo);  //adresse de la cellule défendante
-
     //teste si les cellules sont bien voisines
     if (!AreNeighbors(attackingCell, defendingCell)) return 0; //si les cellules ne sont pas voisines
     if(attackingCell->nbDices == 1) return 0; //si la cellule attaquante n'a qu'un dés
-
     if(attackingCell->owner != idPlayer) return 0; //si la cellule attaquante n'appartient pas au joueur courant
     if(defendingCell->owner == idPlayer) return 0; //si la cellule attaquée appartient au joueur courant
     return 1;
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: Attack
@@ -284,36 +259,29 @@ int Attack(const SMap *map, STurn *turn)
     SCell *attackingCell = GetCell(map, turn->cellFrom); //adresse de la cellule attaquante
     SCell *defendingCell = GetCell(map, turn->cellTo);  //adresse de la cellule défendante
     int i, j;
-
     //on lance les dés de la cellule attaquante
     int attackScore = 0;
     for (i = 0; i < attackingCell->nbDices; i++)
     {
         attackScore += (rand()%5)+1;
     }
-
     //on lance les dés de la cellule attaquée
     int defenseScore = 0;
     for (j = 0; j < defendingCell->nbDices; j++)
     {
         defenseScore += (rand()%5)+1;
     }
-
     printf("%d VS %d\n", attackScore, defenseScore);
-
     if (attackScore>defenseScore) //si l'attaque gagne
     {
         defendingCell->owner = attackingCell->owner;
         defendingCell->nbDices = (attackingCell->nbDices)-1;
         attackingCell->nbDices = 1;
-
         return 1; //on a gagné l'attaque
     }
-
     attackingCell->nbDices = 1; //le nombre de dés de la cellule attaquante descendent à 1
     return 0; //on a perdu l'attaque
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: AreNeighbors
@@ -338,7 +306,6 @@ int AreNeighbors(SCell *cell1, SCell *cell2)
     }
     return 0;
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: GetCell
@@ -356,17 +323,14 @@ SCell* GetCell(const SMap *map, int idCell)
 {
     int i;
     SCell *allCells = map->cells; //tableau de toutes les SCell de la map
-
     for (i = 0; i < (map->nbCells); i++)
     {
         if (allCells[i].id == idCell) {
             return &(allCells[i]);
         }
     }
-
     return NULL;
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: GetClusterSize
@@ -384,15 +348,12 @@ int GetClusterSize(const SMap *map, SCell *startingCell)
 {
     int i, j, k;
     int idPlayer = startingCell->owner; //l'id du joueur propriétaire de la cellule de référence
-
     //int clusterIds[map->nbCells]; //tableau des id des cellules de la grappe, de taille le nombre de cellules de la map, car taille maximale
     int clusterIdsSize = 0; //la taille de la grappe de cellules
-
     SCell **cellsToTest = malloc((map->nbCells)*sizeof(SCell *)); //tableau de pointeurs de SCell. Les cellules à tester lors du prochain while
     for (i = 0; i < (map->nbCells); i++) {
         cellsToTest[i] = malloc(sizeof(SCell));
     }
-
     cellsToTest[0] = startingCell; //la premiere cellule à tester dans le while est startingCell
     int cellsToTestSize = 1; //la taille du tableau de cellules à tester
     int nextCellToTest = 0; //indice de la prochaine cellule à tester
@@ -403,7 +364,6 @@ int GetClusterSize(const SMap *map, SCell *startingCell)
         clusterIdsSize++;
         SCell **voisins = currentCell->neighbors; // Tableau de pointeur vers les cellules voisines de la cellule courante
         int nbVoisins = currentCell->nbNeighbors;
-
         for(j = 0; (j < nbVoisins) ; j++) //parcours des voisins
         {
             if ((voisins[j]->owner == idPlayer) && !IsCellInArrayOfCellPointer(voisins[j], cellsToTest, cellsToTestSize)) //si le cellule voisine est un cellule alliée et qu'elle n'a pas déjà dans cellsToTest
@@ -414,13 +374,10 @@ int GetClusterSize(const SMap *map, SCell *startingCell)
         }
         nextCellToTest++;
     }
-
     //libération allocation mémoire
     free(cellsToTest);
-
     return clusterIdsSize;
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: GetContexts

@@ -26,4 +26,4 @@ void fenetre(int nbJoueurs);
 *
 *********************************************************************************************/
 void displayDices(SDL_Renderer* renderer, int pixel_x, int pixel_y, int idCell, int nbDices);
-void update_affichage(SMap* map, int h, int w, int** tab_points, int** tab_borduresBlanches, int** tab_id, int* tab_comparaison, int couleurs[8][3], SDL_Renderer* renderer);
+void update_affichage(SMap* map, int x, int y, int h, int w, int** tab_points, int** tab_borduresBlanches, int** tab_id, int* tab_comparaison, int couleurs[8][3], SDL_Renderer* renderer);

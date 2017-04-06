@@ -52,6 +52,7 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
   for (i = 0; i < h+2; i++) {
     for (p = 0; p < w+2; p++) {
       tab_id[i][p] = -1;
+      id_tmp[i][p] = -1;
     }
   }
 
@@ -157,6 +158,18 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
 
   //Render tout ce qui a été modifié au niveau graphique
   SDL_RenderPresent(renderer);
+
+  for (i = 0; i < h+2; i++) {
+    free(id_tmp[i]);
+  }
+  free(id_tmp);
+
+  for (i = 0; i < nbTerritoires; i++) {
+    free(tab_couleurs[i]);
+    free(tab_voisins[i]);
+  }
+  free(tab_couleurs);
+  free(tab_voisins);
 
   return map;
 }
@@ -305,6 +318,7 @@ SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison, 
     tab_cell[i].nbNeighbors = voisin;
     cmpt[tab_comparaison[i]]++;
   }
+
   for (i = 0; i < nbJoueurs; i++) {
     free(desParTerr[i]);
   }

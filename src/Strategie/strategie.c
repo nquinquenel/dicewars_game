@@ -20,7 +20,6 @@ void InitGame(unsigned int id, unsigned int nbPlayer, SPlayerInfo *info)
     IA.id = id; //sauvegarde de l'id de l'IA
     IA.nbPlayer = nbPlayer; //sauvegarde du nombre de joueurs
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: PlayTurn1
@@ -39,13 +38,11 @@ int PlayTurn1(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
 {
     // usleep(500000); //sleep de 0.5 sec
     printf("idjoueurActuel : %d\n", idjoueurActuel);
-
     int idFrom = -1; //id cellule attaquante
     int idTo = -1; //id cellule attaquée
     int diff = -1; //différence nbDices entre cellule attaquante et cellule attaquée
     int i, j;
     SCell *territoires = map->cells; //tableau de SCell
-
     for(i = 0; i < (map->nbCells); i++) //parcours des cellules
     {
         if (territoires[i].owner == idjoueurActuel) //si le territoire appartient à l'IA
@@ -61,7 +58,6 @@ int PlayTurn1(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
             }
         }
     }
-
     if (diff>=0) //si on a une attaque possible
     {
         turn->cellFrom = idFrom;
@@ -71,7 +67,6 @@ int PlayTurn1(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
     printf("%s\n", "IA passe son tour");
     return 0; //on passera notre tour
 }
-
 /********************************************************************************************
 *
 * FUNCTION NAME: PlayTurn2
@@ -89,13 +84,11 @@ int PlayTurn1(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
 int PlayTurn2(unsigned int id, const SMap *map, STurn *turn)
 {
     usleep(500000); //sleep de 0.5 sec
-
     int idFrom = -1; //id cellule attaquante
     int idTo = -1; //id cellule attaquée
     int diff = 0; //différence nbDices entre cellule attaquante et cellule attaquée
     int i, j;
     SCell *territoires = map->cells; //tableau de SCell
-
     for(i = 0; i < (map->nbCells); i++) //parcours des cellules
     {
         if (territoires[i].owner == IA.id) //si le territoire appartient à l'IA
@@ -111,7 +104,6 @@ int PlayTurn2(unsigned int id, const SMap *map, STurn *turn)
             }
         }
     }
-
     if (diff>=1) //si on a une attaque possible
     {
         turn->cellFrom = idFrom;
