@@ -221,7 +221,7 @@ void fenetre(int nbJoueurs) {
             //L'IA joue son tour
             output=concat(output,"tour numero:");
             output=concatint(output,nbTurn);
-            playIA = PlayTurn4(idJoueurActuel,map, turn);
+            playIA = PlayTurn1(idJoueurActuel,map, turn);
             //Si elle souhaite attaquer
             if (playIA == 1) {
               output=concat(output, "joueur:");
@@ -288,8 +288,9 @@ void fenetre(int nbJoueurs) {
                     noPerd = 1;
                   }
                 }
-
-                printf("Au joueur %d de jouer(A)\n", getIdJoueurActuel());
+                printf("%s\n", "---------------------------------------");
+                printf("\tAu joueur %d de jouer(A)\n", getIdJoueurActuel());
+                printf("%s\n", "---------------------------------------");
               }
               //Si elle passe son tour
             } else {
@@ -322,7 +323,9 @@ void fenetre(int nbJoueurs) {
                   noPerd = 1;
                 }
               }
-              printf("Au joueur %d de jouer(B)\n", getIdJoueurActuel());
+              printf("%s\n", "---------------------------------------");
+              printf("\tAu joueur %d de jouer(B)\n", getIdJoueurActuel());
+              printf("%s\n", "---------------------------------------");
             }
           }
         }
@@ -380,7 +383,9 @@ void fenetre(int nbJoueurs) {
                 noPerd = 1;
               }
             }
-            printf("Au joueur %d de jouer\n", getIdJoueurActuel());
+            printf("%s\n", "---------------------------------------");
+            printf("\tAu joueur %d de jouer\n", getIdJoueurActuel());
+            printf("%s\n", "---------------------------------------");
             break;
           } else if (e.button.x > 579 && e.button.x < 781 && e.button.y > 612 && e.button.y < 688) {
             for (i = 0; i < 50; i++) {
@@ -536,7 +541,9 @@ void fenetre(int nbJoueurs) {
               noPerd = 1;
             }
           }
-          printf("Au joueur %d de jouer\n", getIdJoueurActuel());
+          printf("%s\n", "---------------------------------------");
+          printf("\tAu joueur %d de jouer\n", getIdJoueurActuel());
+          printf("%s\n", "---------------------------------------");
           writetoLog(output);
           output="";
           break;

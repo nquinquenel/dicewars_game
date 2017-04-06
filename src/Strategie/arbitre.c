@@ -97,7 +97,6 @@ int getIdJoueurActuel() {
 *
 *********************************************************************************************/
 void setIdJoueurActuel(int id, int nbJoueurs) {
-    printf("%d\n", id);
     if (id > nbJoueurs-1) {
         id = 0;
     }
@@ -271,14 +270,16 @@ int Attack(const SMap *map, STurn *turn)
     {
         defenseScore += (rand()%5)+1;
     }
-    printf("%d VS %d\n", attackScore, defenseScore);
+    printf("%d VS %d", attackScore, defenseScore);
     if (attackScore>defenseScore) //si l'attaque gagne
     {
+        printf("%s\n", "  -> gagné");
         defendingCell->owner = attackingCell->owner;
         defendingCell->nbDices = (attackingCell->nbDices)-1;
         attackingCell->nbDices = 1;
         return 1; //on a gagné l'attaque
     }
+    printf("%s\n", "  -> perdu");
     attackingCell->nbDices = 1; //le nombre de dés de la cellule attaquante descendent à 1
     return 0; //on a perdu l'attaque
 }

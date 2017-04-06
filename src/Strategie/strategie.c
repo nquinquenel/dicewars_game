@@ -259,7 +259,6 @@ int PlayTurn4(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
         turn->cellTo = idTo;
         return 1; //on effectuera notre attaque
     }
-    printf("%s\n", "IA passe son tour");
     return 0; //on passera notre tour
 }
 /********************************************************************************************
