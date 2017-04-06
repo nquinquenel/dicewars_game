@@ -106,7 +106,7 @@ int PlayTurn3(unsigned int id, const SMap *map, STurn *turn)
 
 /********************************************************************************************
 *
-* FUNCTION NAME: PlayTurn4
+* FUNCTION NAME: PlayTurn1
 *
 * DESCRIPTION: Fonction à appeler à chaque tour sur la stratégie et tant que le retour de
 *              fonction est vrai et qu'il n'y a pas d'erreur.
