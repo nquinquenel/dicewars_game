@@ -49,7 +49,7 @@ int PlayTurn1(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
         {
             for (j = 0; j < territoires[i].nbNeighbors; j++) //parcours des voisins de ce territoire
             {
-                if((((territoires[i].neighbors[j])->owner) != idjoueurActuel) && (territoires[i].nbDices != 1) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = ennemi && si nbDices cellule attaquante != 0 && si + gde diff de dés
+                if((((territoires[i].neighbors[j])->owner) != idjoueurActuel) && (territoires[i].nbDices != 1) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = ennemi && si nbDices cellule attaquante > 1 && si + gde diff de dés
                 {
                     idFrom = territoires[i].id;
                     idTo = (territoires[i].neighbors[j])->id;
@@ -98,7 +98,7 @@ int PlayTurn2(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
         {
             for (j = 0; j < territoires[i].nbNeighbors; j++) //parcours des voisins de ce territoire
             {
-                if((((territoires[i].neighbors[j])->owner) != idjoueurActuel) && (territoires[i].nbDices != 1) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = ennemi && si nbDices cellule attaquante != 0 && si + gde diff de dés
+                if((((territoires[i].neighbors[j])->owner) != idjoueurActuel) && (territoires[i].nbDices != 1) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = ennemi && si nbDices cellule attaquante > 1 && si + gde diff de dés
                 {
                     idFrom = territoires[i].id;
                     idTo = (territoires[i].neighbors[j])->id;
@@ -184,6 +184,91 @@ int PlayTurn3(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
                                 printf("diff = %d\n",diff );
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    if (diff>=0) //si on a une attaque possible
+    {
+        turn->cellFrom = idFrom;
+        turn->cellTo = idTo;
+        return 1; //on effectuera notre attaque
+    }
+    printf("%s\n", "IA passe son tour");
+    return 0; //on passera notre tour
+}
+/********************************************************************************************
+*
+* FUNCTION NAME: PlayTurn4
+*
+* DESCRIPTION: attaque avec la 1ere cellule trouvée qui à une différence de dés maximale
+*              attaque si attaque autant de dés que défense
+*              si on joueur possède plus de la moitié des cellules de lap, alors on n'attaque que ce joueur
+*
+* ARGUMENT          TYPE             DESCRIPTION
+* idjoueurActuel    unsigned int
+* map               const *SMap      la carte
+* turn              *STurn           le tour courant
+*
+* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
+*
+*********************************************************************************************/
+int PlayTurn4(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
+{
+    int idFrom = -1; //id cellule attaquante
+    int idTo = -1; //id cellule attaquée
+    int diff = -1; //différence nbDices entre cellule attaquante et cellule attaquée
+    int winningPlayer = -1; //l'id du joueur qui possede + de la moitié des cellules
+    int i, j, k, m;
+    SCell *territoires = map->cells; //tableau de SCell
+    int nbCellsPerPlayer[IA.nbPlayer]; // tableau du nombre de cellules de chaque joueur
+    for (k = 0; k < (map->nbCells); k++) //remplissage de nbCellsPerPlayer
+    {
+        nbCellsPerPlayer[territoires[k].owner]++;
+    }
+
+    for(m = 0; m < IA.nbPlayer; m++)
+    {
+        if ((PercentageOfOccupation(map, GetNbPlayerCells(map, m)) > 50) && (idjoueurActuel != m)) //si 50% de la map et pas moi
+        {
+            winningPlayer = m; //si le joueur a + de la moitié de la map, alors on n'attaquera que lui
+            break;
+        }
+    }
+
+    if (winningPlayer != -1) // si un joueur a plus de la moitié de la map
+    {
+        for(i = 0; i < (map->nbCells); i++) //parcours des cellules
+        {
+            if (territoires[i].owner == idjoueurActuel) //si le territoire appartient à l'IA
+            {
+                for (j = 0; j < territoires[i].nbNeighbors; j++) //parcours des voisins de ce territoire
+                {
+                    if((((territoires[i].neighbors[j])->owner) == winningPlayer) && (territoires[i].nbDices != 1) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = winningPlayer && si nbDices cellule attaquante > 1 && si + gde diff de dés
+                    {
+                        idFrom = territoires[i].id;
+                        idTo = (territoires[i].neighbors[j])->id;
+                        diff = ((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices);
+                    }
+                }
+            }
+        }
+    }
+    else //sinon si aucun joueur ne se démarque
+    {
+        for(i = 0; i < (map->nbCells); i++) //parcours des cellules
+        {
+            if (territoires[i].owner == idjoueurActuel) //si le territoire appartient à l'IA
+            {
+                for (j = 0; j < territoires[i].nbNeighbors; j++) //parcours des voisins de ce territoire
+                {
+                    if((((territoires[i].neighbors[j])->owner) != idjoueurActuel) && (territoires[i].nbDices != 1) && (((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices) > diff)) //si voisin = ennemi && si nbDices cellule attaquante > 1 && si + gde diff de dés
+                    {
+                        idFrom = territoires[i].id;
+                        idTo = (territoires[i].neighbors[j])->id;
+                        diff = ((territoires[i].nbDices) - (territoires[i].neighbors[j])->nbDices);
                     }
                 }
             }

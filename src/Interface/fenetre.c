@@ -127,7 +127,7 @@ void fenetre(int nbJoueurs) {
           //L'IA joue son tour
           output=concat(output,"tour numero:");
           output=concatint(output,nbTurn);
-          playIA = PlayTurn1(idJoueurActuel,map, turn);
+          playIA = PlayTurn4(idJoueurActuel,map, turn);
           //Si elle souhaite attaquer
           if (playIA == 1) {
             output=concat(output, "joueur:");

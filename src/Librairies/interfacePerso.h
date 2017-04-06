@@ -261,6 +261,23 @@ int PlayTurn2(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
 *
 *********************************************************************************************/
 int PlayTurn3(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
+/********************************************************************************************
+*
+* FUNCTION NAME: PlayTurn4
+*
+* DESCRIPTION: attaque avec la 1ere cellule trouvée qui à une différence de dés maximale
+*              attaque si attaque autant de dés que défense
+*              si on joueur possède plus de la moitié des cellules de lap, alors on n'attaque que ce joueur
+*
+* ARGUMENT          TYPE             DESCRIPTION
+* idjoueurActuel    unsigned int
+* map               const *SMap      la carte
+* turn              *STurn           le tour courant
+*
+* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
+*
+*********************************************************************************************/
+int PlayTurn4(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
 char* concat( char *s1,  char *s2);
 void writetoLog(char *s);
 char* concatint(char *s1, int n);
