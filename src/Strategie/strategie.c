@@ -278,8 +278,9 @@ int PlayTurn4(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
 *********************************************************************************************/
 int PlayTurn5(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
 {
-    int i, k, m, o;
-    int j = 0;
+
+    int i, k, m, o, p;
+    int j, q = 0;
     int myCellsSize =  GetNbPlayerCells(map, idjoueurActuel); //mon nombre de cellules
     SCell ** myCells = (SCell**)malloc(myCellsSize*sizeof(SCell *)); //tableau de pointeurs vers les cellules alliées
     int clustersSize = 0; //le nombre de SCluster dans clusters
@@ -293,31 +294,21 @@ int PlayTurn5(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
         }
     }
 
-    printf("myCellsSize = %d\n", myCellsSize);
-
     for (k = 0; k < myCellsSize; k++) //parcours des cellules alliées pour construire les structures SCluster -> 1ère cellule
     {
         for (m = 0; m < myCellsSize; m++) //parcours des cellules alliées pour construire les structures SCluster -> 2ème cellule
         {
-            printf("\t\tclustersSize = %d\n", clustersSize);
-            printf(" k = %d\n", k);
-            printf(" m = %d\n", m);
             if (clustersSize) //si il y a des SCluster
             {
-                printf("%s\n", "avant AreNeighborsStrat");
                 if (AreNeighborsStrat(myCells[k], myCells[m])) //si les 2 cellules sont voisines directement (i.e. sont adjacentes)
                 {
-                    printf("%s\n", "avant getCluster c1");
                     SCluster *c1 = (SCluster*)getCluster(clusters, clustersSize, myCells[k]); //récupération de l'adresse du SCluster de la cellule 1
-                    printf("%s\n", "avant getCluster c2");
                     SCluster *c2 = (SCluster*)getCluster(clusters, clustersSize, myCells[m]); //récupération de l'adresse du SCluster de la cellule 2
 
                     if (c1 == NULL) //si c1 n'est pas dans un cluster
                     {
-                        printf("%s\n", "(c1 == NULL)");
                         if (c2 == NULL) //c2 non plus
                         {
-                            printf("\t%s\n", "(c2 == NULL)");
                             clusters = (SCluster**)realloc(clusters, (clustersSize+1)*sizeof(SCluster *)); //ré-allocation mémoire pour le tableau de pointeurs de SCluster
                             clusters[clustersSize] = (SCluster*)createCluster(myCells[k], clustersSize); //on créé un cluster pour la 1ère cellule
                             clustersSize++;
@@ -330,8 +321,6 @@ int PlayTurn5(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
                         }
                         else //c2 dans un cluster
                         {
-                            printf("\t%s\n", "(c2 != NULL)");
-
                             //on rajoute la 1ère cellule au SCluster de la 2ère cellule
                             clusters[c2->id]->cells = (SCell**)realloc(clusters[c2->id]->cells, (clusters[c2->id]->nbCells+1)*sizeof(SCell *)); //ré-allocation mémoire avec la nouvelle taille
                             clusters[c2->id]->cells[clusters[c2->id]->nbCells]= myCells[k];
@@ -340,11 +329,8 @@ int PlayTurn5(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
                     }
                     else //sinon c1 a un cluster
                     {
-                        printf("%s\n", "(c1 != NULL)");
-
                         if (c2 == NULL) //si c2 n'a pas de cluster
                         {
-                            printf("\t%s\n", "(c2 == NULL)");
                             //on rajoute la 2ème cellule au SCluster de la 1ère cellule
                             clusters[c1->id]->cells = (SCell**)realloc(clusters[c1->id]->cells, (clusters[c1->id]->nbCells+1)*sizeof(SCell *)); //ré-allocation mémoire avec la nouvelle taille
                             clusters[c1->id]->cells[clusters[c1->id]->nbCells]= myCells[m];
@@ -352,48 +338,24 @@ int PlayTurn5(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
                         }
                         else if((c2->id) != (c1->id)) //sinon si les 2 cellules sont dans un cluster différent
                         {
-                            printf("\t%s\n", "(c2 != NULL)");
                             int tailleClusterc1 = clusters[c1->id]->nbCells;
                             int tailleClusterc2 = clusters[c2->id]->nbCells;
                             if (tailleClusterc1 >= tailleClusterc2) //si on fusionne c2 dans c1
                             {
-                                printf("\t%s\n", "On met c2 dans c1 ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !");
-                                printf("\t((clusters[c2->id])->nbCells) = %d\n", ((clusters[c2->id])->nbCells));
                                 int a;
-
-                                printf("c2->id = %d\n", c2->id);
-                                printf("c1->id = %d\n", c1->id);
                                 // on rajoute le cluster de la cellule 2 dans celui de la cellule 1
                                 for (a = 0; a < ((clusters[c2->id])->nbCells); a++) //parcours du tableau de pointeurs de cellules du cluster de la cellule 2
                                 {
-                                    if (a <5) {
-                                        printf("\t Dans if a <5 -> ((clusters[c2->id])->nbCells) = %d\n", ((clusters[c2->id])->nbCells));
-                                        printf("\t Dans if a <5 -> ((clusters[c1->id])->nbCells) = %d\n", ((clusters[c1->id])->nbCells));
-                                    }
                                     ((clusters[c1->id])->cells) = (SCell**)realloc(((clusters[c1->id])->cells), (((clusters[c1->id])->nbCells)+1)*sizeof(SCell *));
-                                    if (a <5) {
-                                        printf("\t Dans if a <5 -> ((clusters[c2->id])->nbCells) = %d\n", ((clusters[c2->id])->nbCells));
-                                        printf("\t Dans if a <5 -> ((clusters[c1->id])->nbCells) = %d\n", ((clusters[c1->id])->nbCells));
-                                    } //ré-allocation mémoire pour le 2ème cluster
                                     ((clusters[c1->id])->cells)[((clusters[c1->id])->nbCells)] = ((clusters[c2->id])->cells[a]);
-                                    if (a <5) {
-                                        printf("\t Dans if a <5 -> ((clusters[c2->id])->nbCells) = %d\n", ((clusters[c2->id])->nbCells));
-                                        printf("\t Dans if a <5 -> ((clusters[c1->id])->nbCells) = %d\n", ((clusters[c1->id])->nbCells));
-                                    }
                                     (clusters[c1->id]->nbCells)++;
-                                    if (a <5) {
-                                        printf("\t Dans if a <5 -> ((clusters[c2->id])->nbCells) = %d\n", ((clusters[c2->id])->nbCells));
-                                        printf("\t Dans if a <5 -> ((clusters[c1->id])->nbCells) = %d\n", ((clusters[c1->id])->nbCells));
-                                    }
                                 }
-                                printf("\t%s\n", "avant free");
+
                                 free((clusters[c2->id])->cells); //libération mémoire du tableau de pointeurs de cellule du cluster de la 2ème cellule
                                 clusters[c2->id] = NULL;
                             }
                             else //sinon si on fusionne c1 dans c2
                             {
-                                printf("\t%s\n", "On met c1 dans c2 ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! ! !");
-                                printf("((clusters[c1->id])->nbCells) = %d\n", ((clusters[c1->id])->nbCells));
                                 int a;
                                 // on rajoute le cluster de la cellule 1 dans celui de la cellule 2
                                 for (a = 0; a < ((clusters[c1->id])->nbCells); a++) //parcours du tableau de pointeurs de cellules du cluster de la cellule 1
@@ -402,7 +364,6 @@ int PlayTurn5(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
                                     ((clusters[c2->id])->cells)[((clusters[c2->id])->nbCells)] = ((clusters[c1->id])->cells[a]);
                                     (clusters[c2->id]->nbCells)++;
                                 }
-                                printf("\t%s\n", "avant free");
                                 free((clusters[c1->id])->cells); //libération mémoire du tableau de pointeurs de cellule du cluster de la 1ère cellule
                                 clusters[c1->id] = NULL;
                             }
@@ -411,29 +372,18 @@ int PlayTurn5(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
                 }
                 else if((myCells[k]->id) == (myCells[m]->id)) //si on parle de la même cellule
                 {
-                    printf("%s\n", "--------------------------------------");
-                    printf("%s\n", "si on parle de la meme cellule");
-                    printf("%s\n", "--------------------------------------");
                     SCluster *c1 = (SCluster*)getCluster(clusters, clustersSize, myCells[k]);
 
                     if (c1 == NULL) //si la cellule n'est pas déjà dans un SCluster
                     {
-                        printf("\t%s\n", "if (c1 == NULL)");
                         clusters = (SCluster**)realloc(clusters, (clustersSize+1)*sizeof(SCluster *)); //ré-allocation mémoire pour le tableau de pointeurs de SCluster
-                        printf("\t%s\n", "apres realloc");
                         clusters[clustersSize] = (SCluster*)createCluster(myCells[k], clustersSize); //on créé un cluster pour la cellule
                         clustersSize ++;
-                    }
-                    else
-                    {
-                        // rien a fiare ici
-                        printf("\t%s\n", "if (c1 != NULL) (rien à faire)");
                     }
                 }
             }
             else //sinon si pas encore de SCluster d'initialisé (qd on rentre ici, 1 seule fois, les 2 cellules ont la même adresse)
             {
-                printf("%s\n", "si clusters vide");
                 clusters = (SCluster**)malloc(sizeof(SCluster *)); //allocation mémoire pour le tableau de pointeurs de SCluster
                 clusters[clustersSize] = (SCluster*)createCluster(myCells[k], clustersSize); //on créé un cluster pour la 1ère cellule
                 clustersSize ++;
@@ -441,18 +391,52 @@ int PlayTurn5(unsigned int idjoueurActuel, const SMap *map, STurn *turn)
         }
     }
 
-    printf("%s\n", "avant liberation allocation memoire");
+    int nbClusters = 0; //nombre de clusters
+    for (p = 0; p < clustersSize; p++) //parcours des clusters
+    {
+        if (clusters[p] != NULL)
+        {
+            nbClusters++;
+        }
+    }
+
+    int *sortedIDs = malloc(nbClusters*sizeof(int)); //tableau des id de clusters triés par nombre croissant de cellules
+
+    for (p = 0; p < clustersSize; p++)
+    {
+        if (clusters[p] != NULL)
+        {
+            sortedIDs[q] = (clusters[p]->id);
+            q++;
+        }
+    }
+
+    int highestClusterId = -1; //id du plus grand cluster
+    int highestClusterId2 = -1; //id du plus grand cluster
+    for (p = 0; p < clustersSize; p++) //parcours des clusters
+    {
+        if (clusters[p] != NULL)
+        {
+            if (highestClusterId == -1) //si pas encore d'id
+            {
+                highestClusterId = (clusters[p]->id);
+            }
+            else if((clusters[p]->nbCells) > (clusters[highestClusterId]->nbCells)){
+                highestClusterId = (clusters[p]->id);
+            }
+        }
+    }
+
     // libération allocation mémoire
     for (o = 0; o < clustersSize; o++) //parcours des SCluster
     {
         if (clusters[o] != NULL) {
-            printf("%s\n", "1er free");
             free(clusters[o]->cells); //free tableau de pointeurs de SCell
         }
-        printf("%s\n", "2eme free");
+
         free(clusters[o]); //free de chaque SCluster
     }
-    printf("%s\n", "free clusters");
+
     free(clusters); //free tableau de pointeurs de SCluster
 
     return 0;
@@ -678,9 +662,6 @@ SCluster* getCluster(SCluster **clusters, int clustersSize, SCell *cell)
         {
             if(IsCellInArrayOfCellPointerStrat(cell, clusters[i]->cells, clusters[i]->nbCells)) return clusters[i]; //si la cellules est dans le SCluster
         }
-        else{
-            printf("%s\n", "cluster NULL dans getCluster");
-        }
     }
     return NULL; //la cellule n'est dans aucun SCluster
 }
@@ -705,4 +686,29 @@ SCluster* createCluster(SCell *cell, int clustersSize)
     newCluster_p[0].cells = malloc(sizeof(SCell *)); //allocation mémoire pour le tableau de pointeurs de SCell
     newCluster_p[0].cells[0] = cell;
     return newCluster_p;
+}
+/********************************************************************************************
+*
+* FUNCTION NAME: GetCell
+*
+* DESCRIPTION: renvoie l'adresse de la SCell qui a l'id idCell
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* map           const *SMap      la carte
+* idCell        int              l'id de la cellule à retourner
+*
+* RETURNS: l'adresse de la cellule qui a l'id idCell, NULL sinon
+*
+*********************************************************************************************/
+SCell* GetCell(const SMap *map, int idCell)
+{
+    int i;
+    SCell *allCells = map->cells; //tableau de toutes les SCell de la map
+    for (i = 0; i < (map->nbCells); i++)
+    {
+        if (allCells[i].id == idCell) {
+            return &(allCells[i]);
+        }
+    }
+    return NULL;
 }

@@ -32,7 +32,7 @@ typedef struct SCluster
 {
 	int id;	// Id du cluster
 	int nbCells; // nombre de cellules dans le cluster
-	struct SCell **cells;	// Tableau de pointeurs vers les cellules du cluster
+	struct SCell **cells; // Tableau de pointeurs vers les cellules du cluster
 } SCluster;
 
 void createGame(int nbParties, int nbPlayer, int nbArg, char** noms, pfInitGame* tab_InitGame, pfPlayTurn1* tab_PlayTurn1, pfEndGame* tab_EndGame);
