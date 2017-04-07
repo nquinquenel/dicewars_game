@@ -14,7 +14,7 @@ int IMG_DICES_H = 59; //la dimension de l'image des dés en hauteur
 * DESCRIPTION: Génère la fenêtre de jeu SDL2 et départ du programme (boucle du jeu)
 *
 *********************************************************************************************/
-void fenetre(int nbJoueurs) {
+void fenetre(int nbJoueurs, int nbParties) {
   //Condition pour faire tourner le jeu en boucle
   int running = 1;
   int i, p, s;
@@ -64,6 +64,10 @@ void fenetre(int nbJoueurs) {
 
   //Tableau des ID de chaques cellules
   int** tab_id = malloc(802*sizeof(int*));
+
+  for (i = 0; i < 802; i++) {
+    tab_id[i] = malloc((600)*sizeof(int*));
+  }
 
   //Tableau pour remettre les bordures blanches par défaut
   int** tab_borduresBlanches = malloc(799*sizeof(int*));
@@ -225,7 +229,41 @@ void fenetre(int nbJoueurs) {
             //L'IA joue son tour
             output=concat(output,"tour numero:");
             output=concatint(output,nbTurn);
-            playIA = PlayTurn1(idJoueurActuel,map, turn);
+
+            //Clonage de la map
+            SMap* mapClone = malloc(sizeof(SMap));
+            int j;
+
+            mapClone->stack = malloc(nbJoueurs*(sizeof(int)));
+            for (i = 0; i < nbJoueurs; i++) {
+              (mapClone->stack)[i] = (map->stack)[i];
+            }
+
+            mapClone->nbCells = 50;
+
+            mapClone->cells = malloc(50*sizeof(SCell));
+            for (i = 0; i < 50; i++) {
+              (mapClone->cells)[i].id = (map->cells)[i].id;
+              (mapClone->cells)[i].owner = (map->cells)[i].owner;
+              (mapClone->cells)[i].nbDices = (map->cells)[i].nbDices;
+              (mapClone->cells)[i].nbNeighbors = (map->cells)[i].nbNeighbors;
+              (mapClone->cells)[i].neighbors = malloc(20*sizeof(SCell*));
+              for (j = 0; j < (map->cells)[i].nbNeighbors; j++) {
+                (mapClone->cells)[i].neighbors[j] = &(mapClone->cells)[((map->cells)[i].neighbors)[j]->id];
+              }
+            }
+
+            playIA = PlayTurn1(idJoueurActuel, mapClone, turn);
+
+            for (i = 0; i < 50; i++) {
+              free((mapClone->cells)[i].neighbors);
+            }
+            free(mapClone->stack);
+            free(mapClone->cells);
+            free(mapClone);
+
+            //Free la map cloné
+
             //Si elle souhaite attaquer
             if (playIA == 1) {
               output=concat(output, "joueur:");
@@ -365,6 +403,7 @@ void fenetre(int nbJoueurs) {
           } else if (e.button.x > 359 && e.button.x < 561 && e.button.y > 612 && e.button.y < 688) {
             DistributeDices(map);
             update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+
             idJoueurActuel++;
 
             setIdJoueurActuel(idJoueurActuel, nbJoueurs);
@@ -416,6 +455,10 @@ void fenetre(int nbJoueurs) {
             tab_points = malloc(50*sizeof(int*));
             tab_comparaison = malloc(50*sizeof(int));
 
+            for (i = 0; i < 802; i++) {
+              tab_id[i] = malloc((600)*sizeof(int*));
+            }
+
             for (i = 0; i < 50; i++) {
               tab_points[i] = malloc(2*sizeof(int));
             }
@@ -430,141 +473,141 @@ void fenetre(int nbJoueurs) {
             idJoueurActuel = 0;
             map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
 
-            for (i = 0; i < nbJoueurs; i++) {
-              free(contexts[i]);
-            }
-            free(contexts);
-            SContext **contexts = GetContexts();
-            for (s = 0; s < nbJoueurs; s++) { //pour chaque joueur
-              int t;
-              int clusterSize = 0; //la taille de la plus grosse grappe
-              SCell *allCells = map->cells; // toutes les cellules de la map
-              for (t = 0; t < (map->nbCells); t++) { //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
-                if(allCells[t].owner == s) { //si le joueur est le propriétaire de la cellule
-                  int tmp = GetClusterSize(map, &allCells[t]);
-                  if (tmp > clusterSize) clusterSize = tmp;
-                }
-              }
-              contexts[s]->highestCluster = clusterSize;
-            }
-
-            break;
+            /*    for (i = 0; i < nbJoueurs; i++) {
+            free(contexts[i]);
           }
-
-          //Phase 1 -> Quand on sélectionne le territoire à attaquer
-        } else {
-          cellDeux = territoireSelec(e.button.x, e.button.y, tab_id);
-          STurn *turn = malloc(sizeof(turn));
-          turn->cellFrom = cellUn;
-          turn->cellTo = cellDeux;
-          output=concat(output,"tour numero:");
-          output=concatint(output,nbTurn);
-          if (cellDeux != -1) {
-            int idJoueurDefense = (GetCell(map, cellDeux))->owner;
-            output=concat(output, "joueur:");
-            output=concatint(output, idJoueurActuel);
-            output=concat(output,"attaque avec");
-            output=concatint(output,GetCell(map,turn->cellFrom)->nbDices);
-            output=concat(output,"contre:");
-            output=concat(output,"joueur:");
-            output=concatint(output,GetCell(map,turn->cellTo)->owner);
-            output=concat(output,"avec");
-            output=concatint(output,GetCell(map,turn->cellTo)->nbDices);
-            //On fait une demande d'attaque et on attaque (1 = attaque gagné, 0 = attaque perdue, -1 = attaque non valide)
-            res = demandeAttaque(map, turn, idJoueurActuel);
-            //Si res == 1 alors on a gagné l'attaque, on change la couleur du territoire attaqué
-            if (res == 1) {
-              attaquer_territoire(e.button.x, e.button.y, 800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
-              // maj de highestCluster des 2 joueurs dans la cas d'une attaque réussie
-              UpdateHighestCluster(map, GetCell(map, cellUn), idJoueurActuel); //MAJ pour le joueur en attaque
-              UpdateHighestCluster(map, NULL, idJoueurDefense); //MAj pour le joueur en défense
-              output = concat(output,"gagnee  nouveau nb=");
-              output=concatint(output,contexts[idJoueurActuel]->highestCluster);
-              output=concat(output,"\n");
-            }
-            if (res==0){
-              output=concat(output,"perdu nouveau nb=");
-              output=concatint(output,contexts[idJoueurActuel]->highestCluster);
-              output=concat(output,"\n");
-            }
-          }
-          //On enlève les bordures internes blanches de notre territoire
-          for (i = 1; i < 799; i++) {
-            for (p = 1; p < 599; p++) {
-              if (tab_borduresBlanches[i][p] == 1) {
-                if (res == -1) {
-                  SDL_SetRenderDrawColor(renderer, couleurs[idJoueurActuel][0], couleurs[idJoueurActuel][1], couleurs[idJoueurActuel][2], 0);
-                  SDL_RenderDrawPoint(renderer, i, p);
-                }
-                tab_borduresBlanches[i][p] = 0;
-              }
-            }
-          }
-
-          if (cellDeux == -1) {
-            update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
-          }
-          if (res == -1) {
-            update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
-          }
-
-          SDL_RenderPresent(renderer);
-
-          //On free le turn
-          free(turn);
-
-          //On repasse à la phase 1
-          phase = 0;
+          free(contexts);
+          SContext **contexts = GetContexts();
+          for (s = 0; s < nbJoueurs; s++) { //pour chaque joueur
+          int t;
+          int clusterSize = 0; //la taille de la plus grosse grappe
+          SCell *allCells = map->cells; // toutes les cellules de la map
+          for (t = 0; t < (map->nbCells); t++) { //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
+          if(allCells[t].owner == s) { //si le joueur est le propriétaire de la cellule
+          int tmp = GetClusterSize(map, &allCells[t]);
+          if (tmp > clusterSize) clusterSize = tmp;
         }
-        break;
+      }
+      contexts[s]->highestCluster = clusterSize;
+    }*/
 
-        case SDL_KEYDOWN:
-        switch (e.key.keysym.sym) {
-          //Touche entrée
-          case SDLK_RETURN:
+    break;
+  }
 
-          DistributeDices(map);
-          update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
-
-          //On passe au joueur suivant
-          idJoueurActuel++;
-          nbTurn++;
-
-          setIdJoueurActuel(idJoueurActuel, nbJoueurs);
-          idJoueurActuel = getIdJoueurActuel();
-          int dicesIA = 0;
-          int noPerd = 0;
-          while (noPerd == 0) {
-            for (i = 0; i < 50; i++) {
-              if ((map->cells[i]).owner == idJoueurActuel) {
-                dicesIA += (map->cells[i]).nbDices;
-              }
-            }
-            if (dicesIA == 0) {
-              tabPerdants[idJoueurActuel] = 1;
-              printf("Joueur %d a perdu\n", idJoueurActuel);
-              idJoueurActuel++;
-              setIdJoueurActuel(idJoueurActuel, nbJoueurs);
-              idJoueurActuel = getIdJoueurActuel();
-              dicesIA = 0;
-            } else {
-              noPerd = 1;
-            }
-          }
-          printf("%s\n", "---------------------------------------");
-          printf("\tAu joueur %d de jouer\n", getIdJoueurActuel());
-          printf("%s\n", "---------------------------------------");
-          writetoLog(output);
-          output="";
-          break;
+  //Phase 1 -> Quand on sélectionne le territoire à attaquer
+} else {
+  cellDeux = territoireSelec(e.button.x, e.button.y, tab_id);
+  STurn *turn = malloc(sizeof(turn));
+  turn->cellFrom = cellUn;
+  turn->cellTo = cellDeux;
+  output=concat(output,"tour numero:");
+  output=concatint(output,nbTurn);
+  if (cellDeux != -1) {
+    int idJoueurDefense = (GetCell(map, cellDeux))->owner;
+    output=concat(output, "joueur:");
+    output=concatint(output, idJoueurActuel);
+    output=concat(output,"attaque avec");
+    output=concatint(output,GetCell(map,turn->cellFrom)->nbDices);
+    output=concat(output,"contre:");
+    output=concat(output,"joueur:");
+    output=concatint(output,GetCell(map,turn->cellTo)->owner);
+    output=concat(output,"avec");
+    output=concatint(output,GetCell(map,turn->cellTo)->nbDices);
+    //On fait une demande d'attaque et on attaque (1 = attaque gagné, 0 = attaque perdue, -1 = attaque non valide)
+    res = demandeAttaque(map, turn, idJoueurActuel);
+    //Si res == 1 alors on a gagné l'attaque, on change la couleur du territoire attaqué
+    if (res == 1) {
+      attaquer_territoire(e.button.x, e.button.y, 800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
+      // maj de highestCluster des 2 joueurs dans la cas d'une attaque réussie
+      UpdateHighestCluster(map, GetCell(map, cellUn), idJoueurActuel); //MAJ pour le joueur en attaque
+      UpdateHighestCluster(map, NULL, idJoueurDefense); //MAj pour le joueur en défense
+      output = concat(output,"gagnee  nouveau nb=");
+      output=concatint(output,contexts[idJoueurActuel]->highestCluster);
+      output=concat(output,"\n");
+    }
+    if (res==0){
+      output=concat(output,"perdu nouveau nb=");
+      output=concatint(output,contexts[idJoueurActuel]->highestCluster);
+      output=concat(output,"\n");
+    }
+  }
+  //On enlève les bordures internes blanches de notre territoire
+  for (i = 1; i < 799; i++) {
+    for (p = 1; p < 599; p++) {
+      if (tab_borduresBlanches[i][p] == 1) {
+        if (res == -1) {
+          SDL_SetRenderDrawColor(renderer, couleurs[idJoueurActuel][0], couleurs[idJoueurActuel][1], couleurs[idJoueurActuel][2], 0);
+          SDL_RenderDrawPoint(renderer, i, p);
         }
-        break;
+        tab_borduresBlanches[i][p] = 0;
       }
     }
   }
 
-  SDL_DestroyWindow(window);
-  SDL_Quit();
+  if (cellDeux == -1) {
+    update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+  }
+  if (res != -1) {
+    update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+  }
+
+  SDL_RenderPresent(renderer);
+
+  //On free le turn
+  free(turn);
+
+  //On repasse à la phase 1
+  phase = 0;
+}
+break;
+
+case SDL_KEYDOWN:
+switch (e.key.keysym.sym) {
+  //Touche entrée
+  case SDLK_RETURN:
+
+  DistributeDices(map);
+  update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+
+  //On passe au joueur suivant
+  idJoueurActuel++;
+  nbTurn++;
+
+  setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+  idJoueurActuel = getIdJoueurActuel();
+  int dicesIA = 0;
+  int noPerd = 0;
+  while (noPerd == 0) {
+    for (i = 0; i < 50; i++) {
+      if ((map->cells[i]).owner == idJoueurActuel) {
+        dicesIA += (map->cells[i]).nbDices;
+      }
+    }
+    if (dicesIA == 0) {
+      tabPerdants[idJoueurActuel] = 1;
+      printf("Joueur %d a perdu\n", idJoueurActuel);
+      idJoueurActuel++;
+      setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+      idJoueurActuel = getIdJoueurActuel();
+      dicesIA = 0;
+    } else {
+      noPerd = 1;
+    }
+  }
+  printf("%s\n", "---------------------------------------");
+  printf("\tAu joueur %d de jouer\n", getIdJoueurActuel());
+  printf("%s\n", "---------------------------------------");
+  writetoLog(output);
+  output="";
+  break;
+}
+break;
+}
+}
+}
+
+SDL_DestroyWindow(window);
+SDL_Quit();
 }
 
 /********************************************************************************************

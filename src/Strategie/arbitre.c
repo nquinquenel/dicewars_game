@@ -39,7 +39,7 @@ void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
         idIA[j] = nbPlayer-nbIA+j;
     }
     idJoueurActuel = 0;
-    fenetre(nbPlayer);
+    fenetre(nbPlayer, nbParties);
 }
 int isAnIA(int id) {
     int i = 0;

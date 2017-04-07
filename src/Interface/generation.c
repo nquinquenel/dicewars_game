@@ -44,7 +44,6 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
 
   //h+2 car on ne va pas utiliser la première valeur
   for (i = 0; i < h+2; i++) {
-    tab_id[i] = malloc((w)*sizeof(int*));
     id_tmp[i] = malloc((w)*sizeof(int*));
   }
 
