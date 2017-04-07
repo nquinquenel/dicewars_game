@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "jouer.h"
 #include "../Librairies/interfacePerso.h"
+#include <time.h>
 
 int IMG_DICES_W = 34;//la dimension de l'image des dés en largeur
 int IMG_DICES_H = 59; //la dimension de l'image des dés en hauteur
@@ -88,8 +89,8 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
     }
   }
 
-  int* tabPerdants = malloc(8*sizeof(int));
-  for (i = 0; i < 8; i++) {
+  int* tabPerdants = malloc(nbJoueurs*sizeof(int));
+  for (i = 0; i < nbJoueurs; i++) {
     tabPerdants[i] = -1;
   }
 
@@ -141,12 +142,119 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
     }
     if (cmptPerdants == nbJoueurs-1) {
       jeuFini = 1;
+      nbParties--;
       background_surface = SDL_LoadBMP("../Images/suivant.bmp");
       background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
       SDL_FreeSurface(background_surface);
       SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
       SDL_DestroyTexture(background_texture);
       SDL_RenderPresent(renderer);
+
+      if (nbParties == 0) {
+        //EndGame();
+        printf("Jeu terminé...fermeture\n");
+        usleep(5000000);
+        running = 0;
+        break;
+      } else {
+        usleep(5000000);
+        printf("1___\n");
+
+        for (i = 0; i < nbJoueurs; i++) {
+          tabPerdants[i] = -1;
+        }
+        printf("1___\n");
+        for (i = 0; i < 50; i++) {
+          free(tab_points[i]);
+        }
+        free(tab_points);
+        printf("2___\n");
+
+        for (i = 0; i < 799; i++) {
+          free(tab_borduresBlanches[i]);
+        }
+        free(tab_borduresBlanches);
+        printf("3___\n");
+
+        free(tab_comparaison);
+        printf("4___\n");
+
+        for (i = 0; i < 802; i++) {
+          free(tab_id[i]);
+        }
+        free(tab_id);
+        printf("5___\n");
+        //Tableau pour remettre les bordures blanches par défaut
+        tab_id = malloc(802*sizeof(int*));
+        tab_borduresBlanches = malloc(799*sizeof(int*));
+        tab_points = malloc(50*sizeof(int*));
+        tab_comparaison = malloc(50*sizeof(int));
+        printf("6___\n");
+
+        for (i = 0; i < 50; i++) {
+          tab_points[i] = malloc(2*sizeof(int));
+        }
+
+        printf("7___\n");
+
+        for (i = 0; i < 802; i++) {
+          tab_id[i] = malloc((600)*sizeof(int*));
+        }
+
+        printf("8___\n");
+        for (i = 0; i < 799; i++) {
+          tab_borduresBlanches[i] = malloc(599*sizeof(int));
+          for (p = 0; p < 599; p++) {
+            tab_borduresBlanches[i][p] = 0;
+          }
+        }
+        printf("9___\n");
+        idJoueurActuel = 0;
+        map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
+        printf("10___\n");
+
+        //           for (i = 0; i < nbJoueurs; i++) {
+        //         free(contexts[i]);
+        //       }
+        //       free(contexts);
+        //       SContext **contexts = GetContexts();
+        //       for (s = 0; s < nbJoueurs; s++) { //pour chaque joueur
+        //       int t;
+        //       int clusterSize = 0; //la taille de la plus grosse grappe
+        //       SCell *allCells = map->cells; // toutes les cellules de la map
+        //       for (t = 0; t < (map->nbCells); t++) { //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
+        //       if(allCells[t].owner == s) { //si le joueur est le propriétaire de la cellule
+        //       int tmp = GetClusterSize(map, &allCells[t]);
+        //       if (tmp > clusterSize) clusterSize = tmp;
+        //     }
+        //   }
+        //   contexts[s]->highestCluster = clusterSize;
+        // }
+
+        printf("11___\n");
+        restart = 0;
+        if ((nbJoueurs - getNbIA()) == 0) {
+          IAPause = 0;
+          jeuFini = 0;
+        } else {
+          IAPause = 1;
+          jeuFini = 1;
+        }
+
+        background_surface = SDL_LoadBMP("../Images/valider.bmp");
+        background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+        SDL_FreeSurface(background_surface);
+        SDL_RenderCopy(renderer, background_texture, NULL, &img_pos2);
+        SDL_DestroyTexture(background_texture);
+        SDL_RenderPresent(renderer);
+
+        background_surface = SDL_LoadBMP("../Images/suivant.bmp");
+        background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+        SDL_FreeSurface(background_surface);
+        SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
+        SDL_DestroyTexture(background_texture);
+        SDL_RenderPresent(renderer);
+      }
     }
 
     if (jeuFini == 0) {
