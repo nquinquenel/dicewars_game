@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include "jouer.h"
 #include "../Librairies/interfacePerso.h"
+#include <time.h>
 
 int IMG_DICES_W = 34;//la dimension de l'image des dés en largeur
 int IMG_DICES_H = 59; //la dimension de l'image des dés en hauteur
@@ -38,26 +39,28 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
 
   // positionnement et taille de l'image
   SDL_Rect img_pos;
-  img_pos.x = 580;
+  img_pos.x = 630;
   img_pos.y = 612;
-  img_pos.w = 200;
+  img_pos.w = 150;
   img_pos.h = 75;
 
-  SDL_Surface* background_surface = SDL_LoadBMP("../Images/nouveau.bmp");
+  SDL_Surface* background_surface = SDL_LoadBMP("../Images/suivant.bmp");
   SDL_Texture* background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
   SDL_FreeSurface(background_surface);
   SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
+  SDL_DestroyTexture(background_texture);
 
   SDL_Rect img_pos2;
-  img_pos2.x = 360;
+  img_pos2.x = 460;
   img_pos2.y = 612;
-  img_pos2.w = 200;
+  img_pos2.w = 150;
   img_pos2.h = 75;
 
-  SDL_Surface* background_surface2 = SDL_LoadBMP("../Images/passer.bmp");
+  SDL_Surface* background_surface2 = SDL_LoadBMP("../Images/valider.bmp");
   SDL_Texture* background_texture2 = SDL_CreateTextureFromSurface(renderer, background_surface2);
   SDL_FreeSurface(background_surface2);
   SDL_RenderCopy(renderer, background_texture2, NULL, &img_pos2);
+  SDL_DestroyTexture(background_texture);
 
   //Tableau de comparaison entre id et joueurs
   int *tab_comparaison = malloc(50*sizeof(int));
@@ -86,8 +89,8 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
     }
   }
 
-  int* tabPerdants = malloc(8*sizeof(int));
-  for (i = 0; i < 8; i++) {
+  int* tabPerdants = malloc(nbJoueurs*sizeof(int));
+  for (i = 0; i < nbJoueurs; i++) {
     tabPerdants[i] = -1;
   }
 
@@ -121,12 +124,14 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
   int phase = 0;
   int nbTurn = 0;
   int IAPause = 0;
-  int jeuFini = 0;
+  int jeuFini = 1;
   int idActuelIA = 0;
+  int restart = 0;
   char *output = {""};
 
   while (running == 1) {
 
+    restart = 0;
     tourFini = 0;
     idJoueurActuel = getIdJoueurActuel();
     int cmptPerdants = 0;
@@ -137,12 +142,132 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
     }
     if (cmptPerdants == nbJoueurs-1) {
       jeuFini = 1;
+      nbParties--;
+      background_surface = SDL_LoadBMP("../Images/suivant.bmp");
+      background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+      SDL_FreeSurface(background_surface);
+      SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
+      SDL_DestroyTexture(background_texture);
+      SDL_RenderPresent(renderer);
+
+      if (nbParties == 0) {
+        //EndGame();
+        printf("Jeu terminé...fermeture\n");
+        usleep(5000000);
+        running = 0;
+        break;
+      } else {
+        usleep(5000000);
+        printf("1___\n");
+
+        for (i = 0; i < nbJoueurs; i++) {
+          tabPerdants[i] = -1;
+        }
+        printf("1___\n");
+        for (i = 0; i < 50; i++) {
+          free(tab_points[i]);
+        }
+        free(tab_points);
+        printf("2___\n");
+
+        for (i = 0; i < 799; i++) {
+          free(tab_borduresBlanches[i]);
+        }
+        free(tab_borduresBlanches);
+        printf("3___\n");
+
+        free(tab_comparaison);
+        printf("4___\n");
+
+        for (i = 0; i < 802; i++) {
+          free(tab_id[i]);
+        }
+        free(tab_id);
+        printf("5___\n");
+        //Tableau pour remettre les bordures blanches par défaut
+        tab_id = malloc(802*sizeof(int*));
+        tab_borduresBlanches = malloc(799*sizeof(int*));
+        tab_points = malloc(50*sizeof(int*));
+        tab_comparaison = malloc(50*sizeof(int));
+        printf("6___\n");
+
+        for (i = 0; i < 50; i++) {
+          tab_points[i] = malloc(2*sizeof(int));
+        }
+
+        printf("7___\n");
+
+        for (i = 0; i < 802; i++) {
+          tab_id[i] = malloc((600)*sizeof(int*));
+        }
+
+        printf("8___\n");
+        for (i = 0; i < 799; i++) {
+          tab_borduresBlanches[i] = malloc(599*sizeof(int));
+          for (p = 0; p < 599; p++) {
+            tab_borduresBlanches[i][p] = 0;
+          }
+        }
+        printf("9___\n");
+        idJoueurActuel = 0;
+        map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
+        printf("10___\n");
+
+        //           for (i = 0; i < nbJoueurs; i++) {
+        //         free(contexts[i]);
+        //       }
+        //       free(contexts);
+        //       SContext **contexts = GetContexts();
+        //       for (s = 0; s < nbJoueurs; s++) { //pour chaque joueur
+        //       int t;
+        //       int clusterSize = 0; //la taille de la plus grosse grappe
+        //       SCell *allCells = map->cells; // toutes les cellules de la map
+        //       for (t = 0; t < (map->nbCells); t++) { //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
+        //       if(allCells[t].owner == s) { //si le joueur est le propriétaire de la cellule
+        //       int tmp = GetClusterSize(map, &allCells[t]);
+        //       if (tmp > clusterSize) clusterSize = tmp;
+        //     }
+        //   }
+        //   contexts[s]->highestCluster = clusterSize;
+        // }
+
+        printf("11___\n");
+        restart = 0;
+        if ((nbJoueurs - getNbIA()) == 0) {
+          IAPause = 0;
+          jeuFini = 0;
+        } else {
+          IAPause = 1;
+          jeuFini = 1;
+        }
+
+        background_surface = SDL_LoadBMP("../Images/valider.bmp");
+        background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+        SDL_FreeSurface(background_surface);
+        SDL_RenderCopy(renderer, background_texture, NULL, &img_pos2);
+        SDL_DestroyTexture(background_texture);
+        SDL_RenderPresent(renderer);
+
+        background_surface = SDL_LoadBMP("../Images/suivant.bmp");
+        background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+        SDL_FreeSurface(background_surface);
+        SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
+        SDL_DestroyTexture(background_texture);
+        SDL_RenderPresent(renderer);
+      }
     }
 
     if (jeuFini == 0) {
       //Au tour de l'IA de jouer
       if (isAnIA(idJoueurActuel) == 1) {
         STurn *turn = malloc(sizeof(turn));
+
+        background_surface = SDL_LoadBMP("../Images/pause.bmp");
+        background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+        SDL_FreeSurface(background_surface);
+        SDL_RenderCopy(renderer, background_texture, NULL, &img_pos2);
+        SDL_DestroyTexture(background_texture);
+        SDL_RenderPresent(renderer);
 
         //Tant que l'IA n'a pas fini de jouer
         while (tourFini == 0) {
@@ -159,14 +284,14 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
 
               //Clique souris
               case SDL_MOUSEBUTTONDOWN:
-              if (e.button.x > 359 && e.button.x < 561 && e.button.y > 612 && e.button.y < 688) {
+              if (e.button.x > 459 && e.button.x < 609 && e.button.y > 612 && e.button.y < 688) {
                 if (IAPause == 0) {
                   IAPause = 1;
                 } else {
                   IAPause = 0;
                 }
                 break;
-              } else if (e.button.x > 579 && e.button.x < 781 && e.button.y > 612 && e.button.y < 688) {
+              } else if (e.button.x > 629 && e.button.x < 781 && e.button.y > 612 && e.button.y < 688) {
                 for (i = 0; i < 50; i++) {
                   free(tab_points[i]);
                 }
@@ -193,39 +318,61 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
                   tab_points[i] = malloc(2*sizeof(int));
                 }
 
+
+                for (i = 0; i < 802; i++) {
+                  tab_id[i] = malloc((600)*sizeof(int*));
+                }
+
                 for (i = 0; i < 799; i++) {
                   tab_borduresBlanches[i] = malloc(599*sizeof(int));
                   for (p = 0; p < 599; p++) {
                     tab_borduresBlanches[i][p] = 0;
                   }
                 }
-
                 idJoueurActuel = 0;
                 map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
 
-                for (i = 0; i < nbJoueurs; i++) {
-                  free(contexts[i]);
-                }
-                free(contexts);
-                SContext **contexts = GetContexts();
-                for (s = 0; s < nbJoueurs; s++) { //pour chaque joueur
-                  int t;
-                  int clusterSize = 0; //la taille de la plus grosse grappe
-                  SCell *allCells = map->cells; // toutes les cellules de la map
-                  for (t = 0; t < (map->nbCells); t++) { //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
-                    if(allCells[t].owner == s) { //si le joueur est le propriétaire de la cellule
-                      int tmp = GetClusterSize(map, &allCells[t]);
-                      if (tmp > clusterSize) clusterSize = tmp;
-                    }
-                  }
-                  contexts[s]->highestCluster = clusterSize;
-                }
-
+                //           for (i = 0; i < nbJoueurs; i++) {
+                //         free(contexts[i]);
+                //       }
+                //       free(contexts);
+                //       SContext **contexts = GetContexts();
+                //       for (s = 0; s < nbJoueurs; s++) { //pour chaque joueur
+                //       int t;
+                //       int clusterSize = 0; //la taille de la plus grosse grappe
+                //       SCell *allCells = map->cells; // toutes les cellules de la map
+                //       for (t = 0; t < (map->nbCells); t++) { //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
+                //       if(allCells[t].owner == s) { //si le joueur est le propriétaire de la cellule
+                //       int tmp = GetClusterSize(map, &allCells[t]);
+                //       if (tmp > clusterSize) clusterSize = tmp;
+                //     }
+                //   }
+                //   contexts[s]->highestCluster = clusterSize;
+                // }
                 tourFini = 1;
+                restart = 1;
+                IAPause = 1;
+                jeuFini = 1;
+
+                background_surface = SDL_LoadBMP("../Images/valider.bmp");
+                background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+                SDL_FreeSurface(background_surface);
+                SDL_RenderCopy(renderer, background_texture, NULL, &img_pos2);
+                SDL_DestroyTexture(background_texture);
+                SDL_RenderPresent(renderer);
+
+                background_surface = SDL_LoadBMP("../Images/suivant.bmp");
+                background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+                SDL_FreeSurface(background_surface);
+                SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
+                SDL_DestroyTexture(background_texture);
+                SDL_RenderPresent(renderer);
+
                 break;
               }
             }
-          } else if (IAPause == 0) {
+
+          } else if (IAPause == 0 && restart == 0) {
 
             //L'IA joue son tour
             output=concat(output,"tour numero:");
@@ -296,7 +443,7 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
                 output=concat(output,"\n");
 
               }
-              if(playIA==0){
+              if(playIA==0) {
                 output=concat(output,"perdu nouveau nb=");
                 output=concatint(output,contexts[idJoueurActuel]->highestCluster);
                 output=concat(output,"\n");
@@ -371,6 +518,28 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
                   noPerd = 1;
                 }
               }
+
+              SDL_Surface* background_surface = SDL_LoadBMP("../Images/nouveau.bmp");
+              SDL_Texture* background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+              SDL_FreeSurface(background_surface);
+              SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
+              SDL_RenderPresent(renderer);
+
+              if (isAnIA(idJoueurActuel) == 0) {
+                SDL_Surface* background_surface = SDL_LoadBMP("../Images/passer.bmp");
+                SDL_Texture* background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+                SDL_FreeSurface(background_surface);
+                SDL_RenderCopy(renderer, background_texture, NULL, &img_pos2);
+                SDL_RenderPresent(renderer);
+              } else {
+                background_surface = SDL_LoadBMP("../Images/pause.bmp");
+                background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+                SDL_FreeSurface(background_surface);
+                SDL_RenderCopy(renderer, background_texture, NULL, &img_pos2);
+                SDL_DestroyTexture(background_texture);
+                SDL_RenderPresent(renderer);
+              }
+
               printf("%s\n", "---------------------------------------");
               printf("\tAu joueur %d de jouer(B)\n", getIdJoueurActuel());
               printf("%s\n", "---------------------------------------");
@@ -404,40 +573,63 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
           cellUn = territoireSelec(e.button.x, e.button.y, tab_id);
           //On regarde si c'est notre territoire, si oui on met une bordure interne blanche
           if (cellUn != -1 && tab_comparaison[cellUn] == idJoueurActuel) {
-            notifTerrains(cellUn, tab_id, renderer, 800, 600, tab_borduresBlanches);
-            phase = 1;
-          } else if (e.button.x > 359 && e.button.x < 561 && e.button.y > 612 && e.button.y < 688) {
-            DistributeDices(map);
-            update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
-
-            idJoueurActuel++;
-
-            setIdJoueurActuel(idJoueurActuel, nbJoueurs);
-            idJoueurActuel = getIdJoueurActuel();
-
-            int dicesIA = 0;
-            int noPerd = 0;
-            while (noPerd == 0) {
-              for (i = 0; i < 50; i++) {
-                if ((map->cells[i]).owner == idJoueurActuel) {
-                  dicesIA += (map->cells[i]).nbDices;
-                }
-              }
-              if (dicesIA == 0) {
-                tabPerdants[idJoueurActuel] = 1;
-                printf("Joueur %d a perdu\n", idJoueurActuel);
-                idJoueurActuel++;
-                setIdJoueurActuel(idJoueurActuel, nbJoueurs);
-                idJoueurActuel = getIdJoueurActuel();
-                dicesIA = 0;
-              } else {
-                noPerd = 1;
+            if (jeuFini == 0) {
+              if (isAnIA(idJoueurActuel) == 0) {
+                notifTerrains(cellUn, tab_id, renderer, 800, 600, tab_borduresBlanches);
+                phase = 1;
               }
             }
-            printf("%s\n", "---------------------------------------");
-            printf("\tAu joueur %d de jouer\n", getIdJoueurActuel());
-            printf("%s\n", "---------------------------------------");
-            break;
+          } else if (e.button.x > 359 && e.button.x < 561 && e.button.y > 612 && e.button.y < 688) {
+            if (jeuFini == 1) {
+              jeuFini = 0;
+              IAPause = 0;
+              background_surface = SDL_LoadBMP("../Images/passer.bmp");
+              background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+              SDL_FreeSurface(background_surface);
+              SDL_RenderCopy(renderer, background_texture, NULL, &img_pos2);
+              SDL_DestroyTexture(background_texture);
+              SDL_RenderPresent(renderer);
+
+              background_surface = SDL_LoadBMP("../Images/nouveau.bmp");
+              background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+              SDL_FreeSurface(background_surface);
+              SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
+              SDL_DestroyTexture(background_texture);
+              SDL_RenderPresent(renderer);
+              break;
+            } else {
+              DistributeDices(map);
+              update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+
+              idJoueurActuel++;
+
+              setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+              idJoueurActuel = getIdJoueurActuel();
+
+              int dicesIA = 0;
+              int noPerd = 0;
+              while (noPerd == 0) {
+                for (i = 0; i < 50; i++) {
+                  if ((map->cells[i]).owner == idJoueurActuel) {
+                    dicesIA += (map->cells[i]).nbDices;
+                  }
+                }
+                if (dicesIA == 0) {
+                  tabPerdants[idJoueurActuel] = 1;
+                  printf("Joueur %d a perdu\n", idJoueurActuel);
+                  idJoueurActuel++;
+                  setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+                  idJoueurActuel = getIdJoueurActuel();
+                  dicesIA = 0;
+                } else {
+                  noPerd = 1;
+                }
+              }
+              printf("%s\n", "---------------------------------------");
+              printf("\tAu joueur %d de jouer\n", getIdJoueurActuel());
+              printf("%s\n", "---------------------------------------");
+              break;
+            }
           } else if (e.button.x > 579 && e.button.x < 781 && e.button.y > 612 && e.button.y < 688) {
             for (i = 0; i < 50; i++) {
               free(tab_points[i]);
@@ -479,141 +671,157 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
             idJoueurActuel = 0;
             map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
 
-            /*    for (i = 0; i < nbJoueurs; i++) {
-            free(contexts[i]);
+            //         for (i = 0; i < nbJoueurs; i++) {
+            //         free(contexts[i]);
+            //       }
+            //       free(contexts);
+            //       SContext **contexts = GetContexts();
+            //       for (s = 0; s < nbJoueurs; s++) { //pour chaque joueur
+            //       int t;
+            //       int clusterSize = 0; //la taille de la plus grosse grappe
+            //       SCell *allCells = map->cells; // toutes les cellules de la map
+            //       for (t = 0; t < (map->nbCells); t++) { //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
+            //       if(allCells[t].owner == s) { //si le joueur est le propriétaire de la cellule
+            //       int tmp = GetClusterSize(map, &allCells[t]);
+            //       if (tmp > clusterSize) clusterSize = tmp;
+            //     }
+            //   }
+            //   contexts[s]->highestCluster = clusterSize;
+            // }
+            restart = 1;
+            jeuFini = 1;
+
+            background_surface = SDL_LoadBMP("../Images/suivant.bmp");
+            background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+            SDL_FreeSurface(background_surface);
+            SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
+            SDL_DestroyTexture(background_texture);
+            SDL_RenderPresent(renderer);
+
+            background_surface = SDL_LoadBMP("../Images/valider.bmp");
+            background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
+            SDL_FreeSurface(background_surface);
+            SDL_RenderCopy(renderer, background_texture, NULL, &img_pos2);
+            SDL_DestroyTexture(background_texture);
+            SDL_RenderPresent(renderer);
+
+            break;
           }
-          free(contexts);
-          SContext **contexts = GetContexts();
-          for (s = 0; s < nbJoueurs; s++) { //pour chaque joueur
-          int t;
-          int clusterSize = 0; //la taille de la plus grosse grappe
-          SCell *allCells = map->cells; // toutes les cellules de la map
-          for (t = 0; t < (map->nbCells); t++) { //parcours des cellules de la map pour récupérer la taille de la plus grosse grappe de cellules
-          if(allCells[t].owner == s) { //si le joueur est le propriétaire de la cellule
-          int tmp = GetClusterSize(map, &allCells[t]);
-          if (tmp > clusterSize) clusterSize = tmp;
+
+          //Phase 1 -> Quand on sélectionne le territoire à attaquer
+        } else {
+          cellDeux = territoireSelec(e.button.x, e.button.y, tab_id);
+          STurn *turn = malloc(sizeof(turn));
+          turn->cellFrom = cellUn;
+          turn->cellTo = cellDeux;
+          output=concat(output,"tour numero:");
+          output=concatint(output,nbTurn);
+          if (cellDeux != -1) {
+            int idJoueurDefense = (GetCell(map, cellDeux))->owner;
+            output=concat(output, "joueur:");
+            output=concatint(output, idJoueurActuel);
+            output=concat(output,"attaque avec");
+            output=concatint(output,GetCell(map,turn->cellFrom)->nbDices);
+            output=concat(output,"contre:");
+            output=concat(output,"joueur:");
+            output=concatint(output,GetCell(map,turn->cellTo)->owner);
+            output=concat(output,"avec");
+            output=concatint(output,GetCell(map,turn->cellTo)->nbDices);
+            //On fait une demande d'attaque et on attaque (1 = attaque gagné, 0 = attaque perdue, -1 = attaque non valide)
+            res = demandeAttaque(map, turn, idJoueurActuel);
+            //Si res == 1 alors on a gagné l'attaque, on change la couleur du territoire attaqué
+            if (res == 1) {
+              attaquer_territoire(e.button.x, e.button.y, 800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
+              // maj de highestCluster des 2 joueurs dans la cas d'une attaque réussie
+              UpdateHighestCluster(map, GetCell(map, cellUn), idJoueurActuel); //MAJ pour le joueur en attaque
+              UpdateHighestCluster(map, NULL, idJoueurDefense); //MAj pour le joueur en défense
+              output = concat(output,"gagnee  nouveau nb=");
+              output=concatint(output,contexts[idJoueurActuel]->highestCluster);
+              output=concat(output,"\n");
+            }
+            if (res==0){
+              output=concat(output,"perdu nouveau nb=");
+              output=concatint(output,contexts[idJoueurActuel]->highestCluster);
+              output=concat(output,"\n");
+            }
+          }
+          //On enlève les bordures internes blanches de notre territoire
+          for (i = 1; i < 799; i++) {
+            for (p = 1; p < 599; p++) {
+              if (tab_borduresBlanches[i][p] == 1) {
+                if (res == -1) {
+                  SDL_SetRenderDrawColor(renderer, couleurs[idJoueurActuel][0], couleurs[idJoueurActuel][1], couleurs[idJoueurActuel][2], 0);
+                  SDL_RenderDrawPoint(renderer, i, p);
+                }
+                tab_borduresBlanches[i][p] = 0;
+              }
+            }
+          }
+
+          if (cellDeux == -1) {
+            update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+          }
+          if (res != -1) {
+            update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+          }
+
+          SDL_RenderPresent(renderer);
+
+          //On free le turn
+          free(turn);
+
+          //On repasse à la phase 1
+          phase = 0;
         }
-      }
-      contexts[s]->highestCluster = clusterSize;
-    }*/
+        break;
 
-    break;
-  }
+        case SDL_KEYDOWN:
+        switch (e.key.keysym.sym) {
+          //Touche entrée
+          case SDLK_RETURN:
 
-  //Phase 1 -> Quand on sélectionne le territoire à attaquer
-} else {
-  cellDeux = territoireSelec(e.button.x, e.button.y, tab_id);
-  STurn *turn = malloc(sizeof(turn));
-  turn->cellFrom = cellUn;
-  turn->cellTo = cellDeux;
-  output=concat(output,"tour numero:");
-  output=concatint(output,nbTurn);
-  if (cellDeux != -1) {
-    int idJoueurDefense = (GetCell(map, cellDeux))->owner;
-    output=concat(output, "joueur:");
-    output=concatint(output, idJoueurActuel);
-    output=concat(output,"attaque avec");
-    output=concatint(output,GetCell(map,turn->cellFrom)->nbDices);
-    output=concat(output,"contre:");
-    output=concat(output,"joueur:");
-    output=concatint(output,GetCell(map,turn->cellTo)->owner);
-    output=concat(output,"avec");
-    output=concatint(output,GetCell(map,turn->cellTo)->nbDices);
-    //On fait une demande d'attaque et on attaque (1 = attaque gagné, 0 = attaque perdue, -1 = attaque non valide)
-    res = demandeAttaque(map, turn, idJoueurActuel);
-    //Si res == 1 alors on a gagné l'attaque, on change la couleur du territoire attaqué
-    if (res == 1) {
-      attaquer_territoire(e.button.x, e.button.y, 800, 600, tab_comparaison, tab_id, renderer, map, idJoueurActuel, couleurs);
-      // maj de highestCluster des 2 joueurs dans la cas d'une attaque réussie
-      UpdateHighestCluster(map, GetCell(map, cellUn), idJoueurActuel); //MAJ pour le joueur en attaque
-      UpdateHighestCluster(map, NULL, idJoueurDefense); //MAj pour le joueur en défense
-      output = concat(output,"gagnee  nouveau nb=");
-      output=concatint(output,contexts[idJoueurActuel]->highestCluster);
-      output=concat(output,"\n");
-    }
-    if (res==0){
-      output=concat(output,"perdu nouveau nb=");
-      output=concatint(output,contexts[idJoueurActuel]->highestCluster);
-      output=concat(output,"\n");
-    }
-  }
-  //On enlève les bordures internes blanches de notre territoire
-  for (i = 1; i < 799; i++) {
-    for (p = 1; p < 599; p++) {
-      if (tab_borduresBlanches[i][p] == 1) {
-        if (res == -1) {
-          SDL_SetRenderDrawColor(renderer, couleurs[idJoueurActuel][0], couleurs[idJoueurActuel][1], couleurs[idJoueurActuel][2], 0);
-          SDL_RenderDrawPoint(renderer, i, p);
+          DistributeDices(map);
+          update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+
+          //On passe au joueur suivant
+          idJoueurActuel++;
+          nbTurn++;
+
+          setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+          idJoueurActuel = getIdJoueurActuel();
+          int dicesIA = 0;
+          int noPerd = 0;
+          while (noPerd == 0) {
+            for (i = 0; i < 50; i++) {
+              if ((map->cells[i]).owner == idJoueurActuel) {
+                dicesIA += (map->cells[i]).nbDices;
+              }
+            }
+            if (dicesIA == 0) {
+              tabPerdants[idJoueurActuel] = 1;
+              printf("Joueur %d a perdu\n", idJoueurActuel);
+              idJoueurActuel++;
+              setIdJoueurActuel(idJoueurActuel, nbJoueurs);
+              idJoueurActuel = getIdJoueurActuel();
+              dicesIA = 0;
+            } else {
+              noPerd = 1;
+            }
+          }
+          printf("%s\n", "---------------------------------------");
+          printf("\tAu joueur %d de jouer\n", getIdJoueurActuel());
+          printf("%s\n", "---------------------------------------");
+          writetoLog(output);
+          output="";
+          break;
         }
-        tab_borduresBlanches[i][p] = 0;
+        break;
       }
     }
   }
 
-  if (cellDeux == -1) {
-    update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
-  }
-  if (res != -1) {
-    update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
-  }
-
-  SDL_RenderPresent(renderer);
-
-  //On free le turn
-  free(turn);
-
-  //On repasse à la phase 1
-  phase = 0;
-}
-break;
-
-case SDL_KEYDOWN:
-switch (e.key.keysym.sym) {
-  //Touche entrée
-  case SDLK_RETURN:
-
-  DistributeDices(map);
-  update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
-
-  //On passe au joueur suivant
-  idJoueurActuel++;
-  nbTurn++;
-
-  setIdJoueurActuel(idJoueurActuel, nbJoueurs);
-  idJoueurActuel = getIdJoueurActuel();
-  int dicesIA = 0;
-  int noPerd = 0;
-  while (noPerd == 0) {
-    for (i = 0; i < 50; i++) {
-      if ((map->cells[i]).owner == idJoueurActuel) {
-        dicesIA += (map->cells[i]).nbDices;
-      }
-    }
-    if (dicesIA == 0) {
-      tabPerdants[idJoueurActuel] = 1;
-      printf("Joueur %d a perdu\n", idJoueurActuel);
-      idJoueurActuel++;
-      setIdJoueurActuel(idJoueurActuel, nbJoueurs);
-      idJoueurActuel = getIdJoueurActuel();
-      dicesIA = 0;
-    } else {
-      noPerd = 1;
-    }
-  }
-  printf("%s\n", "---------------------------------------");
-  printf("\tAu joueur %d de jouer\n", getIdJoueurActuel());
-  printf("%s\n", "---------------------------------------");
-  writetoLog(output);
-  output="";
-  break;
-}
-break;
-}
-}
-}
-
-SDL_DestroyWindow(window);
-SDL_Quit();
+  SDL_DestroyWindow(window);
+  SDL_Quit();
 }
 
 /********************************************************************************************
