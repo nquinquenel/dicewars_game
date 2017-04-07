@@ -32,21 +32,21 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
   //Permet de générer une map aléatoire
   srand(time(NULL));
   //SDL_RenderSetScale(renderer, 5.0, 5.0);
-
+printf("Z___\n");
   //Permet d'enlever les id aux pixels bordures (à la fin)
   int** id_tmp = malloc((h+2)*sizeof(int*));
-
+printf("1A___\n");
   //Tableau des voisins de chaque territoire
   int** tab_voisins = malloc(nbTerritoires*sizeof(int*));
 
   //Tableau des couleurs disponibles
   int couleurs[8][3] = {{0,0,255}, {0, 255, 0}, {255, 0, 0}, {128, 68, 188}, {255, 128, 0}, {0, 255, 255}, {102, 51, 0}, {255, 102, 255}};
-
+printf("1B___\n");
   //h+2 car on ne va pas utiliser la première valeur
   for (i = 0; i < h+2; i++) {
     id_tmp[i] = malloc((w)*sizeof(int*));
   }
-
+printf("1C___\n");
   //Initialise les valeurs à -1 pour éviter de tomber sur des adresses mémoires
   for (i = 0; i < h+2; i++) {
     for (p = 0; p < w+2; p++) {
@@ -54,9 +54,9 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
       id_tmp[i][p] = -1;
     }
   }
-
+printf("1___\n");
   int** tab_couleurs = malloc(nbTerritoires*sizeof(int*));
-
+printf("A___\n");
   //Initalise certains tableaux et génère les points ainsi que les couleurs
   for (i = 0; i < nbTerritoires; i++) {
     tab_couleurs[i] = malloc(3*sizeof(int));
@@ -100,7 +100,7 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
       id = 0;
     }
   }
-
+printf("B___\n");
   //Gestion des bordures et des voisins
   int bordure = 0;
   for (i = 0; i < h; i++) {
@@ -140,7 +140,7 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
       }
     }
   }
-
+printf("C___\n");
   /*
   //Matrice adjacence
   j = 0;
