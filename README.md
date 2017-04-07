@@ -6,13 +6,13 @@ Développement du jeu DiceWars, composé d'une interface graphique (librairie SD
 Comment lancer l'éxécutable ?
 ===================
 
-./DiceWars 4 5 libStrategie.so libStrategie.so libStrategie.so
+./DiceWars 4 5 libStrategie1.so libStrategie2.so libStrategie3.so libStrategie4.so
 
 4: Nombre de partie à faire
 
-5: Nombre de joueurs (2 humains et 3 IA)
+5: Nombre de joueurs (1 humains et 4 IA)
 
-libStrategie.so libStrategie.so libStrategie.so: Nom des librairies pour la stratégie
+libStrategie1.so libStrategie2.so libStrategie3.so libStrategie4.so : Nom des librairies pour les stratégies (possible de mettre la même plusieurs fois)
 
 Comment compiler ?
 ===================
