@@ -16291,4 +16291,12 @@ tour numero:	0	joueur:	0	attaque avec	7	contre:	joueur:	1	avec	1	gagnee  nouveau
 	tour numero:	70	joueur:	1	attaque avec	4	contre:	joueur:	0	avec	2	gagnee  nouveau nb=	48	
 	tour numero:	70	joueur:	1	attaque avec	4	contre:	joueur:	0	avec	3	gagnee  nouveau nb=	49	
 	tour numero:	70	joueur:	1	attaque avec	3	contre:	joueur:	0	avec	2	gagnee  nouveau nb=	50	
-	tour numero:	70	
+	tour numero:	70	tour numero:	0	joueur:	0	attaque avec	8	contre:	joueur:	1	avec	1	gagnee  nouveau nb=	25	
+	tour numero:	0	joueur:	0	attaque avec	7	contre:	joueur:	1	avec	1	gagnee  nouveau nb=	26	
+	tour numero:	0	joueur:	0	attaque avec	6	contre:	joueur:	1	avec	1	gagnee  nouveau nb=	27	
+	tour numero:	0	joueur:	0	attaque avec	8	contre:	joueur:	1	avec	4	gagnee  nouveau nb=	28	
+	tour numero:	0	joueur:	0	attaque avec	6	contre:	joueur:	1	avec	2	gagnee  nouveau nb=	29	
+	tour numero:	0	joueur:	0	attaque avec	8	contre:	joueur:	1	avec	4	gagnee  nouveau nb=	30	
+	tour numero:	0	joueur:	0	attaque avec	4	contre:	joueur:	1	avec	1	gagnee  nouveau nb=	31	
+	tour numero:	0	joueur:	0	attaque avec	4	contre:	joueur:	1	avec	2	gagnee  nouveau nb=	32	
+	

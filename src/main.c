@@ -20,14 +20,14 @@ int main(int argc, char **argv) {
   void **lib;
 
   pfInitGame *tab_InitGame;
-  pfPlayTurn1 *tab_PlayTurn1;
+  pfPlayTurn *tab_PlayTurn;
   pfEndGame *tab_EndGame;
 
   if (nombreIA > 0) {
 
     void **lib = malloc(nombreIA*sizeof(void*));
     tab_InitGame = malloc(nombreIA*sizeof(pfInitGame));
-    tab_PlayTurn1 = malloc(nombreIA*sizeof(pfPlayTurn1));
+    tab_PlayTurn = malloc(nombreIA*sizeof(pfPlayTurn));
     tab_EndGame = malloc(nombreIA*sizeof(pfEndGame));
 
     for  (i = 3; i < argc; i++) {
@@ -40,8 +40,8 @@ int main(int argc, char **argv) {
         printf("Erreur init lib InitGame\n");
       }
 
-      if ((tab_PlayTurn1[i-3] = (pfPlayTurn1)dlsym(lib[i-3], "PlayTurn1")) == NULL) {
-        printf("Erreur init lib PlayTurn1\n");
+      if ((tab_PlayTurn[i-3] = (pfPlayTurn)dlsym(lib[i-3], "PlayTurn")) == NULL) {
+        printf("Erreur init lib PlayTurn\n");
       }
 
       if ((tab_EndGame[i-3] = (pfEndGame)dlsym(lib[i-3], "EndGame")) == NULL) {
@@ -51,13 +51,13 @@ int main(int argc, char **argv) {
     }
   }
 
-  createGame(nbParties, nbPlayer, argc, argv, tab_InitGame, tab_PlayTurn1, tab_EndGame);
+  createGame(nbParties, nbPlayer, argc, argv, tab_InitGame, tab_PlayTurn, tab_EndGame);
 
   if (nombreIA > 0) {
     dlclose(lib);
     free(lib);
     free(tab_InitGame);
-    free(tab_PlayTurn1);
+    free(tab_PlayTurn);
     free(tab_EndGame);
   }
 

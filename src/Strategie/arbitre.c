@@ -19,7 +19,7 @@ SContext **contexts; // tableau de pointeurs de SContext
 * RETURNS: L'id du joueur actuel
 *
 *********************************************************************************************/
-void createGame(int nbParties, int nbPlayer, int nbArg, char** noms, pfInitGame* tab_InitGame, pfPlayTurn1* tab_PlayTurn1, pfEndGame* tab_EndGame) {
+void createGame(int nbParties, int nbPlayer, int nbArg, char** noms, pfInitGame* tab_InitGame, pfPlayTurn* tab_PlayTurn, pfEndGame* tab_EndGame) {
     int i, j, temp;
     contexts = malloc(nbPlayer*sizeof(SContext *)); //tableau de pointeurs de SContext
 
@@ -54,7 +54,7 @@ void createGame(int nbParties, int nbPlayer, int nbArg, char** noms, pfInitGame*
         idIA[j] = tabAleaJoueurs[j+(nbPlayer-nbIA)];
     }
     idJoueurActuel = 0;
-    fenetre(nbPlayer, nbParties, tab_InitGame, tab_PlayTurn1, tab_EndGame);
+    fenetre(nbPlayer, nbParties, tab_InitGame, tab_PlayTurn, tab_EndGame);
 }
 
 int isAnIA(int id) {

@@ -15,7 +15,7 @@ int IMG_DICES_H = 59; //la dimension de l'image des dés en hauteur
 * DESCRIPTION: Génère la fenêtre de jeu SDL2 et départ du programme (boucle du jeu)
 *
 *********************************************************************************************/
-void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1* tab_PlayTurn1, pfEndGame* tab_EndGame) {
+void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn* tab_PlayTurn, pfEndGame* tab_EndGame) {
   //Condition pour faire tourner le jeu en boucle
   int running = 1;
   int i, p, s;
@@ -158,60 +158,48 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
         break;
       } else {
         usleep(5000000);
-        printf("1___\n");
 
         for (i = 0; i < nbJoueurs; i++) {
           tabPerdants[i] = -1;
         }
-        printf("1___\n");
         for (i = 0; i < 50; i++) {
           free(tab_points[i]);
         }
         free(tab_points);
-        printf("2___\n");
 
         for (i = 0; i < 799; i++) {
           free(tab_borduresBlanches[i]);
         }
         free(tab_borduresBlanches);
-        printf("3___\n");
 
         free(tab_comparaison);
-        printf("4___\n");
 
         for (i = 0; i < 802; i++) {
           free(tab_id[i]);
         }
         free(tab_id);
-        printf("5___\n");
         //Tableau pour remettre les bordures blanches par défaut
         tab_id = malloc(802*sizeof(int*));
         tab_borduresBlanches = malloc(799*sizeof(int*));
         tab_points = malloc(50*sizeof(int*));
         tab_comparaison = malloc(50*sizeof(int));
-        printf("6___\n");
 
         for (i = 0; i < 50; i++) {
           tab_points[i] = malloc(2*sizeof(int));
         }
 
-        printf("7___\n");
-
         for (i = 0; i < 802; i++) {
           tab_id[i] = malloc((600)*sizeof(int*));
         }
 
-        printf("8___\n");
         for (i = 0; i < 799; i++) {
           tab_borduresBlanches[i] = malloc(599*sizeof(int));
           for (p = 0; p < 599; p++) {
             tab_borduresBlanches[i][p] = 0;
           }
         }
-        printf("9___\n");
         idJoueurActuel = 0;
         map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
-        printf("10___\n");
 
         //           for (i = 0; i < nbJoueurs; i++) {
         //         free(contexts[i]);
@@ -231,7 +219,6 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
         //   contexts[s]->highestCluster = clusterSize;
         // }
 
-        printf("11___\n");
         restart = 0;
         if ((nbJoueurs - getNbIA()) == 0) {
           IAPause = 0;
@@ -401,7 +388,7 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
               }
             }
 
-            playIA = tab_PlayTurn1[idActuelIA](idJoueurActuel, mapClone, turn);
+            playIA = tab_PlayTurn[idActuelIA](idJoueurActuel, mapClone, turn);
 
             idActuelIA++;
             if (idActuelIA > getNbIA()-1) {
@@ -484,7 +471,7 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
                   }
                 }
                 printf("%s\n", "---------------------------------------");
-                printf("\tAu joueur %d de jouer(A)\n", getIdJoueurActuel());
+                printf("\tAu joueur %d de jouer\n", getIdJoueurActuel());
                 printf("%s\n", "---------------------------------------");
               }
               //Si elle passe son tour
@@ -541,7 +528,7 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
               }
 
               printf("%s\n", "---------------------------------------");
-              printf("\tAu joueur %d de jouer(B)\n", getIdJoueurActuel());
+              printf("\tAu joueur %d de jouer\n", getIdJoueurActuel());
               printf("%s\n", "---------------------------------------");
             }
           }

@@ -9,7 +9,7 @@
 #define INT_BUFFER_SIZE 10
 
 typedef void (*pfInitGame)(unsigned int id, unsigned int nbPlayer, SPlayerInfo *info);
-typedef int (*pfPlayTurn1)(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
+typedef int (*pfPlayTurn)(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
 typedef void (*pfEndGame)(unsigned int id, unsigned int idWinner);
 
 // Structure définissant les caractéristiques de l'ia courante
@@ -35,7 +35,7 @@ typedef struct SCluster
 	struct SCell **cells; // Tableau de pointeurs vers les cellules du cluster
 } SCluster;
 
-void createGame(int nbParties, int nbPlayer, int nbArg, char** noms, pfInitGame* tab_InitGame, pfPlayTurn1* tab_PlayTurn1, pfEndGame* tab_EndGame);
+void createGame(int nbParties, int nbPlayer, int nbArg, char** noms, pfInitGame* tab_InitGame, pfPlayTurn* tab_PlayTurn, pfEndGame* tab_EndGame);
 int demandeAttaque(SMap *map, STurn *turn, int idPlayer);
 int getIdJoueurActuel();
 int getNbIA();
@@ -278,26 +278,9 @@ int AreNeighborsStrat(SCell *cell1, SCell *cell2);
 SContext** GetContexts();
 /********************************************************************************************
 *
-* FUNCTION NAME: PlayTurn1
+* FUNCTION NAME: PlayTurn
 *
-* DESCRIPTION: attaque avec la 1ere cellule trouvée qui à une différence de dés maximale
-*              attaque si attaque autant de dés que défense
-*
-* ARGUMENT          TYPE             DESCRIPTION
-* idjoueurActuel    unsigned int
-* map               const *SMap      la carte
-* turn              *STurn           le tour courant
-*
-* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
-*
-*********************************************************************************************/
-int PlayTurn1(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
-/********************************************************************************************
-*
-* FUNCTION NAME: PlayTurn2
-*
-* DESCRIPTION: attaque avec la 1ere cellule trouvée qui à une différence de dés maximale
-*              n'attaque pas si attaque autant de dés que défense
+* DESCRIPTION: la startegie
 *
 * ARGUMENT          TYPE             DESCRIPTION
 * idjoueurActuel    unsigned int
@@ -307,55 +290,7 @@ int PlayTurn1(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
 * RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
 *
 *********************************************************************************************/
-int PlayTurn2(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
-/********************************************************************************************
-*
-* FUNCTION NAME: PlayTurn3
-*
-* DESCRIPTION: attaque avec la cellule qui a le plus de dés et qui à la plus petite différence de dés avec la cellule attaquée
-*
-* ARGUMENT          TYPE             DESCRIPTION
-* idjoueurActuel    unsigned int
-* map               const *SMap      la carte
-* turn              *STurn           le tour courant
-*
-* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
-*
-*********************************************************************************************/
-int PlayTurn3(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
-/********************************************************************************************
-*
-* FUNCTION NAME: PlayTurn4
-*
-* DESCRIPTION: attaque avec la 1ere cellule trouvée qui à une différence de dés maximale
-*              attaque si attaque autant de dés que défense
-*              si on joueur possède plus de la moitié des cellules de lap, alors on n'attaque que ce joueur
-*
-* ARGUMENT          TYPE             DESCRIPTION
-* idjoueurActuel    unsigned int
-* map               const *SMap      la carte
-* turn              *STurn           le tour courant
-*
-* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
-*
-*********************************************************************************************/
-int PlayTurn4(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
-/********************************************************************************************
-*
-* FUNCTION NAME: PlayTurn5
-*
-* DESCRIPTION: attaque la cellule selon un chemin sûr pour se rapprocher / atteindre une grappe de cellules alliées.
-*              et ainsi former une grosse grappe de cellules pour avoir plus de dés distribués à la fin du tour
-*
-* ARGUMENT          TYPE             DESCRIPTION
-* idjoueurActuel    unsigned int
-* map               const *SMap      la carte
-* turn              *STurn           le tour courant
-*
-* RETURNS: 0 coups terminés (ou erreur), 1 structure turn complétée avec un nouveau coup à jouer.
-*
-*********************************************************************************************/
-int PlayTurn5(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
+int PlayTurn(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
 /********************************************************************************************
 *
 * FUNCTION NAME: getCluster
