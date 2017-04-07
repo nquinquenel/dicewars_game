@@ -20,11 +20,26 @@ SContext **contexts; // tableau de pointeurs de SContext
 *
 *********************************************************************************************/
 void createGame(int nbParties, int nbPlayer, int nbArg, char** noms, pfInitGame* tab_InitGame, pfPlayTurn1* tab_PlayTurn1, pfEndGame* tab_EndGame) {
-    int i, j;
+    int i, j, temp;
     contexts = malloc(nbPlayer*sizeof(SContext *)); //tableau de pointeurs de SContext
+
+    srand ( time(NULL) );
+
+    int tabAleaJoueurs[nbPlayer];
+    for (i = 0; i < nbPlayer; i++) {
+      tabAleaJoueurs[i] = i;
+    }
+    for (i = nbPlayer-1; i > 0; i--) {
+        j = rand() % (i+1);
+
+        temp = tabAleaJoueurs[i];
+        tabAleaJoueurs[i] = tabAleaJoueurs[j];
+        tabAleaJoueurs[j] = temp;
+    }
+
     for (i = 0; i < nbPlayer; i++) {
         contexts[i] = malloc(sizeof(SContext));
-        contexts[i]->id = i; //id du joueur
+        contexts[i]->id = tabAleaJoueurs[i]; //id du joueur
         contexts[i]->highestCluster = 0; //taille de la plus grosse grappe de cellules alliées. 0 à l'initialisation
         contexts[i]->nbPlayer = nbPlayer; //nb de joueurs dans la partie
     }
@@ -34,8 +49,8 @@ void createGame(int nbParties, int nbPlayer, int nbArg, char** noms, pfInitGame*
     SPlayerInfo **sp = malloc(nbIA*sizeof(SPlayerInfo*));
     for (j = 0; j < nbIA; j++) {
         sp[j] = malloc(sizeof(SPlayerInfo));
-        tab_InitGame[j](j+(nbPlayer-nbIA), nbPlayer, sp[j]);
-        idIA[j] = nbPlayer-nbIA+j;
+        tab_InitGame[j](tabAleaJoueurs[j+(nbPlayer-nbIA)], nbPlayer, sp[j]);
+        idIA[j] = tabAleaJoueurs[j+(nbPlayer-nbIA)];
     }
     idJoueurActuel = 0;
     fenetre(nbPlayer, nbParties, tab_InitGame, tab_PlayTurn1, tab_EndGame);
