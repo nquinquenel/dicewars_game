@@ -1,5 +1,9 @@
 #include "generation.h"
 
+typedef void (*pfInitGame)(unsigned int id, unsigned int nbPlayer, SPlayerInfo *info);
+typedef int (*pfPlayTurn1)(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
+typedef void (*pfEndGame)(unsigned int id, unsigned int idWinner);
+
 /********************************************************************************************
 *
 * FUNCTION NAME: fenetre
@@ -7,7 +11,7 @@
 * DESCRIPTION: Génère la fenêtre de jeu SDL2 et départ du programme (boucle du jeu)
 *
 *********************************************************************************************/
-void fenetre(int nbJoueurs, int nbParties);
+void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1* tab_PlayTurn1, pfEndGame* tab_EndGame);
 
 /********************************************************************************************
 *

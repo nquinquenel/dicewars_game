@@ -430,7 +430,7 @@ int IsIntInArray(int val, int *arr, int size)
 * RETURNS: 1 si cell est dans arrCell, 0 sinon
 *
 *********************************************************************************************/
-int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size)
+int IsCellInArrayOfCellPointerStrat(SCell *cell, SCell **arrCell, int size)
 {
     int i;
     for (i=0; i < size; i++) {

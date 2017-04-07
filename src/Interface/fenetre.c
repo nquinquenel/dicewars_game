@@ -14,7 +14,7 @@ int IMG_DICES_H = 59; //la dimension de l'image des dés en hauteur
 * DESCRIPTION: Génère la fenêtre de jeu SDL2 et départ du programme (boucle du jeu)
 *
 *********************************************************************************************/
-void fenetre(int nbJoueurs, int nbParties) {
+void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1* tab_PlayTurn1, pfEndGame* tab_EndGame) {
   //Condition pour faire tourner le jeu en boucle
   int running = 1;
   int i, p, s;
@@ -122,6 +122,7 @@ void fenetre(int nbJoueurs, int nbParties) {
   int nbTurn = 0;
   int IAPause = 0;
   int jeuFini = 0;
+  int idActuelIA = 0;
   char *output = {""};
 
   while (running == 1) {
@@ -253,7 +254,15 @@ void fenetre(int nbJoueurs, int nbParties) {
               }
             }
 
-            playIA = PlayTurn1(idJoueurActuel, mapClone, turn);
+
+            printf("1___%d\n", idActuelIA);
+            playIA = tab_PlayTurn1[idActuelIA](idJoueurActuel, mapClone, turn);
+
+            printf("2___\n");
+            idActuelIA++;
+            if (idActuelIA > getNbIA()-1) {
+              idActuelIA = 0;
+            }
 
             for (i = 0; i < 50; i++) {
               free((mapClone->cells)[i].neighbors);

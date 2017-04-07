@@ -1,6 +1,5 @@
 #include "../Librairies/interface.h"
 #include "../Librairies/interfacePerso.h"
-#include "../Interface/fenetre.h"
 int idJoueurActuel;
 int* idIA;
 int nbIA;
@@ -20,7 +19,7 @@ SContext **contexts; // tableau de pointeurs de SContext
 * RETURNS: L'id du joueur actuel
 *
 *********************************************************************************************/
-void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
+void createGame(int nbParties, int nbPlayer, int nbArg, char** noms, pfInitGame* tab_InitGame, pfPlayTurn1* tab_PlayTurn1, pfEndGame* tab_EndGame) {
     int i, j;
     contexts = malloc(nbPlayer*sizeof(SContext *)); //tableau de pointeurs de SContext
     for (i = 0; i < nbPlayer; i++) {
@@ -35,12 +34,13 @@ void createGame(int nbParties, int nbPlayer, int nbArg, char** noms) {
     SPlayerInfo **sp = malloc(nbIA*sizeof(SPlayerInfo*));
     for (j = 0; j < nbIA; j++) {
         sp[j] = malloc(sizeof(SPlayerInfo));
-        InitGame(j+(nbPlayer-nbIA), nbPlayer, sp[j]);
+        tab_InitGame[j](j+(nbPlayer-nbIA), nbPlayer, sp[j]);
         idIA[j] = nbPlayer-nbIA+j;
     }
     idJoueurActuel = 0;
-    fenetre(nbPlayer, nbParties);
+    fenetre(nbPlayer, nbParties, tab_InitGame, tab_PlayTurn1, tab_EndGame);
 }
+
 int isAnIA(int id) {
     int i = 0;
     for (i = 0; i < nbIA; i++) {
@@ -85,6 +85,11 @@ int demandeAttaque(SMap *map, STurn *turn, int idPlayer) {
 int getIdJoueurActuel() {
     return idJoueurActuel;
 }
+
+int getNbIA() {
+  return nbIA;
+}
+
 /********************************************************************************************
 *
 * FUNCTION NAME: setIdJoueurActuel
@@ -381,6 +386,30 @@ int GetClusterSize(const SMap *map, SCell *startingCell)
     free(cellsToTest);
     return clusterIdsSize;
 }
+
+/********************************************************************************************
+*
+* FUNCTION NAME: IsCellInArrayOfCellPointer
+*
+* DESCRIPTION: teste si une adresse de cellule est dans un tableau d'adresses de cellules
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* cell          *SCell           l'adresse de la cellule à rechercher
+* arrCell       **SCell          le tableau d'adresses de cellules
+* size          int              la taille du tableau
+*
+* RETURNS: 1 si cell est dans arrCell, 0 sinon
+*
+*********************************************************************************************/
+int IsCellInArrayOfCellPointer(SCell *cell, SCell **arrCell, int size)
+{
+    int i;
+    for (i=0; i < size; i++) {
+        if (arrCell[i] == cell) return 1;
+    }
+    return 0;
+}
+
 /********************************************************************************************
 *
 * FUNCTION NAME: GetContexts

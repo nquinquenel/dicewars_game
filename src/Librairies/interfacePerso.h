@@ -3,9 +3,14 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include "interface.h"
 
 // taille du buffer pour l'écriture dans le fichier de log
 #define INT_BUFFER_SIZE 10
+
+typedef void (*pfInitGame)(unsigned int id, unsigned int nbPlayer, SPlayerInfo *info);
+typedef int (*pfPlayTurn1)(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
+typedef void (*pfEndGame)(unsigned int id, unsigned int idWinner);
 
 // Structure définissant les caractéristiques de l'ia courante
 typedef struct SIa
@@ -30,9 +35,10 @@ typedef struct SCluster
 	struct SCell **cells;	// Tableau de pointeurs vers les cellules du cluster
 } SCluster;
 
-void createGame(int nbParties, int nbPlayer, int nbArg, char** noms);
+void createGame(int nbParties, int nbPlayer, int nbArg, char** noms, pfInitGame* tab_InitGame, pfPlayTurn1* tab_PlayTurn1, pfEndGame* tab_EndGame);
 int demandeAttaque(SMap *map, STurn *turn, int idPlayer);
 int getIdJoueurActuel();
+int getNbIA();
 void setIdJoueurActuel(int id, int nbJoueurs);
 /********************************************************************************************
 *
