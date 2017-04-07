@@ -232,7 +232,7 @@ void DistributeDices(const SMap *map)
         }
     }
     //maj de la stack du joueur courant apres la distribution des dés
-    if (nbDicesToDistribute<=40) map->stack[idJoueurActuel] = nbDicesToDistribute;
+    if (nbDicesToDistribute<40) map->stack[idJoueurActuel] = nbDicesToDistribute;
     else map->stack[idJoueurActuel] = 40; //si plus de 40 dés restant à distribuer
 
     free(myCells);
@@ -370,7 +370,7 @@ SCell* GetCell(const SMap *map, int idCell)
 *********************************************************************************************/
 int GetClusterSize(const SMap *map, SCell *startingCell)
 {
-    int i, j, k;
+    int i, j;
     int idPlayer = startingCell->owner; //l'id du joueur propriétaire de la cellule de référence
     //int clusterIds[map->nbCells]; //tableau des id des cellules de la grappe, de taille le nombre de cellules de la map, car taille maximale
     int clusterIdsSize = 0; //la taille de la grappe de cellules

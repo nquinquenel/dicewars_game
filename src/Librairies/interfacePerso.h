@@ -27,7 +27,7 @@ typedef struct SContext
 	int highestCluster; // la taille de la plus grosse grappe de cellules alliées
 } SContext;
 
-// Structure définissant une grappe de cellules alliées voisins
+// Structure définissant une grappe de cellules alliées voisines
 typedef struct SCluster
 {
 	int id;	// Id du cluster
@@ -356,6 +356,35 @@ int PlayTurn4(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
 *
 *********************************************************************************************/
 int PlayTurn5(unsigned int idjoueurActuel, const SMap *map, STurn *turn);
+/********************************************************************************************
+*
+* FUNCTION NAME: getCluster
+*
+* DESCRIPTION: teste une cellule est dans un SCluster
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* clusters      **SCluster       le tableau de pointeurs vers des structures SCluster
+* cell          *SCell           l'adresse de la cellule
+*
+* RETURNS: l'adresse du SCluster si la cellule est dedans, parmis le tableau de pointeurs
+*          NULL sinon
+*
+*********************************************************************************************/
+SCluster* getCluster(SCluster **clusters, int clustersSize, SCell *cell);
+/********************************************************************************************
+*
+* FUNCTION NAME: createCluster
+*
+* DESCRIPTION: créer un nouveau SCluster ciontenant une cellule
+*
+* ARGUMENT      TYPE             DESCRIPTION
+* cell          *SCell           l'adresse de la cellule
+* clusterSize   int              la taille actuelle du tableau de SCluster pour déterminer l'id du cluster à créer
+*
+* RETURNS: l'adresse du nouveau SCluster créé
+*
+*********************************************************************************************/
+SCluster* createCluster(SCell* cell, int clustersSize);
 char* concat( char *s1,  char *s2);
 void writetoLog(char *s);
 char* concatint(char *s1, int n);
