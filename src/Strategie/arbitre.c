@@ -213,6 +213,8 @@ void DistributeDices(const SMap *map)
     //maj de la stack du joueur courant apres la distribution des dés
     if (nbDicesToDistribute<=40) map->stack[idJoueurActuel] = nbDicesToDistribute;
     else map->stack[idJoueurActuel] = 40; //si plus de 40 dés restant à distribuer
+
+    free(myCells);
 }
 /********************************************************************************************
 *

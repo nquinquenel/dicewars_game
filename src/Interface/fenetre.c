@@ -59,6 +59,16 @@ void fenetre(int nbJoueurs) {
   SDL_FreeSurface(background_surface2);
   SDL_RenderCopy(renderer, background_texture2, NULL, &img_pos2);
 
+  SDL_Surface** tab_surface = malloc(8*sizeof(SDL_Surface*));
+  tab_surface[0] = SDL_LoadBMP("../Images/1dés.bmp");
+  tab_surface[1] = SDL_LoadBMP("../Images/2dés.bmp");
+  tab_surface[2] = SDL_LoadBMP("../Images/3dés.bmp");
+  tab_surface[3] = SDL_LoadBMP("../Images/4dés.bmp");
+  tab_surface[4] = SDL_LoadBMP("../Images/5dés.bmp");
+  tab_surface[5] = SDL_LoadBMP("../Images/6dés.bmp");
+  tab_surface[6] = SDL_LoadBMP("../Images/7dés.bmp");
+  tab_surface[7] = SDL_LoadBMP("../Images/8dés.bmp");
+
   //Tableau de comparaison entre id et joueurs
   int *tab_comparaison = malloc(50*sizeof(int));
 
@@ -198,6 +208,10 @@ void fenetre(int nbJoueurs) {
                 idJoueurActuel = 0;
                 map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
 
+                for (i = 0; i < nbJoueurs; i++) {
+                  free(contexts[i]);
+                }
+                free(contexts);
                 SContext **contexts = GetContexts();
                 for (s = 0; s < nbJoueurs; s++) { //pour chaque joueur
                   int t;
@@ -297,6 +311,10 @@ void fenetre(int nbJoueurs) {
               tourFini = 1;
               // on distribue aléatoirement les dés sur les territoires alliés
               DistributeDices(map);
+<<<<<<< HEAD
+              update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+=======
+>>>>>>> f096cc1e06417c4bd85e69c4bbb42f5d8c7d0f8a
 
               //On passe au joueur suivant
               idJoueurActuel++;
@@ -330,7 +348,9 @@ void fenetre(int nbJoueurs) {
         }
 
         //On free le turn
-        free(turn);
+        if (playIA == 1) {
+          free(turn);
+        }
         writetoLog(output);
         output="";
       }
@@ -423,6 +443,10 @@ void fenetre(int nbJoueurs) {
             idJoueurActuel = 0;
             map = generer_map(renderer, 800, 600, nbJoueurs, 50, tab_comparaison, tab_id, tab_points);
 
+            for (i = 0; i < nbJoueurs; i++) {
+              free(contexts[i]);
+            }
+            free(contexts);
             SContext **contexts = GetContexts();
             for (s = 0; s < nbJoueurs; s++) { //pour chaque joueur
               int t;
@@ -493,7 +517,7 @@ void fenetre(int nbJoueurs) {
           if (cellDeux == -1) {
             update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
           }
-          if (res != -1) {
+          if (res == -1) {
             update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
           }
 
@@ -616,11 +640,12 @@ void displayDices(SDL_Renderer* renderer, int pixel_x, int pixel_y, int idCell, 
 
   background_texture = SDL_CreateTextureFromSurface(renderer, background_surface);
 
-  SDL_FreeSurface(background_surface);
-
   //background_surface_tab[idCell] = background_surface;
   //background_texture_tab[idCell] = background_texture;
   SDL_RenderCopy(renderer, background_texture, NULL, &img_pos);
+
+  SDL_FreeSurface(background_surface);
+  SDL_DestroyTexture(background_texture);
 }
 
 void update_affichage(SMap* map, int x, int y, int h, int w, int** tab_points, int** tab_borduresBlanches, int** tab_id, int* tab_comparaison, int couleurs[8][3], SDL_Renderer* renderer) {
