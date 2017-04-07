@@ -254,11 +254,8 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
               }
             }
 
-
-            printf("1___%d\n", idActuelIA);
             playIA = tab_PlayTurn1[idActuelIA](idJoueurActuel, mapClone, turn);
 
-            printf("2___\n");
             idActuelIA++;
             if (idActuelIA > getNbIA()-1) {
               idActuelIA = 0;
@@ -306,13 +303,13 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
               }
               //Si l'IA a fait une attaque autorisé (gagné ou perdue)
               if (playIA != -1) {
-                update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+        //        update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
                 //Si l'IA fait un mouvement interdit
               } else {
                 tourFini = 1;
                 DistributeDices(map);
-                update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+        //        update_affichage(map, tab_points[turn->cellFrom][0], tab_points[turn->cellFrom][1], 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
                 //On passe au joueur suivant
                 output=concat(output,"invalid");
@@ -348,7 +345,7 @@ void fenetre(int nbJoueurs, int nbParties, pfInitGame* tab_InitGame, pfPlayTurn1
               tourFini = 1;
               // on distribue aléatoirement les dés sur les territoires alliés
               DistributeDices(map);
-              update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
+      //        update_affichage(map, 0, 0, 800, 600, tab_points, tab_borduresBlanches, tab_id, tab_comparaison, couleurs, renderer);
 
               //On passe au joueur suivant
               idJoueurActuel++;

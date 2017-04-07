@@ -43,6 +43,7 @@ void createGame(int nbParties, int nbPlayer, int nbArg, char** noms, pfInitGame*
         contexts[i]->highestCluster = 0; //taille de la plus grosse grappe de cellules alliées. 0 à l'initialisation
         contexts[i]->nbPlayer = nbPlayer; //nb de joueurs dans la partie
     }
+
     nbIA = nbArg - 3;
     idIA = malloc(nbIA * sizeof(int));
     printf("Nombre d'IA : %d\n", nbIA);

@@ -153,8 +153,8 @@ SMap* generer_map(SDL_Renderer* renderer, int h, int w, int nbJoueurs, int nbTer
   }*/
 
   SCell *map_cellules = generer_cellules(tab_voisins, nbTerritoires, tab_comparaison, renderer, tab_points, nbJoueurs);
-  SMap *map = generer_territoire(map_cellules, nbTerritoires, nbJoueurs);
 
+  SMap *map = generer_territoire(map_cellules, nbTerritoires, nbJoueurs);
   //Render tout ce qui a été modifié au niveau graphique
   SDL_RenderPresent(renderer);
 
@@ -282,7 +282,7 @@ SCell* generer_cellules(int **tab_adj, int nbTerritoires, int *tab_comparaison, 
     desParTerr[j][i] += nbRandom;
     total = total - nbRandom;
     i++;
-    if (total > 0 && i > nbTerr[j]) {
+    if (total > 0 && i > (nbTerr[j]-1)) {
       i = 0;
     } else if (total == 0 && j < nbJoueurs) {
       j++;

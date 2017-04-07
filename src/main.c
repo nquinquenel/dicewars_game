@@ -14,7 +14,6 @@ int main(int argc, char **argv) {
   int nbParties, nbPlayer;
   nbParties = argv[1][0] - '0';
   nbPlayer = argv[2][0] - '0';
-  printf("test\n");
 
   int nombreIA = argc - 3;
 
