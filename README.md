@@ -1,3 +1,30 @@
+Project DiceWars
+===================
+
+Development of the game DiceWars composed of a graphical interface (SDL library) and an artificial intelligence.
+
+How to use ?
+===================
+
+./DiceWars 4 5 libStrategie1.so libStrategie2.so libStrategie3.so libStrategie4.so
+
+4: Number of games to do
+
+5: Number of players (1 Human and 4 AI)
+
+libStrategie1.so libStrategie2.so libStrategie3.so libStrategie4.so : Name of the libraries for the AI (you can put the same multiple times)
+
+How to compile ?
+===================
+
+You just have to be in the repertory /src/ and to use the following commands :
+
+    make: Compile the project and creates the file /src/DiceWars
+    make clean: Remove the objects files (.o)
+    make mrproper: Remove the objects files and the executable
+
+_______________
+
 Projet DiceWars
 ===================
 
@@ -22,18 +49,5 @@ Il suffit de se placer dans le répertoire /src/ puis d'utiliser les commandes s
     make: Compile le projet dans son ensemble et créer un fichier /src/DiceWars
     make clean: Supprime les fichiers objets (.o)
     make mrproper: Supprime les fichiers objets et l'exécutable
-
-Organisation
-===================
-
-Partie Interface graphique
-
-    -QUINQUENEL Nicolas
-    -EHRESMANN Nicolas
-    
-Partie Stratégie de jeu
-
-    -SOYER Mathieu
-    -OUTHIER Arthur
 
     
